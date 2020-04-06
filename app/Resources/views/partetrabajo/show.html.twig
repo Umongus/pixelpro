@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h2>Nombre: {{ parteTrabajo.id }}</h2>
+<h2>Fecha: {{ parteTrabajo.fecha|date('Y-m-d') }}</h2>
+
+<h2>Trabajador: {{ parteTrabajo.trabajador.getNombre() }}</h2>
+<h2>Trabajo: {{ parteTrabajo.trabajo.getNombre() }}</h2>
+<h2>Tipo: {{ parteTrabajo.tipo.getNombre() }}</h2>
+<h2>Cantidad: {{ parteTrabajo.cantidad }}</h2>
+<h2>Finca: {{ parteTrabajo.finca.getNombre() }}</h2>
+
+<h1><a href='{{ path('partetrabajo_index')}}'>Volver a Partes de Trabajo</a></h1>
+<h1><a href='{{ path('lista_mes')}}'>Volver a Listar Mes</a></h1>
+
+{% endblock %}

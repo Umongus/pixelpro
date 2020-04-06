@@ -1,0 +1,141 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+
+
+
+
+
+<div class="row">
+  <div class="col-2">
+    <p>El numero de partes de trabajo es: {{partes}}</p>
+    <p>El numero de trabajdores distintos es es: {{trabajadores}}</p>
+    <p>La primera fecha vale:{{fecha1|date('d-m-Y')}}</p>
+    <p>La segunda fecha vale:{{fecha2|date('d-m-Y')}}</p>
+    <p>El numero de elementos de array peonadas: {{arrPeonadas}}</p><br>
+    <p>Cambiar mes: <a href="{{ path('Inicia_Listado', { 'opcion': 'mes' }) }}">{{mes}}</a></p>
+    <p>Cambiar año: <a href="{{ path('Inicia_Listado', { 'opcion': 'ano' }) }}">{{ano}}</a></p>
+  </div>
+  <div class="col-8">
+    {% if observados != NULL %}
+    <h2 class="page header">Listado de Partes con observaciones:</h2>
+    <table class="table table-striped table-sm">
+    <thead>
+    <tr>
+    <th>ID</th>
+    <th>FECHA</th>
+    <th>TRABAJADOR</th>
+    <th>TRABAJO</th>
+    <th>TIPO</th>
+    <th>CANTIDAD</th>
+    <th>FINCA</th>
+    <th>CUADRILLA</th>
+    <th>PRODUCTO</th>
+    <th>OBSERVACION</th>
+    <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for parte in observados %}
+    <tr>
+    <th>{{ parte.id }}</th>
+    <td>{{ parte.fecha|date('d-m-Y') }}</td>
+    <td>{{ parte.trabajador.getNombre() }}</td>
+    <td>{{ parte.trabajo }}</td>
+    <td>{{ parte.tipo }}</td>
+    <td>{{ parte.cantidad }}</td>
+    <td>{{ parte.finca }}</td>
+    <td>{{ parte.cuadrilla }}</td>
+    <td>{{ parte.producto }}</td>
+    <td>{{ parte.observacion[:17] }}...</td>
+    <td>
+
+    <a href=" {{ path('partetrabajo_edit', { 'id': parte.id }) }}">Editar |</a>
+    <a href="{{ path('partetrabajo_show', { 'id': parte.id }) }}">Mostrar |</a>
+
+    </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+  </table>
+  {% else %}
+  <h3>NO EXISTEN PARTES DE TRABAJO CON OBSERVACIONES!!</h3>
+  {% endif %}
+  </div>
+  <div class="col-2">
+    {% for trabajador in arrTrabajadores %}
+    <p>{{trabajador}}</p><br>
+    {% endfor %}
+  </div>
+
+</div>
+<div class="row">
+  <div class="col-12">
+    <table class="table table-sm">
+  <thead>
+    <tr>
+      <th scope="col">PEONADAS, mes:{{fecha1|date('m-Y')}}</th>
+      {% for i in 1..31 %}
+      <th scope="col">{{i}}</th>
+      {% endfor %}
+      <th scope="col">Total</th>
+      <th scope="col">Altas</th>
+      <th scope="col">CCON</th>
+      <th scope="col">CSIN</th>
+
+    </tr>
+  </thead>
+  <tbody>
+    {% for key, peonada in peonadas %}
+    <tr>
+      <th scope="row">{{key}}</th>
+      {% for dia in peonada %}
+      {% if dia > 0 %}
+        <td><a href="#">{{dia}}</a></td>
+      {% elseif key == 'TOTAL'%}
+        <td><strong>{{dia}}</strong></td>
+      {% else %}
+        <td>{{dia}}</td>
+      {% endif %}
+      {% endfor %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+  </div>
+</div>
+<br><br>
+<div class="row">
+  <div class="col-12">
+    <table class="table table-sm">
+  <thead>
+    <tr>
+      <th scope="col">HORAS, mes:{{fecha1|date('m-Y')}}</th>
+      {% for i in 1..31 %}
+      <th scope="col">{{i}}</th>
+      {% endfor %}
+      <th scope="col">Total</th>
+      <th scope="col">CHOR</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for key, hora in horas %}
+    <tr>
+      <th scope="row">{{key}}</th>
+      {% for dia in hora %}
+      {% if dia > 0 %}
+      <td><a href="#">{{dia}}</a></td>
+      {% elseif key == 'TOTAL' %}
+      <td><strong>{{dia}}</strong></td>
+      {% else %}
+      <td>{{dia}}</td>
+      {% endif %}
+
+      {% endfor %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+  </div>
+</div>
+
+{% endblock %}

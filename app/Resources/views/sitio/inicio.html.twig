@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+<h2 class="page header">Listado de Trabajadores</h2>
+<table class="table table-striped">
+<thead>
+<tr>
+<th>ID</th>
+<th>TRABAJADOR</th>
+<th>DNI</th>
+<th>OPCIONES</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+{% for trabajador in trabajadores %}
+<tr>
+<th scope="row">{{trabajador.id}}</th>
+<td>{{trabajador.nombre}}</td>
+<td>{{trabajador.dni}}</td>
+<td>
+<a href=" {{ path('Mostrar_trabajador', {'id':trabajador.id})}}">Ver más |</a>
+<a href=" {{ path('actualizar_trabajador', {'id':trabajador.id})}}">Editar |</a>
+<a href=" {{ path('eliminar_trabajador', {'id':trabajador.id})}}">Eliminar</a>
+</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+<ul>
+    <li>
+    <a href= "{{ path('nuevo_trabajador')}}">Insertar tranbajadores</a>
+
+  </li>
+</ul>
+
+
+{% endblock %}

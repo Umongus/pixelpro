@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+
+    <h2 class="page header">Listado de Tipos</h2>
+    <table class="table table-striped">
+    <thead>
+    <tr>
+    <th>ID</th>
+    <th>NOMBRE</th>
+    <th>AÑO</th>
+    <th>OPCIONES</th>
+
+    </tr>
+    </thead>
+    <tbody>
+    {% for producto in productos %}
+    <tr>
+    <th scope="row">{{ producto.id }}</th>
+    <td>{{ producto.nombre }}</td>
+    <td>{{ producto.year }}</td>
+    <td>
+
+    <a href=" {{ path('producto_edit', { 'id': producto.id }) }}">Editar |</a>
+    <a href="{{ path('producto_show', { 'id': producto.id }) }}">Mostrar |</a>
+    <a href="{{ path('producto_delete', { 'id': producto.id }) }}">Eliminar</a>
+
+    </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('producto_new') }}">Crear nuevo Producto</a>
+        </li>
+    </ul>
+{% endblock %}

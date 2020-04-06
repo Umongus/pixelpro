@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+
+<br>
+<div class="row">
+{% for key, cosecha in partes %}
+  <div class="col-3">
+    <p>COSECHA: <strong>{{key}}</strong></p>
+    <table class="table table-sm">
+  <thead>
+    <tr>
+      <th scope="col">Finca: {{cabecera}}</th>
+      <th scope="col">Peonadas</th>
+      <th scope="col">Horas</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for key, parte in cosecha %}
+    <tr>
+      <th scope="row">{{key}}</th>
+      {% for trabajo in parte %}
+        <td><strong>{{trabajo}}</strong></td>
+      {% endfor %}
+    </tr>
+    {% endfor %}
+  </tbody>
+  </table>
+  </div>
+{% endfor %}
+</div>
+<br>
+<hr>
+<br>
+<p>Cambiar alguno de los siguentes parámetros:
+<a href=" {{ path('Inicia_Comparativa', { 'opcion': 'finca' }) }}"> Finca |</a>
+<a href=" {{ path('Inicia_Comparativa', { 'opcion': 'cosecha' }) }}">Cosecha |</a>
+<a href=" {{ path('Inicia_Comparativa', { 'opcion': 'ambos' }) }}">Ambos</a>
+</p>
+<br>
+<hr>
+<br>
+{% for cos in cosas %}
+<p>Accediendo al primer nivel: {{cos}}</p>
+{% endfor %}
+<br>
+
+
+
+{% endblock %}

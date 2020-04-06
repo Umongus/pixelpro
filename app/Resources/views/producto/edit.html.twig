@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+
+<h2 class="page-header">Editar Producto</h2>
+{{form_start(form)}}
+{{form_widget(form)}}
+{{form_end(form)}}
+
+<a href="{{path('producto_index')}}">Volver al inicio</a>
+
+{% endblock %}

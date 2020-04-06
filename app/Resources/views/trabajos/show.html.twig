@@ -1,0 +1,6 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+<h2>Nombre: {{trabajo.id}}</h2>
+<h2>Nombre: {{trabajo.nombre}}</h2>
+<h1><a href='{{ path('trabajos_index')}}'>Volver al inicio</a></h1>
+{% endblock %}

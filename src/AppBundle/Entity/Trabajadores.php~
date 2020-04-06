@@ -1,0 +1,42 @@
+<?php
+namespace AppBundle\Entity;
+//src/AppBundle/Entity/Trabajadores.php
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
+
+/**
+ * @ORM\Entity
+ * @ORM\Table(name="trabajadores")
+ */
+class Trabajadores
+{
+    /**
+     * @ORM\Column(type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
+
+    /**
+     * @ORM\Column(type="string", length=100)
+     */
+    private $nombre;
+
+    /**
+     * @ORM\Column(type="string", length=100)
+     * @Assert\NotBlank()
+     * @Assert\Length(min = 3)
+     */
+    private $apellidos;
+
+    /**
+     * @ORM\Column(type="string", length=100)
+     */
+    private $dni;
+
+    /**
+     * @ORM\Column(type="string", length=100)
+     */
+    private $observaciones;
+}

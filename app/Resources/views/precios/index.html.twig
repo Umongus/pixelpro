@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Precios list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Mes</th>
+                <th>Ano</th>
+                <th>Valor</th>
+                <th>Nota</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for precio in precios %}
+            <tr>
+                <td><a href="{{ path('precios_show', { 'id': precio.id }) }}">{{ precio.id }}</a></td>
+                <td>{{ precio.mes }}</td>
+                <td>{{ precio.ano }}</td>
+                <td>{{ precio.valor }}</td>
+                <td>{{ precio.nota }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('precios_show', { 'id': precio.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('precios_edit', { 'id': precio.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('precios_new') }}">Create a new precio</a>
+        </li>
+    </ul>
+{% endblock %}

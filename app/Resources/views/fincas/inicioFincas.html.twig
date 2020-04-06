@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+<h2 class="page header">Listado de Fincas</h2>
+<table class="table table-striped">
+<thead>
+<tr>
+<th>ID</th>
+<th>FINCAS</th>
+<th>CULTIVO PRINCIPAL</th>
+<th>OLIVAR (ha)</th>
+<th>CALMA (ha)</th>
+<th>OPCIONES</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+{% for finca in fincas %}
+<tr>
+<th scope="row">{{finca.id}}</th>
+<td>{{finca.nombre}}</td>
+<td>{{finca.cultivoPrincipal}}</td>
+<td>{{finca.superficieOlivar}}</td>
+<td>{{finca.superficieCalma}}</td>
+<td>
+<a href=" {{ path('mostrar_Finca', {'id':finca.id})}}">Ver más |</a>
+<a href=" {{ path('editar_finca', {'id':finca.id})}}">Editar |</a>
+<a href=" {{ path('eliminar_finca', {'id':finca.id})}}">Eliminar</a>
+</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+
+<ul>
+    <li>
+    <a href= "{{ path('nueva_Finca')}}">Insertar finca</a>
+
+    </li>
+</ul>
+
+
+{% endblock %}

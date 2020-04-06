@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Altas list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Fecha</th>
+                <th>Cantidad</th>
+                <th>Observacion</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for alta in altas %}
+            <tr>
+                <td><a href="{{ path('altas_show', { 'id': alta.id }) }}">{{ alta.id }}</a></td>
+                <td>{% if alta.fecha %}{{ alta.fecha|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{{ alta.cantidad }}</td>
+                <td>{{ alta.observacion }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('altas_show', { 'id': alta.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('altas_edit', { 'id': alta.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('altas_new') }}">Create a new alta</a>
+        </li>
+    </ul>
+{% endblock %}
