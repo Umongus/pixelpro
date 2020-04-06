@@ -36,6 +36,7 @@ class ParteTrabajoController extends Controller
    * @Method({"GET", "POST"})
    */
   public function comparativaAction (Request $request){
+  $hesubidoCambio = 0;
   $comp = new TratArray();
   $em = $this->getDoctrine()->getManager();
   $session = $request->getSession();
