@@ -225,7 +225,7 @@ class ParteTrabajoController extends Controller
       }
       return $this->redirect($this->generateUrl('Lista_Comparativa'));
     }else{
-      return $this->render('partetrabajo/inicioMes.html.twig', array('form'=>$form->createView()));
+      return $this->render('partetrabajo/inicioComparativa.html.twig', array('form'=>$form->createView()));
     }
   }
 
@@ -259,23 +259,37 @@ class ParteTrabajoController extends Controller
     $session = $request->getSession();
     $session->start();
 
+    $meses  = array('Enero'=>'Enero',
+    'Febrero'=>'Febrero',
+    'Marzo'=>'Marzo',
+    'Abril'=>'Abril',
+    'Mayo'=>'Mayo',
+    'Junio'=>'Junio',
+    'Julio'=>'Julio',
+    'Agosto'=>'Agosto',
+    'Septiembre'=>'Septiembre',
+    'Octubre'=>'Octubre',
+    'Noviembre'=>'Noviembre',
+    'Diciembre'=>'Diciembre');
+
+    $em = $this->getDoctrine()->getManager();
+    $query = $em->createQuery(
+      'SELECT p
+       FROM AppBundle:Producto p
+       ORDER BY p.year ASC'
+      );
+      $productos = $query->getResult();
+      for ($i=0; $i < count($productos); $i++) {
+        $year = $productos[$i]->getYear();
+        $Aproducto[$year] = $year;
+      }
+
     if ($opcion == 'ambos') {
       $defaultData = array('message' => $opcion);
       $form = $this->createFormBuilder($defaultData)
-          ->add('year', TextType::class)
-          ->add('mes', ChoiceType::class, array('choices' => array(
-           'Enero'=>'Enero',
-           'Febrero'=>'Febrero',
-           'Marzo'=>'Marzo',
-           'Abril'=>'Abril',
-           'Mayo'=>'Mayo',
-           'Junio'=>'Junio',
-           'Julio'=>'Julio',
-           'Agosto'=>'Agosto',
-           'Septiembre'=>'Septiembre',
-           'Octubre'=>'Octubre',
-           'Noviembre'=>'Noviembre',
-           'Diciembre'=>'Diciembre')
+          ->add('year', ChoiceType::class,array('choices' => $Aproducto
+            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')) )
+          ->add('mes', ChoiceType::class, array('choices' => $meses
             ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
           ->add('Enviar', SubmitType::class)
           ->getForm();
@@ -289,19 +303,7 @@ class ParteTrabajoController extends Controller
     }else {
       $defaultData = array('message' => $opcion);
       $form = $this->createFormBuilder($defaultData)
-      ->add('mes', ChoiceType::class, array('choices' => array(
-       'Enero'=>'Enero',
-       'Febrero'=>'Febrero',
-       'Marzo'=>'Marzo',
-       'Abril'=>'Abril',
-       'Mayo'=>'Mayo',
-       'Junio'=>'Junio',
-       'Julio'=>'Julio',
-       'Agosto'=>'Agosto',
-       'Septiembre'=>'Septiembre',
-       'Octubre'=>'Octubre',
-       'Noviembre'=>'Noviembre',
-       'Diciembre'=>'Diciembre')
+      ->add('mes', ChoiceType::class, array('choices' => $meses
         ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
           ->add('Enviar', SubmitType::class)
           ->getForm();
@@ -364,20 +366,6 @@ class ParteTrabajoController extends Controller
     $mes = $session->get('mes2');
 
 
-    //$form = $this->createFormBuilder()
-      //  ->add('year', TextType::class)
-      //  ->add('mes', TextType::class)
-      //  ->add('Enviar', SubmitType::class)
-      //  ->getForm();
-
-    //$form->handleRequest($request);
-
-
-
-
-    //if($form->isSubmitted() && $form->isValid()){
-    //  $ano = $form->get('year')->getData();
-    //  $mes = $form->get('mes')->getData();
       $arrayIntervalo = $calculo->dameElIntervalo($mes, $ano);
 
       $fecha1= new \DateTime($arrayIntervalo[0] .'-'. $arrayIntervalo[1] .'-01');

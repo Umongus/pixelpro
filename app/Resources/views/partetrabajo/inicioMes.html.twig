@@ -1,11 +1,23 @@
 {% extends 'base.html.twig' %}
 {% block body %}
 
-<h2 class="page-header">Introducir fecha de mes a listar</h2>
+<div class="row">
+<div class="col-4">
+<h2 class="page-header">Realiza una combinacion</h2>
 {{form_start(form)}}
-{{form_widget(form)}}
-{{form_end(form)}}
-
-
+  <fieldset>
+  <br>
+  <div>
+  <strong>{{ form_label(form.year, 'Ejercicio') }}</strong><br>
+  <span>{{ form_widget(form.year) }}</span>
+  </div>
+  <div>
+  <strong>{{ form_label(form.mes) }}</strong><br>
+  <span>{{ form_widget(form.mes) }}</span>
+  </div><br>
+  </fieldset>
+{{ form_end(form) }}
+</div>
+</div>
 
 {% endblock %}

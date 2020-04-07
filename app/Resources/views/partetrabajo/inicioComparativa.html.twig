@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+<div class="row">
+<div class="col-4">
+<h2 class="page-header">Introducir fecha de mes a listar</h2>
+{{form_start(form)}}
+  <fieldset>
+  <br>
+  <div>
+  <strong>{{ form_label(form.Primera, 'Columna 1') }}</strong><br>
+  <span>{{ form_widget(form.Primera) }}</span>
+  </div>
+  <div>
+  <strong>{{ form_label(form.Cosecha2, 'Columna 2') }}</strong><br>
+  <span>{{ form_widget(form.Cosecha2) }}</span>
+  </div><br>
+  <div>
+  <div>
+  <strong>{{ form_label(form.Cosecha3, 'Columna 3') }}</strong><br>
+  <span>{{ form_widget(form.Cosecha3) }}</span>
+  </div><br>
+  <strong>{{ form_label(form.Cosecha4, 'Columna 4') }}</strong><br>
+  <span>{{ form_widget(form.Cosecha4) }}</span>
+  </div><br>
+  </fieldset>
+{{ form_end(form) }}
+</div>
+</div>
+
+{% endblock %}
