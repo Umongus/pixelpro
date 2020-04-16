@@ -1,22 +1,25 @@
 {% extends 'base.html.twig' %}
+
 {% block body %}
 <div class="row">
 <div class="col-4">
-<h2 class="page-header">Añadir nuevo Producto:</h2>
+<br>
+<h1 class="page-header">Selecciona mes y año:</h1>
 {{form_start(form)}}
   <fieldset>
   <br>
   <div>
-  <strong>{{ form_label(form.nombre) }}</strong><br>
-  <span>{{ form_widget(form.nombre) }}</span>
-  </div><br>
+  <strong>{{ form_label(form.mes, 'Mes:') }}</strong><br>
+  <span>{{ form_widget(form.mes) }}</span>
+  </div>
   <div>
-  <strong>{{ form_label(form.year, 'Año:') }}</strong><br>
+  <strong>{{ form_label(form.year, 'Ejercicio:') }}</strong><br>
   <span>{{ form_widget(form.year) }}</span>
   </div><br>
   </fieldset>
 {{ form_end(form) }}
 </div>
 </div>
+
 
 {% endblock %}

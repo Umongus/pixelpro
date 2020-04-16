@@ -12,7 +12,7 @@ class ParteTrabajoType extends AbstractType{
 
 
     $builder
-    ->add('trabajador')
+    //->add('trabajador')
     ->add('cantidad')
     ->add('trabajo')
     ->add('tipo')

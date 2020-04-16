@@ -50,7 +50,9 @@
         <p><strong>SUBTOTALES:</strong></p>
         <p><strong>Dia en curso: {{fecha|date('d-m-Y')}}</strong></p>
         {% for cuadrilla in arrayCuadrilla %}
+        <a href="{{ path('modCuadrilla_parte', { 'cuad': cuadrilla }) }}">
         <p><strong>Cuadrilla {{ cuadrilla }}: Peonadas: {{arrayPeonadas[cuadrilla]}}  Horas: {{arrayHoras[cuadrilla]}}</strong></p>
+        </a>
         {% endfor %}
         <hr>
         <p><strong>TOTAL: Peonadas: {{totPeonadas}}  Horas: {{totHoras}}</strong></p>

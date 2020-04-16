@@ -20,7 +20,7 @@ if ($partesTrabajo != NULL) {
   foreach ($fincas as $finca) {
     foreach ($partesTrabajo as $parte) {
       if ($finca->getNombre() == $parte->getFinca()->getNombre() && $cosecha == $parte->getProducto()->getNombre()) {
-        if ($parte->getTipo()->getNombre() == 'Horas') {
+        if ($parte->getTipo()->getNombre() == 'Hora') {
           $horas = $horas + $parte->getCantidad();
           $totHoras = $totHoras + $parte->getCantidad();
         }else{
@@ -56,7 +56,7 @@ if ($partesTrabajo != NULL) {
   foreach ($trabajos as $trabajo) {
     foreach ($partesTrabajo as $parte) {
       if ($trabajo->getNombre() == $parte->getTrabajo()->getNombre() && $cosecha == $parte->getProducto()->getNombre()) {
-        if ($parte->getTipo()->getNombre() == 'Horas') {
+        if ($parte->getTipo()->getNombre() == 'Hora') {
           $horas = $horas + $parte->getCantidad();
           $totHoras = $totHoras + $parte->getCantidad();
         }else{
@@ -82,7 +82,7 @@ return $ACfinca;
 }
 
 
-public function dameArrayPeonadas($trabajadores, $partes, $mes, $ano, $tipo, $altas){
+public function dameArrayPeonadas($trabajadores, $partes, $mes, $ano, $tipo, $altas, $precio){
   $fecha = new \DateTime($ano.'-'.$mes.'-1');
   for ($x=1; $x < 36 ; $x++) {//NUEVO
     $totales[$x] = 0; //NUEVO
@@ -107,9 +107,9 @@ for ($h=0; $h < count($trabajadores); $h++) {
       if ($i == 31) {
         $arrayPeonadas[$trabajador][32]=$contador;
         $totales[32]=$totales[32]+$contador;//NUEVO
-        if ($tipo == 'Peonadas') {
+        if ($tipo == 'Peonada') {
           $arrayPeonadas[$trabajador][33]=0;
-          $arrayPeonadas[$trabajador][34]=0;
+          $arrayPeonadas[$trabajador][34]=$arrayPeonadas[$trabajador][32]*$precio[0]->getValor();
           $arrayPeonadas[$trabajador][35]=0;
           for ($g=0; $g < count($altas) ; $g++) {
             if ($trabajador == $altas[$g]->getNombre()->getNombre()) {
@@ -117,8 +117,8 @@ for ($h=0; $h < count($trabajadores); $h++) {
               $totales[33]=$totales[33]+$altas[$g]->getCantidad();//NUEVO
               $peo = $arrayPeonadas[$trabajador][32];
               $alt = $arrayPeonadas[$trabajador][33];
-              $CS = ($alt*47.95)-($alt*3);
-              $CC =($peo - $alt)*47.95;
+              $CS = ($alt*$precio[0]->getValor())-($alt*3);
+              $CC =($peo - $alt)*$precio[0]->getValor();
               $arrayPeonadas[$trabajador][34]=$CC;
               $arrayPeonadas[$trabajador][35]=$CS;
               $totales[34]=$totales[34]+$CC;//NUEVO
@@ -127,10 +127,10 @@ for ($h=0; $h < count($trabajadores); $h++) {
             }
           }
         }else {
-          $arrayPeonadas[$trabajador][32]=$contador;
-          $totales[32]=$totales[32]+$contador;
-          $arrayPeonadas[$trabajador][33]=$contador*7;
-          $totales[33]=$totales[33]+$contador*7;
+          //$arrayPeonadas[$trabajador][32]=$contador;
+          //$totales[32]=$totales[32]+$contador;
+          $arrayPeonadas[$trabajador][33]=$contador*$precio[0]->getValor();
+          $totales[33]=$totales[33]+$contador*$precio[0]->getValor();
         }
       }
     }
@@ -247,16 +247,16 @@ public function calcula($aceituna2017)
     $nuevaBusqueda = count($aceituna2017);
     //$tipo = $aceituna2017[0]->getTipo();
     $arrayResultado =array();
-    $arrayResultado['Peonadas'] = 0;
-    $arrayResultado['Horas'] = 0;
+    $arrayResultado['Peonada'] = 0;
+    $arrayResultado['Hora'] = 0;
     $horas = 0;
     $peonadas = 0;
     for ($i=0; $i < $nuevaBusqueda ; $i++) {
        $tipo = $aceituna2017[$i]->getTipo()->getNombre();
-       if ($tipo == 'Peonadas') {
-         $arrayResultado['Peonadas'] = $arrayResultado['Peonadas'] + $aceituna2017[$i]->getCantidad();
+       if ($tipo == 'Peonada') {
+         $arrayResultado['Peonada'] = $arrayResultado['Peonada'] + $aceituna2017[$i]->getCantidad();
        }else {
-         $arrayResultado['Horas'] = $arrayResultado['Horas'] + $aceituna2017[$i]->getCantidad();
+         $arrayResultado['Hora'] = $arrayResultado['Hora'] + $aceituna2017[$i]->getCantidad();
        }
      }
      return $arrayResultado;

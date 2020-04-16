@@ -24,7 +24,7 @@ class PreciosController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $precios = $em->getRepository('AppBundle:Precios')->findAll();
+        $precios = $em->getRepository('AppBundle:Precios')->findAll(['ano'=>'ASC']);
 
         return $this->render('precios/index.html.twig', array(
             'precios' => $precios,
@@ -42,9 +42,30 @@ class PreciosController extends Controller
         $precio = new Precios();
         $form = $this->createForm('AppBundle\Form\PreciosType', $precio);
         $form->handleRequest($request);
+        $error = 'TodoCorrecto';
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
+            //Necesitmaos comprobar que no existe un registro con mes, año y tipo existente
+            $mes = $precio->getMes();
+            $ano = $precio->getAno();
+            $tipo = $precio->getTipo();
+            $error = 'Ya existe un precio en el mes: '.$mes.' año: '.$ano.' tipo: '.$tipo->getNombre().' ';
+
+            $existePrecio = $em->getRepository('AppBundle:Precios')->findBy(['mes'=>$mes, 'ano'=>$ano, 'tipo'=>$tipo]);
+
+            if ($existePrecio <> NULL) {
+
+
+              $form = $this->createForm('AppBundle\Form\PreciosType', $precio);
+
+              return $this->render('precios/new.html.twig', array(
+                  'error' => $error,
+                  'precio' => $precio,
+                  'form' => $form->createView(),
+              ));
+            }
+
             $em->persist($precio);
             $em->flush();
 
@@ -52,6 +73,7 @@ class PreciosController extends Controller
         }
 
         return $this->render('precios/new.html.twig', array(
+            'error' => $error,
             'precio' => $precio,
             'form' => $form->createView(),
         ));

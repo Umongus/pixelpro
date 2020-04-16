@@ -4,6 +4,9 @@ namespace AppBundle\Controller;
 
 use AppBundle\Entity\ParteTrabajo;
 use AppBundle\Entity\Producto;
+use AppBundle\Entity\Trabajadores;
+use AppBundle\Entity\Precios;
+use AppBundle\Entity\Tipo;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -385,16 +388,22 @@ class ParteTrabajoController extends Controller
        $query = $em->createQuery(
         'SELECT a
          FROM AppBundle:Altas a
-         WHERE a.fecha >= :fecha1 AND a.fecha < :fecha2
-         ORDER BY a.fecha ASC'
-        )->setParameter('fecha1', $fecha1)
-        ->setParameter('fecha2', $fecha2);
-
+         WHERE a.mes = :mes AND a.ano = :ano
+         ORDER BY a.mes ASC'
+        )->setParameter('mes', $mes)
+        ->setParameter('ano', $ano);
        $altas = $query->getResult();
 
+       $tipo = $em->getRepository('AppBundle:Tipo')->findBy(['nombre'=>'Peonada']);
+       $precio = $em->getRepository('AppBundle:Precios')->findBy(['mes'=>$mes,'ano'=>$ano, 'tipo'=>$tipo[0]]);
+
        $trabajadores = $calculo->dameArrayTrabajadores($partes);
-       $peonadas = $calculo->dameArrayPeonadas($trabajadores, $partes, $arrayIntervalo[1], $ano, 'Peonadas', $altas);
-       $horas = $calculo->dameArrayPeonadas($trabajadores, $partes, $arrayIntervalo[1], $ano, 'Horas', $altas);
+       $peonadas = $calculo->dameArrayPeonadas($trabajadores, $partes, $arrayIntervalo[1], $ano, 'Peonada', $altas, $precio);
+
+       $tipo = $em->getRepository('AppBundle:Tipo')->findBy(['nombre'=>'Hora']);
+       $precio = $em->getRepository('AppBundle:Precios')->findBy(['mes'=>$mes,'ano'=>$ano, 'tipo'=>$tipo[0]]);
+
+       $horas = $calculo->dameArrayPeonadas($trabajadores, $partes, $arrayIntervalo[1], $ano, 'Hora', $altas, $precio );
        $query = $em->createQuery(
         'SELECT p
          FROM AppBundle:ParteTrabajo p
@@ -413,7 +422,11 @@ class ParteTrabajoController extends Controller
          )->setParameter('valor', 'NULL');
          $observados = $query->getResult();
 
+      $tipo = $em->getRepository('AppBundle:Tipo')->findBy(['nombre'=>'Peonada']);
+      $precio2 = $em->getRepository('AppBundle:Precios')->findBy(['mes'=>$mes,'ano'=>$ano, 'tipo'=>$tipo[0]]);
+
       return $this->render('partetrabajo/resultadoMes.html.twig', array('fecha1'=>$fecha1,
+       'desastre'=> $precio[0]->getValor(),
        'mes' => $mes,
        'ano' => $ano,
        'arrPeonadas' => count($peonadas),
@@ -457,29 +470,33 @@ class ParteTrabajoController extends Controller
    }
    /**
     * Modifica en la sesion la cuadrilla a insertar en parte de trabajo.
-    *
-    * @Route("/inicio2", name="modCuadrilla_parte")
+    * @Route("/inicio2/{cuad}", defaults={"cuad" = "nada"}, name="modCuadrilla_parte")
     * @Method({"GET", "POST"})
     */
-    public function cuadrillaAction (Request $request)
+    public function cuadrillaAction (Request $request, $cuad = 'nada')
     {
       $parteTrabajo = new Partetrabajo();
 
       $session = $request->getSession();
       $session->start();
+      if ($cuad <> 'nada') {
+            $session->set('cuadrilla', $cuad);
+            return $this->redirect($this->generateUrl('partetrabajo_index'));
+      }else {
 
-          $mensajeInicio = 'Introducir Fecha y Cuadrilla';
-          $form = $this->createForm(CuadrillaParteType::class, $parteTrabajo, array('action'=>$this->generateUrl('modCuadrilla_parte'), 'method'=>'POST'));
+            $mensajeInicio = 'Introducir Fecha y Cuadrilla';
+            $form = $this->createForm(CuadrillaParteType::class, $parteTrabajo, array('action'=>$this->generateUrl('modCuadrilla_parte'), 'method'=>'POST'));
 
-          $form->handleRequest($request);
+            $form->handleRequest($request);
 
-      if ($form->isSubmitted() && $form->isValid()) {
+            if ($form->isSubmitted() && $form->isValid()) {
 
-        $cuadrilla = $parteTrabajo->getCuadrilla();
-        $session->set('cuadrilla', $cuadrilla);
-        return $this->redirect($this->generateUrl('partetrabajo_index'));
+              $cuadrilla = $parteTrabajo->getCuadrilla();
+              $session->set('cuadrilla', $cuadrilla);
+              return $this->redirect($this->generateUrl('partetrabajo_index'));
+            }
+            return $this->render('partetrabajo/inicioParte2.html.twig', array('mensajeInicio' => $mensajeInicio,'form'=>$form->createView()));
       }
-      return $this->render('partetrabajo/inicioParte.html.twig', array('mensajeInicio' => $mensajeInicio,'form'=>$form->createView()));
     }
     /**
      * Lists all parteTrabajo entities.
@@ -490,18 +507,37 @@ class ParteTrabajoController extends Controller
     public function indexAction(Request $request, $prueba=NULL)
     {
       $parteTrabajo = new Partetrabajo();
+      $em = $this->getDoctrine()->getManager();
+
+      //Obtenemos una lista ordenada de nombres de Trabajadores
+
+      $query = $em->createQuery(
+       'SELECT t
+        FROM AppBundle:Trabajadores t
+        ORDER BY t.nombre ASC'
+       );
+       $trabajadores = $query->getResult();
+       for ($i=0; $i < count($trabajadores); $i++) {
+         $nombre = $trabajadores[$i]->getNombre();
+         $Atrabajadores[$nombre] = $nombre;
+       }
 
       $session = $request->getSession();
       $session->start();
       $fecha = $session->get('fecha');
       $cuadrilla = $session->get('cuadrilla');
 
-      $form = $this->createForm(ParteTrabajoType::class, $parteTrabajo, array('action'=>$this->generateUrl('partetrabajo_index'), 'method'=>'POST'));
 
+      $form = $this->createForm(ParteTrabajoType::class, $parteTrabajo, array('action'=>$this->generateUrl('partetrabajo_index'), 'method'=>'POST'));
+      $form->add('trabajador', ChoiceType::class, array('choices' => $Atrabajadores, 'mapped'=>false));
       $form->handleRequest($request);
 
+      $nombresito = $form->get('trabajador')->getData();
+      $queEs = $em->getRepository('AppBundle:Trabajadores')->findBy(['nombre'=>$nombresito]);
+
       if ($form->isSubmitted() && $form->isValid()) {
-          $em = $this->getDoctrine()->getManager();
+
+          $parteTrabajo->setTrabajador($queEs[0]);
           $parteTrabajo->setFecha($fecha);
           $parteTrabajo->setCuadrilla($cuadrilla);
           $em->persist($parteTrabajo);
@@ -514,15 +550,22 @@ class ParteTrabajoController extends Controller
        $nuevaBusqueda = count($aceituna2017);
 
        $Calculo = new TratArray();
+       $fechaNueva = new DateTime();
+       $fechaNueva = $fecha;
 
        $arrayResumen = $Calculo->calcula($aceituna2017);
 
        $em = $this->getDoctrine()->getManager();
-       $parteTrabajos = $em->getRepository('AppBundle:ParteTrabajo')->findBy(['fecha'=>$fecha, 'cuadrilla'=>$cuadrilla]);
-       $partesDia = $em->getRepository('AppBundle:ParteTrabajo')->findBy(['fecha'=>$fecha]);
+       $parteTrabajos = $em->getRepository('AppBundle:ParteTrabajo')->findBy(['fecha'=>$fechaNueva, 'cuadrilla'=>$cuadrilla]);
+       $partesDia = $em->getRepository('AppBundle:ParteTrabajo')->findBy(['fecha'=>$fechaNueva]);
        $arrayCuadrilla2 = $Calculo->calculaCuadrillas($partesDia);
-       $arrayHoras2 = $Calculo->calculaTipos($arrayCuadrilla2, $partesDia, 'Horas');
-       $arrayPeonadas2 = $Calculo->calculaTipos($arrayCuadrilla2, $partesDia, 'Peonadas');
+       $arrayHoras2 = $Calculo->calculaTipos($arrayCuadrilla2, $partesDia, 'Hora');
+       $arrayPeonadas2 = $Calculo->calculaTipos($arrayCuadrilla2, $partesDia, 'Peonada');
+
+       $atope = 'PartesDia NO es igual a NULL';
+       if ($partesDia == NULL) {
+         $atope = 'PartesDia es igual a NULL';
+       }
 
        $totPeonadas2 = 0;
        foreach ($arrayPeonadas2 as $peonada) {
@@ -547,14 +590,15 @@ class ParteTrabajoController extends Controller
        //BANCO DE PRUEBAS
        $parteTrabajo = new Partetrabajo();
        $form = $this->createForm(ParteTrabajoType::class, $parteTrabajo, array('action'=>$this->generateUrl('partetrabajo_index'), 'method'=>'POST'));
+       $form->add('trabajador', ChoiceType::class, array('choices' => $Atrabajadores, 'mapped'=>false));
 
        return $this->render('partetrabajo/index.html.twig', array(
             //'tipo' => $tipo,
-            'desastre' => $ae['Juan'][0],
+            'desastre' => $nombresito,
             'aceituna2017' => $aceituna2017,
             'nuevaBusqueda' =>$nuevaBusqueda,
-            'peonadas' => $arrayResumen['Peonadas'],
-            'horas' => $arrayResumen['Horas'],
+            'peonadas' => 45,//$arrayResumen['Peonadas'],
+            'horas' => 46,//$arrayResumen['Hora'],
             'totHoras' => $totHoras2,
             'totPeonadas' =>$totPeonadas2,
             'arrayCuadrilla' => $arrayCuadrilla2,

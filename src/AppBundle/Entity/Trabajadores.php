@@ -32,7 +32,9 @@ class Trabajadores
     private $dni;
 
     /**
-     * @ORM\Column(type="string", length=100)
+     * @var string
+     *
+     * @ORM\Column(name="observaciones", type="string", length=100, nullable=true)
      */
     private $observaciones;
 

@@ -1,14 +1,15 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>Precios list</h1>
+    <h1>Listado de Precios</h1>
 
-    <table>
+    <table class="table table-striped">
         <thead>
             <tr>
                 <th>Id</th>
                 <th>Mes</th>
                 <th>Ano</th>
+                <th>Tipo</th>
                 <th>Valor</th>
                 <th>Nota</th>
                 <th>Actions</th>
@@ -20,17 +21,15 @@
                 <td><a href="{{ path('precios_show', { 'id': precio.id }) }}">{{ precio.id }}</a></td>
                 <td>{{ precio.mes }}</td>
                 <td>{{ precio.ano }}</td>
+                <td>{{ precio.tipo.nombre }}</td>
                 <td>{{ precio.valor }}</td>
-                <td>{{ precio.nota }}</td>
+                <td>{{ precio.nota[:8] }}...</td>
                 <td>
-                    <ul>
-                        <li>
-                            <a href="{{ path('precios_show', { 'id': precio.id }) }}">show</a>
-                        </li>
-                        <li>
-                            <a href="{{ path('precios_edit', { 'id': precio.id }) }}">edit</a>
-                        </li>
-                    </ul>
+
+                            <a href="{{ path('precios_show', { 'id': precio.id }) }}">show |</a>
+
+                            <a href="{{ path('precios_edit', { 'id': precio.id }) }}"> edit</a>
+
                 </td>
             </tr>
         {% endfor %}

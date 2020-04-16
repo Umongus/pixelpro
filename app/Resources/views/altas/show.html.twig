@@ -10,12 +10,24 @@
                 <td>{{ alta.id }}</td>
             </tr>
             <tr>
-                <th>Fecha</th>
-                <td>{% if alta.fecha %}{{ alta.fecha|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <th>Trabajador</th>
+              <td>{{alta.nombre}}</td>
+            </tr>
+            <tr>
+                <th>Mes</th>
+              <td>{{alta.mes}}</td>
+            </tr>
+            <tr>
+                <th>Año</th>
+              <td>{{alta.ano}}</td>
             </tr>
             <tr>
                 <th>Cantidad</th>
                 <td>{{ alta.cantidad }}</td>
+            </tr>
+            <tr>
+                <th>Producto</th>
+                <td>{{ alta.producto }}</td>
             </tr>
             <tr>
                 <th>Observacion</th>

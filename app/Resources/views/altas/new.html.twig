@@ -1,12 +1,40 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>Alta creation</h1>
+<div class="row">
+<div class="col-4">
+<h2 class="page-header">Añadir nuevo precio:</h2>
+<hr>
+<p><strong>Mes Seleccionado: </strong></p>
+<a href="#"><strong>{{mesAlta}}</strong></a>
+<p><strong>Año Seleccionado: </strong></p>
+<a href="#"><strong>{{anoAlta}}</strong></a>
+<br>
+{{form_start(form)}}
+  <fieldset>
 
-    {{ form_start(form) }}
-        {{ form_widget(form) }}
-        <input type="submit" value="Create" />
-    {{ form_end(form) }}
+  <div>
+  <strong>{{ form_label(form.nombre, 'Trabajador') }}</strong><br>
+  <span>{{ form_widget(form.nombre) }}</span>
+  </div><br>
+  <div>
+  <div>
+  <strong>{{ form_label(form.cantidad, 'Número de altas en el mes:') }}</strong><br>
+  <span>{{ form_widget(form.cantidad) }}</span>
+  </div><br>
+  <div>
+  <div>
+  <strong>{{ form_label(form.observacion, 'Alguna observacioón:') }}</strong><br>
+  <span>{{ form_widget(form.observacion) }}</span>
+  </div><br>
+  <strong>{{ form_label(form.producto) }}</strong><br>
+  <span>{{ form_widget(form.producto) }}</span>
+  </div><br>
+  </fieldset>
+  <input type="submit" value="Create" />
+{{ form_end(form) }}
+</div>
+</div>
 
     <ul>
         <li>
