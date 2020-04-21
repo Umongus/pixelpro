@@ -2,9 +2,18 @@
 {% block body %}
 
 <h2 class="page-header">Editar Trabajo</h2>
+
 {{form_start(form)}}
-{{form_widget(form)}}
-{{form_end(form)}}
+  <fieldset>
+  <br>
+  <div>
+  <strong>{{ form_label(form.nombre) }}</strong><br>
+  <span>{{ form_widget(form.nombre) }}</span>
+  </div><br>
+
+  </fieldset>
+{{ form_end(form) }}
+<br>
 <a href="{{path('trabajos_index')}}">Volver al inicio</a>
 
 {% endblock %}

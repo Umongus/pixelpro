@@ -3,8 +3,46 @@
 
 <h2 class="page-header">Editar Parte de Trabajo</h2>
 {{form_start(form)}}
-{{form_widget(form)}}
-{{form_end(form)}}
+<fieldset>
+  <br>
+  <div>
+  <strong>{{ form_label(form.fecha) }}</strong><br>
+  <span>{{ form_widget(form.fecha) }}</span>
+  </div>
+  <div>
+  <strong>{{ form_label(form.trabajador) }}</strong><br>
+  <span>{{ form_widget(form.trabajador) }}</span>
+  </div>
+  <div>
+  <strong>{{ form_label(form.trabajo) }}</strong><br>
+  <span>{{ form_widget(form.trabajo) }}</span>
+  </div>
+  <div>
+  <strong>{{ form_label(form.tipo) }}</strong><br>
+  <span>{{ form_widget(form.tipo) }}</span>
+  </div>
+  <div>
+  <strong>{{ form_label(form.cantidad) }}</strong><br>
+  <span>{{ form_widget(form.cantidad) }}</span>
+  </div>
+  <div>
+  <strong>{{ form_label(form.finca) }}</strong><br>
+  <span>{{ form_widget(form.finca) }}</span>
+  </div>
+  <div>
+  <strong>{{ form_label(form.cuadrilla) }}</strong><br>
+  <span>{{ form_widget(form.cuadrilla) }}</span>
+  </div>
+  <div>
+  <strong>{{ form_label(form.producto) }}</strong><br>
+  <span>{{ form_widget(form.producto) }}</span><br>
+  </div>
+  <div>
+  <strong>{{ form_label(form.observacion) }}</strong><br>
+  <span>{{ form_widget(form.observacion) }}</span><br>
+  </div><br>
+  </fieldset>
+{{ form_end(form) }}
 
 <a href="{{path('partetrabajo_index')}}">Volver al inicio</a>
 

@@ -2,37 +2,42 @@
 
 {% block body %}
 
+    <div class="row">
+        <div class="col-3">
+        <br><br>
+        <ul>
+            <li>
+                <h4><a href="{{ path('tipo_new') }}">Crear nuevo Tipo</a></h4>
+            </li>
+        </ul>
+        </div>
+        <div class="col-9">
+        <h1 class="page header">Listado de Tipos</h1>
+        <table class="table table-striped">
+        <thead>
+        <tr>
+        <th>ID</th>
+        <th>NOMBRE</th>
+        <th>OPCIONES</th>
 
-    <h1 class="page header">Listado de Tipos</h1>
-    <table class="table table-striped">
-    <thead>
-    <tr>
-    <th>ID</th>
-    <th>NOMBRE</th>
-    <th>OPCIONES</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for tipo in tipos %}
+        <tr>
+        <th scope="row">{{ tipo.id }}</th>
+        <td>{{ tipo.nombre }}</td>
+        <td>
 
-    </tr>
-    </thead>
-    <tbody>
-    {% for tipo in tipos %}
-    <tr>
-    <th scope="row">{{ tipo.id }}</th>
-    <td>{{ tipo.nombre }}</td>
-    <td>
+        <a href=" {{ path('tipo_edit', { 'id': tipo.id }) }}">Editar |</a>
+        <a href="{{ path('tipo_show', { 'id': tipo.id }) }}">Mostrar |</a>
+        <a href="{{ path('tipo_delete', { 'id': tipo.id }) }}">Eliminar</a>
 
-    <a href=" {{ path('tipo_edit', { 'id': tipo.id }) }}">Editar |</a>
-    <a href="{{ path('tipo_show', { 'id': tipo.id }) }}">Mostrar |</a>
-    <a href="{{ path('tipo_delete', { 'id': tipo.id }) }}">Eliminar</a>
-
-    </td>
-    </tr>
-    {% endfor %}
-    </tbody>
-    </table>
-
-    <ul>
-        <li>
-            <a href="{{ path('tipo_new') }}">Crear nuevo Tipo</a>
-        </li>
-    </ul>
+        </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+        </div>
+    </div>
 {% endblock %}

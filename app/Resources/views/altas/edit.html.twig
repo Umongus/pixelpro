@@ -1,21 +1,53 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>Alta edit</h1>
 
-    {{ form_start(edit_form) }}
-        {{ form_widget(edit_form) }}
-        <input type="submit" value="Edit" />
-    {{ form_end(edit_form) }}
+    <div class="row">
+      <div class="col-1">
 
-    <ul>
-        <li>
-            <a href="{{ path('altas_index') }}">Back to the list</a>
-        </li>
-        <li>
-            {{ form_start(delete_form) }}
-                <input type="submit" value="Delete">
-            {{ form_end(delete_form) }}
-        </li>
-    </ul>
+      </div>
+      <div class="col-11">
+      <h1>Alta edit</h1>
+      <br>
+      {{form_start(edit_form)}}
+        <fieldset>
+        <div>
+        <strong>{{ form_label(edit_form.mes, 'Mes') }}</strong><br>
+        <span>{{ form_widget(edit_form.mes) }}</span>
+        </div><br>
+        <div>
+        <strong>{{ form_label(edit_form.ano, 'Año') }}</strong><br>
+        <span>{{ form_widget(edit_form.ano) }}</span>
+        </div><br>
+        <div>
+        <strong>{{ form_label(edit_form.nombre, 'Trabajador') }}</strong><br>
+        <span>{{ form_widget(edit_form.nombre) }}</span>
+        </div><br>
+        <div>
+        <div>
+        <strong>{{ form_label(edit_form.cantidad, 'Número de altas en el mes:') }}</strong><br>
+        <span>{{ form_widget(edit_form.cantidad) }}</span>
+        </div><br>
+        <div>
+        <div>
+        <strong>{{ form_label(edit_form.observacion, 'Alguna observacioón:') }}</strong><br>
+        <span>{{ form_widget(edit_form.observacion) }}</span>
+        </div><br>
+        <strong>{{ form_label(edit_form.producto) }}</strong><br>
+        <span>{{ form_widget(edit_form.producto) }}</span>
+        </div><br>
+
+        </fieldset>
+        <input type="submit" value="Create" />
+      {{ form_end(edit_form) }}
+      <br>
+      <ul>
+          <li>
+              <a href="{{ path('altas_index') }}">Back to the list</a>
+          </li>
+
+      </ul>
+    </div>
+  </div>
+    
 {% endblock %}

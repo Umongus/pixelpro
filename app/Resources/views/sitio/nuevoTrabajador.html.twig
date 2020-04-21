@@ -14,13 +14,33 @@
   <strong>{{ form_label(form.dni) }}</strong><br>
   <span>{{ form_widget(form.dni) }}</span>
   </div><br>
-  <div>
+
   <div>
   <strong>{{ form_label(form.observaciones) }}</strong><br>
   <span>{{ form_widget(form.observaciones) }}</span>
   </div><br>
   </fieldset>
 {{ form_end(form) }}
+</div>
+
+
+
+<div class="col-7">
+<p>El valor desastre vale: {{desastre}}</p>
+<p>NOTA: El nombre del trabajador a insertar debe cumplir con el siguiente patrón:</p>
+<p><strong>PATRON: 1º Apellido(espacio)2ºApellido(coma)(espacio)Nombre(Junto si es compuesto)</strong></p>
+<p>Ejemplo:</p>
+<p>        Gallego Antequera, AntonioManuel</p>
+<p>        Gallego Brenes, JoseMaria</p>
+{% if errorNombre != 'TodoCorrecto' %}
+<h1><strong>{{errorNombre}}</strong></h1>
+{% endif %}
+{% if errorDni != 'TodoCorrecto' %}
+<h1><strong>{{errorDni}}</strong></h1>
+{% endif %}
+{% if errorNombreFormato != 'TodoCorrecto' %}
+<h1><strong>{{errorNombreFormato}}</strong></h1>
+{% endif %}
 </div>
 </div>
 {% endblock %}

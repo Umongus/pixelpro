@@ -22,6 +22,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Validator\Constraints\DateTime;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use AppBundle\Funciones\TratArray;
 
 /**
@@ -79,7 +80,7 @@ class ParteTrabajoController extends Controller
   for ($i=0; $i < 4; $i++) {
     if ($opcion == 'campana') {
       $primero[$cosecha[$i]] = $comp->comparafinca($partes, $fincas, $cosecha[$i]);
-      $cabecera = $campana;
+      $cabecera = ' ';
     }else {
       $primero[$cosecha[$i]] = $comp->comparafinca($partes, $trabajos, $cosecha[$i]);
       $cabecera = $finca;
@@ -431,7 +432,7 @@ class ParteTrabajoController extends Controller
        'ano' => $ano,
        'arrPeonadas' => count($peonadas),
        'peonadas' => $peonadas,
-       'horas' => $horas,
+       'horas' =>$horas,
        'observados' => $observados,
        'arrTrabajadores' => $trabajadores,
        'trabajadores' => count($trabajadores),
@@ -535,19 +536,26 @@ class ParteTrabajoController extends Controller
       $nombresito = $form->get('trabajador')->getData();
       $queEs = $em->getRepository('AppBundle:Trabajadores')->findBy(['nombre'=>$nombresito]);
 
+      $desastre = 'Correcto';
+
       if ($form->isSubmitted() && $form->isValid()) {
 
           $parteTrabajo->setTrabajador($queEs[0]);
           $parteTrabajo->setFecha($fecha);
           $parteTrabajo->setCuadrilla($cuadrilla);
-          $em->persist($parteTrabajo);
-          $em->flush();
+          if ($parteTrabajo->getCantidad() <= 0) {
+            $desastre = "La catidad insertada debe ser mayor que 0";
+          }else {
+            $em->persist($parteTrabajo);
+            $em->flush();
+
+          }
       }
 
        $em = $this->getDoctrine()->getManager();
        $producto = $em->getRepository('AppBundle:Producto')->findOneByNombre('Aceituna 2017');
        $aceituna2017 = $em->getRepository('AppBundle:ParteTrabajo')->findByProducto($producto->getId());
-       $nuevaBusqueda = count($aceituna2017);
+       //$nuevaBusqueda = count($aceituna2017);
 
        $Calculo = new TratArray();
        $fechaNueva = new DateTime();
@@ -594,9 +602,9 @@ class ParteTrabajoController extends Controller
 
        return $this->render('partetrabajo/index.html.twig', array(
             //'tipo' => $tipo,
-            'desastre' => $nombresito,
+            'desastre' => $desastre,
             'aceituna2017' => $aceituna2017,
-            'nuevaBusqueda' =>$nuevaBusqueda,
+
             'peonadas' => 45,//$arrayResumen['Peonadas'],
             'horas' => 46,//$arrayResumen['Hora'],
             'totHoras' => $totHoras2,
@@ -665,6 +673,9 @@ class ParteTrabajoController extends Controller
       $parteTrabajo = $em->getRepository('AppBundle:ParteTrabajo')->find($id);
 
       $form = $this->createForm(ParteTrabajoType::class, $parteTrabajo, array('action'=>$this->generateUrl('partetrabajo_edit', array('id'=>$parteTrabajo->getId())), 'method'=>'PUT'));
+      $form->add('fecha', DateType::class);
+      $form->add('cuadrilla');
+      $form->add('trabajador');
       $form->add('save', SubmitType::class, array('label'=>'Editar Parte'));
 
       $form->handlerequest($request);

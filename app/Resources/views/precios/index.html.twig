@@ -1,6 +1,17 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
+
+    <div class="row">
+    <div class="col-2">
+    <br><br>
+    <ul>
+        <li>
+            <h4><a href="{{ path('precios_new') }}">Create a new precio</a></h4>
+        </li>
+    </ul>
+    </div>
+    <div class="col-10">
     <h1>Listado de Precios</h1>
 
     <table class="table table-striped">
@@ -35,10 +46,7 @@
         {% endfor %}
         </tbody>
     </table>
+    </div>
 
-    <ul>
-        <li>
-            <a href="{{ path('precios_new') }}">Create a new precio</a>
-        </li>
-    </ul>
+    </div>
 {% endblock %}

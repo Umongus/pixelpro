@@ -1,37 +1,44 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
+    <div class="row">
+      <div class="col-3">
+      <br>
+      <ul>
+          <li>
+              <a href="{{ path('trabajos_new') }}">Crear nuevo Trabajo</a>
+          </li>
+      </ul>
+      </div>
+      <div class="col-6">
+      <h1 class="page header">Listado de Trabajos</h1>
+      <table class="table table-striped">
+      <thead>
+      <tr>
+      <th>ID</th>
+      <th>NOMBRE</th>
+      <th>OPCIONES</th>
 
+      </tr>
+      </thead>
+      <tbody>
+      {% for trabajo in trabajos %}
+      <tr>
+      <th scope="row">{{ trabajo.id }}</th>
+      <td>{{ trabajo.nombre }}</td>
+      <td>
 
-    <h1 class="page header">Listado de Trabajos</h1>
-    <table class="table table-striped">
-    <thead>
-    <tr>
-    <th>ID</th>
-    <th>NOMBRE</th>
-    <th>OPCIONES</th>
+      <a href=" {{ path('trabajos_edit', { 'id': trabajo.id }) }}">Editar |</a>
+      <a href="{{ path('trabajos_show', { 'id': trabajo.id }) }}">Mostrar |</a>
+      <a href="{{ path('trabajos_delete', { 'id': trabajo.id }) }}">Eliminar</a>
+      </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+      </table>
+      </div>
+      <div class="col-6">
 
-    </tr>
-    </thead>
-    <tbody>
-    {% for trabajo in trabajos %}
-    <tr>
-    <th scope="row">{{ trabajo.id }}</th>
-    <td>{{ trabajo.nombre }}</td>
-    <td>
-
-    <a href=" {{ path('trabajos_edit', { 'id': trabajo.id }) }}">Editar |</a>
-    <a href="{{ path('trabajos_show', { 'id': trabajo.id }) }}">Mostrar |</a>
-    <a href="{{ path('trabajos_delete', { 'id': trabajo.id }) }}">Eliminar</a>
-    </td>
-    </tr>
-    {% endfor %}
-    </tbody>
-    </table>
-
-    <ul>
-        <li>
-            <a href="{{ path('trabajos_new') }}">Crear nuevo Trabajo</a>
-        </li>
-    </ul>
+      </div>
+    </div>
 {% endblock %}

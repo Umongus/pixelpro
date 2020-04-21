@@ -1,10 +1,43 @@
 {% extends 'base.html.twig' %}
 {% block body %}
 
-<h2 class="page-header">Editar Trabajador</h2>
+<div class="row">
+<div class="col-4">
+<h2 class="page-header">Editar trabajador:</h2>
 {{form_start(form)}}
-{{form_widget(form)}}
-{{form_end(form)}}
+  <fieldset>
+  <br>
+  <div>
+  <strong>{{ form_label(form.nombre) }}</strong><br>
+  <span>{{ form_widget(form.nombre) }}</span>
+  </div><br>
+  <div>
+  <strong>{{ form_label(form.dni) }}</strong><br>
+  <span>{{ form_widget(form.dni) }}</span>
+  </div><br>
+
+  <div>
+  <strong>{{ form_label(form.observaciones) }}</strong><br>
+  <span>{{ form_widget(form.observaciones) }}</span>
+  </div><br>
+  </fieldset>
+{{ form_end(form) }}
+</div>
+
+<p>El valor desastre vale: {{desastre}}</p>
+
+<div class="col-7">
+{% if errorNombre != 'TodoCorrecto' %}
+<h1><strong>{{errorNombre}}</strong></h1>
+{% endif %}
+{% if errorDni != 'TodoCorrecto' %}
+<h1><strong>{{errorDni}}</strong></h1>
+{% endif %}
+{% if errorNombreFormato != 'TodoCorrecto' %}
+<h1><strong>{{errorNombreFormato}}</strong></h1>
+{% endif %}
+</div>
+</div>
 <a href="{{path('inicio')}}">Volver al inicio</a>
 
 {% endblock %}

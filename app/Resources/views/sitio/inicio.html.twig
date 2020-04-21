@@ -1,5 +1,16 @@
 {% extends 'base.html.twig' %}
 {% block body %}
+<div class="row">
+<div class="col-2">
+<br>
+<br>
+<ul>
+    <li>
+      <a href= "{{ path('nuevo_trabajador')}}">NUEVO TRABAJADOR</a>
+    </li>
+</ul>
+</div>
+<div class="col-10">
 <h2 class="page header">Listado de Trabajadores</h2>
 <table class="table table-striped">
 <thead>
@@ -7,6 +18,7 @@
 <th>ID</th>
 <th>TRABAJADOR</th>
 <th>DNI</th>
+<th>OBSERVACIONES</th>
 <th>OPCIONES</th>
 <th></th>
 </tr>
@@ -17,6 +29,7 @@
 <th scope="row">{{trabajador.id}}</th>
 <td>{{trabajador.nombre}}</td>
 <td>{{trabajador.dni}}</td>
+<td>{{trabajador.observaciones}}</td>
 <td>
 <a href=" {{ path('Mostrar_trabajador', {'id':trabajador.id})}}">Ver más |</a>
 <a href=" {{ path('actualizar_trabajador', {'id':trabajador.id})}}">Editar |</a>
@@ -26,13 +39,12 @@
 {% endfor %}
 </tbody>
 </table>
+</div>
+</div>
 
-<ul>
-    <li>
-    <a href= "{{ path('nuevo_trabajador')}}">Insertar tranbajadores</a>
 
-  </li>
-</ul>
+
+
 
 
 {% endblock %}

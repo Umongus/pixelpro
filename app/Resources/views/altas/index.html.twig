@@ -1,52 +1,66 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>Listado de Altas: <strong>{{mesAlta}}</strong> , <strong>{{anoAlta}}</strong></h1>
 
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Mes</th>
-                <th>Año</th>
-                <th>Nombre</th>
-                <th>Nº Altas</th>
-                <th>Producto</th>
-                <th>Observaciones</th>
-                <th>OPCIONES</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for alta in altas %}
-            <tr>
-                <td><a href="{{ path('altas_show', { 'id': alta.id }) }}">{{ alta.id }}</a></td>
-              <td>{% if alta.mes %}{{ alta.mes}}{% endif %}</td>
-              <td>{{ alta.ano }}</td>
-              <td>{{ alta.nombre }}</td>
-                <td>{{ alta.cantidad }}</td>
-                <td>{{ alta.producto }}</td>
-                <td>{{ alta.observacion }}</td>
-                <td>
+<div class="row">
+  <div class="col-2">
+  <br>
+  <br>
+  <br>
+  <ul>
+      <li>
+          <p><a href="{{ path('altas_new', {'mesAlta': mesAlta }) }}">Crear nueva ALta</a></p>
+      </li>
+      <li>
+          <p>Cambiar mes: <a href="{{ path('altas_inicio') }}">{{mesAlta}}</a></p>
+      </li>
+      <li>
+          <p>Cambiar año: <a href="{{ path('altas_inicio') }}">{{anoAlta}}</a></p>
+      </li>
+  </ul>
+  <br>
+  <p> ALTAS MES: <strong>{{mesAlta}}</strong> </p>
+  <p> TOTAL: <strong> {{totalALtas}} </strong>Altas</p>
+  </div>
+  <div class="col-10">
+  <br>
+  <h1>Listado de Altas: <strong>{{mesAlta}}</strong> , <strong>{{anoAlta}}</strong></h1>
+  <table class="table table-striped">
+      <thead>
+          <tr>
+              <th>Id</th>
+              <th>Mes</th>
+              <th>Año</th>
+              <th>Nombre</th>
+              <th>Nº Altas</th>
+              <th>Producto</th>
+              <th>Observaciones</th>
+              <th>OPCIONES</th>
+          </tr>
+      </thead>
+      <tbody>
+      {% for alta in altas %}
+          <tr>
+              <td><a href="{{ path('altas_show', { 'id': alta.id }) }}">{{ alta.id }}</a></td>
+            <td>{% if alta.mes %}{{ alta.mes}}{% endif %}</td>
+            <td>{{ alta.ano }}</td>
+            <td>{{ alta.nombre }}</td>
+              <td>{{ alta.cantidad }}</td>
+              <td>{{ alta.producto }}</td>
+              <td>{{ alta.observacion }}</td>
+              <td>
 
-                            <a href="{{ path('altas_show', { 'id': alta.id }) }}">show |</a>
+                          <a href="{{ path('altas_show', { 'id': alta.id }) }}">show |</a>
 
-                            <a href="{{ path('altas_edit', { 'id': alta.id }) }}"> edit</a>
+                          <a href="{{ path('altas_edit', { 'id': alta.id }) }}"> edit |</a>
 
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+                          <a href="{{ path('borrar_reg', { 'id': alta.id }) }}"> borrar</a>
 
-    <ul>
-        <li>
-            <p><a href="{{ path('altas_new', {'mesAlta': mesAlta }) }}">Crear nueva ALta</a></p>
-        </li>
-        <li>
-            <p>Cambiar mes: <a href="{{ path('altas_inicio') }}">{{mesAlta}}</a></p>
-        </li>
-        <li>
-            <p>Cambiar año: <a href="{{ path('altas_inicio') }}">{{anoAlta}}</a></p>
-        </li>
-    </ul>
+              </td>
+          </tr>
+      {% endfor %}
+      </tbody>
+  </table>
+  </div>
+</div>
 {% endblock %}

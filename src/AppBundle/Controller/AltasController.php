@@ -103,6 +103,11 @@ class AltasController extends Controller
          ->setParameter('anoAlta', $anoAlta);
          $altas = $query->getResult();
 
+         $totalAltas = 0;
+         for ($i=0; $i < count($altas) ; $i++) {
+          $totalAltas = $totalAltas + $altas[$i]->getCantidad();
+         }
+
         //$altas = $em->getRepository('AppBundle:Altas')->findAll();
         $estado = 'lleno';
         if ($altas == NULL) {
@@ -110,6 +115,7 @@ class AltasController extends Controller
         }
 
         return $this->render('altas/index.html.twig', array(
+            'totalALtas' => $totalAltas,
             'altas' => $altas,
             'estado' => $estado,
             'mesAlta' => $mesAlta,
@@ -215,16 +221,33 @@ class AltasController extends Controller
     /**
      * Deletes a alta entity.
      *
-     * @Route("/{id}", name="altas_delete")
-     * @Method("DELETE")
+     * @Route("/borraReg/{id}", name="borrar_reg")
+     * @Method("GET")
      */
-    public function deleteAction(Request $request, Altas $alta)
+    public function borrarAction ($id){
+      $em = $this->getDoctrine()->getManager();
+      $alta = $em->getRepository('AppBundle:Altas')->findBy(['id'=>$id]);
+      $em->remove($alta[0]);
+      $em->flush();
+      return $this->redirectToRoute('altas_index');
+
+    }
+
+    /**
+     * Deletes a alta entity.
+     *
+     * @Route("/{id}", name="altas_delete")
+     * @Method({"POST","GET"})
+     */
+    public function deleteAction(Request $request, $id)
     {
-        $form = $this->createDeleteForm($alta);
+        $em = $this->getDoctrine()->getManager();
+        $alta = $em->getRepository('AppBundle:Altas')->findBy(['id'=>$id]);
+        $form = $this->createDeleteForm($alta[0]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+
             $em->remove($alta);
             $em->flush();
         }
@@ -243,7 +266,7 @@ class AltasController extends Controller
     {
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('altas_delete', array('id' => $alta->getId())))
-            ->setMethod('DELETE')
+            ->setMethod('POST')
             ->getForm()
         ;
     }

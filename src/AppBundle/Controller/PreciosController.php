@@ -26,8 +26,16 @@ class PreciosController extends Controller
 
         $precios = $em->getRepository('AppBundle:Precios')->findAll(['ano'=>'ASC']);
 
+        $query = $em->createQuery(
+         'SELECT p
+          FROM AppBundle:Precios p
+          ORDER BY p.ano DESC'
+         );
+         $Aprecios = $query->getResult();
+
+
         return $this->render('precios/index.html.twig', array(
-            'precios' => $precios,
+            'precios' => $Aprecios,
         ));
     }
 
