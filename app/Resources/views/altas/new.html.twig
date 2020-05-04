@@ -24,7 +24,7 @@
   </div><br>
   <div>
   <div>
-  <strong>{{ form_label(form.observacion, 'Alguna observacioón:') }}</strong><br>
+  <strong>{{ form_label(form.observacion, 'Alguna observación:') }}</strong><br>
   <span>{{ form_widget(form.observacion) }}</span>
   </div><br>
   <strong>{{ form_label(form.producto) }}</strong><br>
@@ -39,6 +39,18 @@
     <ul>
         <li>
             <a href="{{ path('altas_index') }}">Back to the list</a>
+        </li>
+    </ul>
+    {% if mensaje != 'Verdadero'%}
+    <ul>
+        <li>
+              <p><h4>{{mensaje}}</h4></p>
+        </li>
+    </ul>
+  {% endif %}
+    <ul>
+        <li>
+            <p>Valor desastre vale: {{desastre}}</p>
         </li>
     </ul>
 {% endblock %}

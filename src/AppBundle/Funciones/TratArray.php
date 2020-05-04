@@ -111,6 +111,11 @@ for ($h=0; $h < count($trabajadores); $h++) {
           $arrayPeonadas[$trabajador][33]=0;
           $arrayPeonadas[$trabajador][34]=$arrayPeonadas[$trabajador][32]*$precio[0]->getValor();
           $arrayPeonadas[$trabajador][35]=0;
+
+          //if (count($altas) == 0) {  }
+
+          $totales[34]=$totales[34]+$arrayPeonadas[$trabajador][34];
+
           for ($g=0; $g < count($altas) ; $g++) {
             if ($trabajador == $altas[$g]->getNombre()->getNombre()) {
               $arrayPeonadas[$trabajador][33]=$altas[$g]->getCantidad();
@@ -121,7 +126,10 @@ for ($h=0; $h < count($trabajadores); $h++) {
               $CC =($peo - $alt)*$precio[0]->getValor();
               $arrayPeonadas[$trabajador][34]=$CC;
               $arrayPeonadas[$trabajador][35]=$CS;
-              $totales[34]=$totales[34]+$CC;//NUEVO
+              //$totales[34]=$totales[34]+$CC;//NUEVO
+              $toPeo = $totales[32];
+              $toAlt = $totales[33];
+              $totales[34]= ($toPeo-$toAlt)*$precio[0]->getValor();
               $totales[35]=$totales[35]+$CS;//NUEVO
 
             }
@@ -166,6 +174,12 @@ public function dameArrayTrabajadores($partes){
 
 public function dameElIntervalo($mes, $ano){
     switch ($mes) {
+      case 'Todos':
+        $arrayIntervalo[0] = $ano;
+        $arrayIntervalo[1] = 1;
+        $arrayIntervalo[2] = $ano+1;
+        $arrayIntervalo[3] = 1;
+         break;
       case 'Enero':
         $arrayIntervalo[0] = $ano;
         $arrayIntervalo[1] = 1;

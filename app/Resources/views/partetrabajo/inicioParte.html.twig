@@ -2,7 +2,13 @@
 {% block body %}
 <div class=”col-lg-8 box-form”>
 <br>
-<h2 class="page-header">Selecciona nuevo día y cuadrilla:</h2>
+<h2 class="page-header">Selecciona nuevo día y cuadrilla:</h2><br>
+
+<h4> <strong> Último registro insertado</strong> </h4>
+<ul>
+  <li>{{parte.fecha|date( 'd-m-Y' )}} | {{parte.trabajador}} | {{parte.trabajo}} | {{parte.finca}}</li>
+</ul>
+
 
 {{form_start(form)}}
   <fieldset>

@@ -22,7 +22,9 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Validator\Constraints\DateTime;
+
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+
 use AppBundle\Funciones\TratArray;
 
 /**
@@ -33,6 +35,214 @@ use AppBundle\Funciones\TratArray;
 
 class ParteTrabajoController extends Controller
 {
+  /**
+   * Lista la comparatiza de gastos en trabajos realizados en una determinada finca y año.
+   *
+   * @Route("/listados/", name="listados")
+   * @Method({"GET", "POST"})
+   */
+  public function listadosAction (Request $request){
+    $em = $this->getDoctrine()->getManager();
+    $calculo = new TratArray();
+    $ary = ['Las 13','Rancho'];
+    //Inicializamos el parte por defecto
+    $query = $em->createQuery(
+      "SELECT p
+      FROM AppBundle:ParteTrabajo p
+      JOIN p.finca f JOIN p.trabajo t
+      WHERE f.nombre IN (:arr) AND t.nombre IN (:att)"
+    )->setParameter('arr', $ary)
+    ->setParameter('att', ['Limpia']);
+    $partes = $query->getResult();
+
+    $Aejercicio = $this->dame('Ejercicios');
+    $Ames = $this->dame('Meses');
+    $Afinca = $this->dame('Fincas');
+    $Atrabajo = $this->dame('Trabajos');
+    $Atrabajador = $this->dame('Trabajadores');
+    $Atipo = $this->dame('Tipos');
+
+    $defaultData = array('message' => 'Listar Partes');
+    $form = $this->createFormBuilder($defaultData)
+        ->add('Ejercicio', ChoiceType::class, array('choices' => $Aejercicio
+         ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+        ->add('Mes', ChoiceType::class, array('choices' => $Ames
+         ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+        ->add('Finca', ChoiceType::class, array('choices' => $Afinca
+         ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+        ->add('Trabajo', ChoiceType::class, array('choices' => $Atrabajo
+         ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+        ->add('Trabajador', ChoiceType::class, array('choices' => $Atrabajador
+           ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+        ->add('Tipo', ChoiceType::class, array('choices' => $Atipo
+          ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+        ->add('Enviar', SubmitType::class)
+        ->getForm();
+    $form->handleRequest($request);
+    if ($form->isSubmitted() && $form->isValid()) {
+
+      $Gproductos = $form->get('Ejercicio')->getData();
+      $Gfincas = $form->get('Finca')->getData();
+      $Gtrabajos = $form->get('Trabajo')->getData();
+      $mes = $form->get('Mes')->getData();
+
+      $ano = $em->getRepository('AppBundle:Producto')->findOneBy(array('nombre' => $Gproductos));
+      $Intervalo = $calculo->dameElIntervalo($mes,$ano->getYear());
+      $fecha1= new \DateTime($Intervalo[0] .'-'. $Intervalo[1] .'-01');
+      $fecha2= new \DateTime($Intervalo[2] .'-'. $Intervalo[3] .'-01');
+
+      $Gtrabajadores = $form->get('Trabajador')->getData();
+      $Gtipos = $form->get('Tipo')->getData();
+
+      $b=0;
+      foreach ($Atrabajador as $trabajador) {
+        $Btrabajadores[$b]=$trabajador;
+        $b++;
+      }
+
+      $Gtrabajadores = ($Gtrabajadores == 'Todos') ? $Btrabajadores : $Gtrabajadores ;
+
+      $b=0;
+      foreach ($Afinca as $finca) {
+        $Bfincas[$b]=$finca;
+        $b++;
+      }
+
+      $Gfincas = ($Gfincas == 'Todos') ? $Bfincas : $Gfincas ;
+
+      $b=0;
+      foreach ($Atrabajo as $trabajo) {
+        $Btrabajos[$b]=$trabajo;
+        $b++;
+      }
+
+      $Gtrabajos = ($Gtrabajos == 'Todos') ? $Btrabajos : $Gtrabajos ;
+
+      $b=0;
+      foreach ($Atipo as $tipo) {
+        $Btipos[$b]=$tipo;
+        $b++;
+      }
+
+      $Gtipos = ($Gtipos == 'Todos') ? $Btipos : $Gtipos ;
+
+      $query = $em->createQuery(
+      "SELECT p
+      FROM AppBundle:ParteTrabajo p
+      JOIN p.producto pr JOIN p.finca f JOIN p.trabajo t JOIN p.trabajador tr JOIN p.tipo ti
+      WHERE pr.nombre IN (:producto) AND f.nombre IN (:finca) AND t.nombre IN (:trabajo) AND tr.nombre IN (:trabajador)
+      AND ti.nombre IN (:tipo) AND p.fecha > :fecha1 AND p.fecha < :fecha2
+      ORDER BY p.id ASC"
+     )->setParameter('producto', $Gproductos )->setParameter('finca', $Gfincas )
+     ->setParameter('trabajo', $Gtrabajos)->setParameter('fecha1', $fecha1)->setParameter('fecha2',$fecha2)
+     ->setParameter('trabajador', $Gtrabajadores)->setParameter('tipo', $Gtipos);
+    $quimera = $query->getResult();
+
+    $suma = $this->sumaTipos($quimera);
+
+    return $this->render('partetrabajo/listados.html.twig', ['sumaP'=>$suma[0], 'sumaH'=>$suma[1],'partes'=>$quimera, 'form'=>$form->createView()]);
+    }
+
+  $suma = $this->sumaTipos($partes);
+  return $this->render('partetrabajo/listados.html.twig', ['sumaP'=>$suma[0], 'sumaH'=>$suma[1],'partes'=>$partes,'form'=>$form->createView()]);
+  }
+
+  public function sumaTipos($partesTrabajo){
+    $sumaHora = 0;
+    $sumaPeonada = 0;
+
+      foreach ($partesTrabajo as $parte) {
+
+        if ($parte->getTipo()->getNombre() == 'Hora') {
+          $sumaHora = $sumaHora + $parte->getCantidad();
+        } else {
+          $sumaPeonada = $sumaPeonada + $parte->getCantidad();
+        }
+      }
+      $resultado[0]=$sumaPeonada;
+      $resultado[1]=$sumaHora;
+    return $resultado;
+  }
+
+  public function dame($opcion){
+  $em = $this->getDoctrine()->getManager();
+
+  if ($opcion == 'Ejercicios') {
+    $query = $em->createQuery(
+      'SELECT e
+      FROM AppBundle:Producto e
+      ORDER BY e.year DESC'
+    );
+    $result = $query->getResult();
+  }elseif ($opcion == 'Meses') {
+    $resultado  = array(
+    'Todos'=>'Todos',
+    'Enero'=>'Enero',
+    'Febrero'=>'Febrero',
+    'Marzo'=>'Marzo',
+    'Abril'=>'Abril',
+    'Mayo'=>'Mayo',
+    'Junio'=>'Junio',
+    'Julio'=>'Julio',
+    'Agosto'=>'Agosto',
+    'Septiembre'=>'Septiembre',
+    'Octubre'=>'Octubre',
+    'Noviembre'=>'Noviembre',
+    'Diciembre'=>'Diciembre');
+  }elseif ($opcion == 'Fincas') {
+    $query = $em->createQuery(
+      'SELECT e
+      FROM AppBundle:Fincas e
+      ORDER BY e.nombre ASC'
+    );
+    $result = $query->getResult();
+  }elseif ($opcion == 'Trabajos') {
+    $query = $em->createQuery(
+      'SELECT e
+      FROM AppBundle:Trabajos e
+      ORDER BY e.nombre ASC'
+    );
+    $result = $query->getResult();
+  }elseif ($opcion == 'Trabajadores') {
+    $query = $em->createQuery(
+      'SELECT e
+      FROM AppBundle:Trabajadores e
+      ORDER BY e.nombre ASC'
+    );
+    $result = $query->getResult();
+  }elseif ($opcion == 'Tipos') {
+    $query = $em->createQuery(
+      'SELECT e
+      FROM AppBundle:Tipo e
+      ORDER BY e.nombre ASC'
+    );
+    $result = $query->getResult();
+  }
+
+  if ($opcion <> 'Meses') {
+    if ($opcion == 'Ejercicios') {
+      for ($i=0; $i < count($result); $i++) {
+        $resultado[$result[$i]->getNombre()]=$result[$i]->getNombre();
+      }
+    }else {
+
+     $final = count($result)+1;
+     for ($i=0; $i < $final; $i++) {
+       if ($i==0) {
+         $resultado['Todos']='Todos';
+       }else {
+         $j = $i-1;
+         $valor = $result[$j];
+         $resultado[$valor->getNombre()]=$valor->getNombre();
+       }
+     }
+
+   }
+   }
+
+  return $resultado;
+  }
+
   /**
    * Lista la comparatiza de gastos en trabajos realizados en una determinada finca y año.
    *
@@ -77,11 +287,15 @@ class ParteTrabajoController extends Controller
     )->setParameter('finca', $finca);
     $partes = $query->getResult();
 
+
+
   for ($i=0; $i < 4; $i++) {
     if ($opcion == 'campana') {
-      $primero[$cosecha[$i]] = $comp->comparafinca($partes, $fincas, $cosecha[$i]);
+      $partes2 = $em->getRepository('AppBundle:ParteTrabajo')->findAll();
+      $primero[$cosecha[$i]] = $comp->comparaProducto($partes2, $fincas, $cosecha[$i]);
       $cabecera = ' ';
     }else {
+
       $primero[$cosecha[$i]] = $comp->comparafinca($partes, $trabajos, $cosecha[$i]);
       $cabecera = $finca;
     }
@@ -427,7 +641,7 @@ class ParteTrabajoController extends Controller
       $precio2 = $em->getRepository('AppBundle:Precios')->findBy(['mes'=>$mes,'ano'=>$ano, 'tipo'=>$tipo[0]]);
 
       return $this->render('partetrabajo/resultadoMes.html.twig', array('fecha1'=>$fecha1,
-       'desastre'=> $precio[0]->getValor(),
+       'desastre'=> count($altas),//$precio[0]->getValor(),
        'mes' => $mes,
        'ano' => $ano,
        'arrPeonadas' => count($peonadas),
@@ -451,12 +665,22 @@ class ParteTrabajoController extends Controller
    public function inicioAction (Request $request, $cuadrilla=NULL)
    {
      $parteTrabajo = new Partetrabajo();
-
      $session = $request->getSession();
+     $em = $this->getDoctrine()->getManager();
      $session->start();
+     $query = $em->createQuery(
+      'SELECT p
+       FROM AppBundle:ParteTrabajo p
+       ORDER BY p.id DESC'
+      );
+      $PartesDeTrabajo = $query->getResult();
+
+
 
          $mensajeInicio = 'Introducir Fecha y Cuadrilla';
          $form = $this->createForm(FechaParteType::class, $parteTrabajo, array('action'=>$this->generateUrl('inicio_parte'), 'method'=>'POST'));
+
+         $form->get('fecha')->setData($PartesDeTrabajo[0]->getFecha());
 
          $form->handleRequest($request);
 
@@ -464,10 +688,14 @@ class ParteTrabajoController extends Controller
        $fecha = $parteTrabajo->getFecha();
        $cuadrilla = $parteTrabajo->getCuadrilla();
        $session->set('fecha', $fecha);
+       //$session->set('fechaSiguiente', $fecha);
        $session->set('cuadrilla', $cuadrilla);
        return $this->redirect($this->generateUrl('partetrabajo_index'));
      }
-     return $this->render('partetrabajo/inicioParte.html.twig', array('mensajeInicio' => $mensajeInicio,'form'=>$form->createView()));
+     return $this->render('partetrabajo/inicioParte.html.twig', array(
+       'parte' => $PartesDeTrabajo[0],
+       'mensajeInicio' => $mensajeInicio,
+       'form'=>$form->createView()));
    }
    /**
     * Modifica en la sesion la cuadrilla a insertar en parte de trabajo.
@@ -502,13 +730,30 @@ class ParteTrabajoController extends Controller
     /**
      * Lists all parteTrabajo entities.
      *
-     * @Route("/", name="partetrabajo_index")
+     * @Route("/{dia}", defaults={ "dia" = "NULL" }, name="partetrabajo_index")
      * @Method({"GET", "POST"})
      */
-    public function indexAction(Request $request, $prueba=NULL)
+    public function indexAction(Request $request, $dia='NULL')
     {
       $parteTrabajo = new Partetrabajo();
       $em = $this->getDoctrine()->getManager();
+      $session = $request->getSession();
+      $session->start();
+
+      $fech = $session->get('fecha');
+      $cuadrilla = $session->get('cuadrilla');
+
+      if ($dia == 'Siguiente') {
+        $fecha = clone $fech;
+        $fecha->modify('+1 day');
+        $session->set('fecha', $fecha);
+      }elseif ($dia == 'Anterior') {
+        $fecha = clone $fech;
+        $fecha->modify('-1 day');
+        $session->set('fecha', $fecha);
+      }else {
+        $fecha = $fech;
+      }
 
       //Obtenemos una lista ordenada de nombres de Trabajadores
 
@@ -523,11 +768,7 @@ class ParteTrabajoController extends Controller
          $Atrabajadores[$nombre] = $nombre;
        }
 
-      $session = $request->getSession();
-      $session->start();
-      $fecha = $session->get('fecha');
-      $cuadrilla = $session->get('cuadrilla');
-
+      //$fechaSiguiente = $session->get('fechaSiguiente');
 
       $form = $this->createForm(ParteTrabajoType::class, $parteTrabajo, array('action'=>$this->generateUrl('partetrabajo_index'), 'method'=>'POST'));
       $form->add('trabajador', ChoiceType::class, array('choices' => $Atrabajadores, 'mapped'=>false));
@@ -559,7 +800,9 @@ class ParteTrabajoController extends Controller
 
        $Calculo = new TratArray();
        $fechaNueva = new DateTime();
+
        $fechaNueva = $fecha;
+       //$desastre = $fecha;
 
        $arrayResumen = $Calculo->calcula($aceituna2017);
 
@@ -594,15 +837,17 @@ class ParteTrabajoController extends Controller
        $oo[1] = 8;
        $ae['Antonio'] = $ii;
        $ae['Juan'] = $oo;
-
        //BANCO DE PRUEBAS
+
+       $fechaSiguiente = clone $fecha;
+
        $parteTrabajo = new Partetrabajo();
        $form = $this->createForm(ParteTrabajoType::class, $parteTrabajo, array('action'=>$this->generateUrl('partetrabajo_index'), 'method'=>'POST'));
        $form->add('trabajador', ChoiceType::class, array('choices' => $Atrabajadores, 'mapped'=>false));
 
        return $this->render('partetrabajo/index.html.twig', array(
             //'tipo' => $tipo,
-            'desastre' => $desastre,
+            'desastre' => $fechaSiguiente->modify('+1 day'),//$fechaSiguiente->add(new \DateInterval('P1D')),
             'aceituna2017' => $aceituna2017,
 
             'peonadas' => 45,//$arrayResumen['Peonadas'],

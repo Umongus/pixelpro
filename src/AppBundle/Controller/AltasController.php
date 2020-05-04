@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\HttpFoundation\Session\Session;
+use AppBundle\Funciones\TratArray;
 
 
 /**
@@ -134,6 +135,7 @@ class AltasController extends Controller
         $session = $request->getSession();
         $session->start();
         $alta = new Altas();
+        $calculo = new TratArray();
         $em = $this->getDoctrine()->getManager();
         $mesAlta = $session->get('mesAlta');
         $anoAlta = $session->get('anoAlta');
@@ -141,16 +143,7 @@ class AltasController extends Controller
         $alta->setMes($mesAlta);
         $alta->setAno($anoAlta);
 
-        $query = $em->createQuery(
-         'SELECT t
-          FROM AppBundle:Trabajadores t
-          ORDER BY t.nombre ASC'
-         );
-         $trabajadores = $query->getResult();
-         for ($i=0; $i < count($trabajadores); $i++) {
-           $nombre = $trabajadores[$i]->getNombre();
-           $Atrabajadores[$nombre] = $nombre;
-         }
+        $Atrabajadores = $this->listaOrdenadaTrabajadores();
 
         $form = $this->createForm('AppBundle\Form\Altas2Type', $alta);
         $form->add('nombre', ChoiceType::class, array('choices' => $Atrabajadores, 'mapped'=>false));
@@ -161,15 +154,29 @@ class AltasController extends Controller
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $alta->setNombre($trabajador[0]);
+            $existe = $this->compruebaTrabajador($mesAlta,$anoAlta,$trabajador);
 
+            if ($existe == 'Verdadero') {
+            $alta->setNombre($trabajador[0]);
             $em->persist($alta);
             $em->flush();
-
-            return $this->redirectToRoute('altas_show', array('id' => $alta->getId()));
+           }else{
+             $desastre = $this->compruebaTrabajador($mesAlta,$anoAlta,$trabajador);
+            return $this->render('altas/new.html.twig', array(
+                'desastre' => $desastre,
+                'mensaje' => 'El trabajador ('.$nombre.') no ha realizado trabajos en el mes de: '.$mesAlta ,
+                'mesAlta' => $mesAlta,
+                'anoAlta' => $anoAlta,
+                'alta' => $alta,
+                'form' => $form->createView()));
+          }
+            return $this->render('altas/show.html.twig', array('alta'=>$alta, 'desastre' => $existe));
+            //return $this->redirectToRoute('altas_show', array('id' => $alta->getId()));
         }
 
         return $this->render('altas/new.html.twig', array(
+            'desastre' => 'Nda todavia',
+            'mensaje' => 'Verdadero',
             'mesAlta' => $mesAlta,
             'anoAlta' => $anoAlta,
             'alta' => $alta,
@@ -188,6 +195,7 @@ class AltasController extends Controller
         $deleteForm = $this->createDeleteForm($alta);
 
         return $this->render('altas/show.html.twig', array(
+            'desastre' => 'Vengo de otro sitio',
             'alta' => $alta,
             'delete_form' => $deleteForm->createView(),
         ));
@@ -253,6 +261,55 @@ class AltasController extends Controller
         }
 
         return $this->redirectToRoute('altas_index');
+    }
+
+    //GRUPO DE FUNCIONES INTERNAS
+    //GRUPO DE FUNCIONES INTERNAS
+    //GRUPO DE FUNCIONES INTERNAS
+
+    public function listaOrdenadaTrabajadores(){
+      $em = $this->getDoctrine()->getManager();
+      $query = $em->createQuery(
+       'SELECT t
+        FROM AppBundle:Trabajadores t
+        ORDER BY t.nombre ASC'
+       );
+       $trabajadores = $query->getResult();
+
+       for ($i=0; $i < count($trabajadores); $i++) {
+         $nombre = $trabajadores[$i]->getNombre();
+         $Atrabajadores[$nombre] = $nombre;
+       }
+
+      return $Atrabajadores;
+    }
+
+    public function compruebaTrabajador ($mesAlta, $anoAlta, $trabajador){
+      $existe = 'Verdadero';
+      $calculo = new TratArray();
+      $em = $this->getDoctrine()->getManager();
+      $arrayIntervalo = $calculo->dameElIntervalo($mesAlta, $anoAlta);
+
+      $fecha1= new \DateTime($arrayIntervalo[0] .'-'. $arrayIntervalo[1] .'-01');
+      $fecha2= new \DateTime($arrayIntervalo[2] .'-'. $arrayIntervalo[3] .'-01');
+
+      $query = $em->createQuery(
+       'SELECT p
+        FROM AppBundle:ParteTrabajo p
+        JOIN p.trabajador t
+        WHERE p.fecha >= :fecha1 AND p.fecha < :fecha2
+        ORDER BY t.nombre ASC'
+       )->setParameter('fecha1', $fecha1)
+       ->setParameter('fecha2', $fecha2);
+       $partes = $query->getResult();
+
+       $existe = 'Falso';
+       for ($i=0; $i < count($partes); $i++) {
+         if ($trabajador[0]->getId() == $partes[$i]->getTrabajador()->getId()) {
+           $existe = 'Verdadero';
+         }
+       }
+      return $existe;
     }
 
     /**

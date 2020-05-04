@@ -61,7 +61,10 @@
     <div class="col-9">
       <div class="m-4">
 
-      <h2 class="page header">Listado de Partes de trabajo: Día en curso( {{fecha|date('d-m-Y')}} )</h2><h2> Cuadrilla:{{cuadrilla}}</h2>
+      <h2 class="page header">Listado de Partes de trabajo: Día en curso( {{fecha|date('d-m-Y')}} )</h2>
+
+      <h2> <a href="{{ path('partetrabajo_index', { 'dia': 'Anterior' }) }}">Día anterior </a>Cuadrilla:{{cuadrilla}}<a href="{{ path('partetrabajo_index', { 'dia': 'Siguiente' }) }}"> Día siguiente</a></h2>
+
       <table class="table table-striped table-sm">
       <thead>
       <tr>
@@ -122,11 +125,11 @@
     </li>
   </ul>
   </div>
-  
+
   <div class="col-5">
     <ul>
       <li>
-        <a href="{{ path('inicio_parte') }}">Valor desastre vale= {{desastre}}</a>
+        <a href="{{ path('inicio_parte') }}">Valor desastre vale= {{desastre|date('d-m-Y')}}</a>
       </li>
     </ul>
 
