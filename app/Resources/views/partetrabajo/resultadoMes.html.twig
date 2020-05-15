@@ -87,7 +87,7 @@
   </thead>
   <tbody>
     {% for key, peonada in peonadas %}
-      {% if peonadas[key][32] > 0 %}
+      {% if peonadas[key][32] > 0 or peonadas[key][33] > 0 %}
         <tr>
           <th scope="row">{{key}}</th>
           {% for dia in peonada %}

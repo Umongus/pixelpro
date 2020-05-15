@@ -64,6 +64,8 @@ class ParteTrabajoController extends Controller
 
     $defaultData = array('message' => 'Listar Partes');
     $form = $this->createFormBuilder($defaultData)
+        ->add('Ano', ChoiceType::class, array('choices' => ['2017'=>2017, '2018'=>2018, '2019'=>2019, '2020'=>2020]
+         ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
         ->add('Ejercicio', ChoiceType::class, array('choices' => $Aejercicio
          ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
         ->add('Mes', ChoiceType::class, array('choices' => $Ames
@@ -86,8 +88,8 @@ class ParteTrabajoController extends Controller
       $Gtrabajos = $form->get('Trabajo')->getData();
       $mes = $form->get('Mes')->getData();
 
-      $ano = $em->getRepository('AppBundle:Producto')->findOneBy(array('nombre' => $Gproductos));
-      $Intervalo = $calculo->dameElIntervalo($mes,$ano->getYear());
+      $ano = $form->get('Ano')->getData();//$em->getRepository('AppBundle:Producto')->findOneBy(array('nombre' => $Gproductos));
+      $Intervalo = $calculo->dameElIntervalo($mes,$ano);
       $fecha1= new \DateTime($Intervalo[0] .'-'. $Intervalo[1] .'-01');
       $fecha2= new \DateTime($Intervalo[2] .'-'. $Intervalo[3] .'-01');
 
@@ -126,12 +128,20 @@ class ParteTrabajoController extends Controller
 
       $Gtipos = ($Gtipos == 'Todos') ? $Btipos : $Gtipos ;
 
+      $b=0;
+      foreach ($Aejercicio as $ejercicio) {
+        $Bejercicios[$b]=$ejercicio;
+        $b++;
+      }
+
+      $Gproductos = ($Gproductos == 'Todos') ? $Bejercicios : $Gproductos ;
+
       $query = $em->createQuery(
       "SELECT p
       FROM AppBundle:ParteTrabajo p
       JOIN p.producto pr JOIN p.finca f JOIN p.trabajo t JOIN p.trabajador tr JOIN p.tipo ti
       WHERE pr.nombre IN (:producto) AND f.nombre IN (:finca) AND t.nombre IN (:trabajo) AND tr.nombre IN (:trabajador)
-      AND ti.nombre IN (:tipo) AND p.fecha > :fecha1 AND p.fecha < :fecha2
+      AND ti.nombre IN (:tipo) AND p.fecha >= :fecha1 AND p.fecha < :fecha2
       ORDER BY p.id ASC"
      )->setParameter('producto', $Gproductos )->setParameter('finca', $Gfincas )
      ->setParameter('trabajo', $Gtrabajos)->setParameter('fecha1', $fecha1)->setParameter('fecha2',$fecha2)
@@ -220,11 +230,7 @@ class ParteTrabajoController extends Controller
   }
 
   if ($opcion <> 'Meses') {
-    if ($opcion == 'Ejercicios') {
-      for ($i=0; $i < count($result); $i++) {
-        $resultado[$result[$i]->getNombre()]=$result[$i]->getNombre();
-      }
-    }else {
+
 
      $final = count($result)+1;
      for ($i=0; $i < $final; $i++) {
@@ -237,7 +243,7 @@ class ParteTrabajoController extends Controller
        }
      }
 
-   }
+
    }
 
   return $resultado;
@@ -474,6 +480,7 @@ class ParteTrabajoController extends Controller
    */
   public function iniciarListadoAction (Request $request, $opcion = 'ambos'){
 
+    $desastre ='Correcto';
     $session = $request->getSession();
     $session->start();
 
@@ -544,9 +551,21 @@ class ParteTrabajoController extends Controller
         $session->set('mes2', $mes);
       }
 
-      return $this->redirect($this->generateUrl('lista_mes'));
+      $mes = $session->get('mes2');
+      $ano = $session->get('year2');
+      $Aprecios = $em->getRepository('AppBundle:Precios')->findBy(['mes'=>$mes,'ano'=>$ano]);
+      if (count($Aprecios) > 0) {
+
+        return $this->redirect($this->generateUrl('lista_mes'));
+
+      }else {
+        $desastre = 'No hay determinado un precio para el mes solicitado!!!';
+      }
+
     }
-    return $this->render('partetrabajo/inicioMes.html.twig', array('form'=>$form->createView()));
+    return $this->render('partetrabajo/inicioMes.html.twig', array('form'=>$form->createView(),
+      'desastre'=>$desastre
+    ));
   }
   /**
    * Lista los trabajos de un mes y los representa en una tabla parecida al excel.
@@ -727,6 +746,53 @@ class ParteTrabajoController extends Controller
             return $this->render('partetrabajo/inicioParte2.html.twig', array('mensajeInicio' => $mensajeInicio,'form'=>$form->createView()));
       }
     }
+
+    public function aviso($fecha, $opcion, $nombresito){
+      $desastre = 'Correcto';
+      $em = $this->getDoctrine()->getManager();
+      $partes = $em->getRepository('AppBundle:ParteTrabajo')->findBy(['fecha'=>$fecha]);
+
+      switch ($opcion) {
+      case 'MasDeDos':
+        if (count($partes) > 0) {
+            $cantidad = 0;
+            for ($j=0; $j < count($partes) ; $j++) {
+              if ($partes[$j]->getTipo()->getNombre()=='Peonada' && $partes[$j]->getTrabajador()->getNombre()==$nombresito) {
+                $cantidad = $cantidad + $partes[$j]->getCantidad();
+              }
+            }
+
+            if ($cantidad > 1) {
+              $desastre = '¡¡EL TRABJADOR '.$nombresito.' CON MÁS DE UNA PEONADA EN ESTE DÍA!!';
+            }
+
+        }
+      break;
+      case 'PrimeraVez':
+      $suma = (int)$fecha->format('m');
+      $suma = $suma +1;
+      $cadena = (string)$suma;
+      $fechaUno= new \DateTime($fecha->format('Y') .'-'. $fecha->format('m') .'-01');
+      $fechaDos= new \DateTime($fecha->format('Y') .'-'. $cadena .'-01');
+
+      $query = $em->createQuery(
+        "SELECT p
+        FROM AppBundle:ParteTrabajo p
+        JOIN p.trabajador t
+        WHERE p.fecha >= :fecha1 AND p.fecha < :fecha2 AND t.nombre = :nombre"
+      )->setParameter('fecha1', $fechaUno)
+      ->setParameter('fecha2', $fechaDos)
+      ->setParameter('nombre', $nombresito);
+      $partes = $query->getResult();
+
+      if (count($partes) == 0) {
+        $desastre = $nombresito;
+      }
+        break;
+      }
+      return $desastre;
+    }
+
     /**
      * Lists all parteTrabajo entities.
      *
@@ -735,6 +801,9 @@ class ParteTrabajoController extends Controller
      */
     public function indexAction(Request $request, $dia='NULL')
     {
+      $masDeDos = 'Correcto';
+      $primeraVez = 'Correcto';
+      $calculo = new TratArray();
       $parteTrabajo = new Partetrabajo();
       $em = $this->getDoctrine()->getManager();
       $session = $request->getSession();
@@ -755,8 +824,6 @@ class ParteTrabajoController extends Controller
         $fecha = $fech;
       }
 
-      //Obtenemos una lista ordenada de nombres de Trabajadores
-
       $query = $em->createQuery(
        'SELECT t
         FROM AppBundle:Trabajadores t
@@ -768,41 +835,56 @@ class ParteTrabajoController extends Controller
          $Atrabajadores[$nombre] = $nombre;
        }
 
-      //$fechaSiguiente = $session->get('fechaSiguiente');
+      $Afincas = $this->dame('Fincas');
+      unset($Afincas['Todos']);
 
       $form = $this->createForm(ParteTrabajoType::class, $parteTrabajo, array('action'=>$this->generateUrl('partetrabajo_index'), 'method'=>'POST'));
       $form->add('trabajador', ChoiceType::class, array('choices' => $Atrabajadores, 'mapped'=>false));
+      $form->add('finca', ChoiceType::class, array('choices' => $Afincas, 'mapped'=>false));
       $form->handleRequest($request);
 
       $nombresito = $form->get('trabajador')->getData();
+      $trabajadorName = $nombresito;
       $queEs = $em->getRepository('AppBundle:Trabajadores')->findBy(['nombre'=>$nombresito]);
 
-      $desastre = 'Correcto';
-
+//PARTE DE LA FUNCION AVISO
+      $suma = (int)$fech->format('m');
+      $suma = $suma +1;
+      $cadena = (string)$suma;
+      $fechaUno= new \DateTime($fech->format('Y') .'-'. $fech->format('m') .'-01');
+      $fechaDos= new \DateTime($fech->format('Y') .'-'. $cadena .'-01');
+//PARTE DE LA FUNCION AVISO
       if ($form->isSubmitted() && $form->isValid()) {
+        $nombresito = $form->get('finca')->getData();
+        $objetoFinca = $em->getRepository('AppBundle:Fincas')->findBy(['nombre'=>$nombresito]);
 
+          $parteTrabajo->setFinca($objetoFinca[0]);
           $parteTrabajo->setTrabajador($queEs[0]);
           $parteTrabajo->setFecha($fecha);
           $parteTrabajo->setCuadrilla($cuadrilla);
+
           if ($parteTrabajo->getCantidad() <= 0) {
-            $desastre = "La catidad insertada debe ser mayor que 0";
+            $desastre = "La cantidad insertada debe ser mayor que 0";
           }else {
+
+            $primeraVez = $this->aviso($fech, 'PrimeraVez', $trabajadorName);
+
             $em->persist($parteTrabajo);
             $em->flush();
-
           }
+
+          $masDeDos = $this->aviso($fecha, 'MasDeDos', $trabajadorName);
+
       }
 
        $em = $this->getDoctrine()->getManager();
        $producto = $em->getRepository('AppBundle:Producto')->findOneByNombre('Aceituna 2017');
        $aceituna2017 = $em->getRepository('AppBundle:ParteTrabajo')->findByProducto($producto->getId());
-       //$nuevaBusqueda = count($aceituna2017);
 
        $Calculo = new TratArray();
        $fechaNueva = new DateTime();
 
        $fechaNueva = $fecha;
-       //$desastre = $fecha;
 
        $arrayResumen = $Calculo->calcula($aceituna2017);
 
@@ -813,11 +895,6 @@ class ParteTrabajoController extends Controller
        $arrayHoras2 = $Calculo->calculaTipos($arrayCuadrilla2, $partesDia, 'Hora');
        $arrayPeonadas2 = $Calculo->calculaTipos($arrayCuadrilla2, $partesDia, 'Peonada');
 
-       $atope = 'PartesDia NO es igual a NULL';
-       if ($partesDia == NULL) {
-         $atope = 'PartesDia es igual a NULL';
-       }
-
        $totPeonadas2 = 0;
        foreach ($arrayPeonadas2 as $peonada) {
           $totPeonadas2 = $totPeonadas2 + $peonada;
@@ -827,29 +904,20 @@ class ParteTrabajoController extends Controller
        foreach ($arrayHoras2 as $hora) {
           $totHoras2 = $totHoras2 + $hora;
        }
-       //BANCO DE PRUEBAS
-       $ae = array();
-       $ii = array();
-       $oo = array();
-       $ii[0] = 7;
-       $ii[1] = 7;
-       $oo[0] = 8;
-       $oo[1] = 8;
-       $ae['Antonio'] = $ii;
-       $ae['Juan'] = $oo;
-       //BANCO DE PRUEBAS
 
        $fechaSiguiente = clone $fecha;
 
        $parteTrabajo = new Partetrabajo();
        $form = $this->createForm(ParteTrabajoType::class, $parteTrabajo, array('action'=>$this->generateUrl('partetrabajo_index'), 'method'=>'POST'));
        $form->add('trabajador', ChoiceType::class, array('choices' => $Atrabajadores, 'mapped'=>false));
+       $form->add('finca', ChoiceType::class, array('choices' => $Afincas, 'mapped'=>false));
 
        return $this->render('partetrabajo/index.html.twig', array(
-            //'tipo' => $tipo,
-            'desastre' => $fechaSiguiente->modify('+1 day'),//$fechaSiguiente->add(new \DateInterval('P1D')),
+            'fecha1' => $fechaUno,
+            'fecha2' => $fechaDos,
+            'prueba' => $primeraVez,
+            'desastre' => $masDeDos,//$fechaSiguiente->modify('+1 day'),//$fechaSiguiente->add(new \DateInterval('P1D')),
             'aceituna2017' => $aceituna2017,
-
             'peonadas' => 45,//$arrayResumen['Peonadas'],
             'horas' => 46,//$arrayResumen['Hora'],
             'totHoras' => $totHoras2,
@@ -921,6 +989,7 @@ class ParteTrabajoController extends Controller
       $form->add('fecha', DateType::class);
       $form->add('cuadrilla');
       $form->add('trabajador');
+      $form->add('finca');
       $form->add('save', SubmitType::class, array('label'=>'Editar Parte'));
 
       $form->handlerequest($request);

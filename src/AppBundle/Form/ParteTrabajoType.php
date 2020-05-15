@@ -13,10 +13,10 @@ class ParteTrabajoType extends AbstractType{
 
     $builder
     //->add('trabajador')
+    //->add('finca')
     ->add('cantidad')
     ->add('trabajo')
     ->add('tipo')
-    ->add('finca')
     ->add('producto')
     ->add('observacion', TextareaType::class, array('required' => false))
     ->add('save', SubmitType::class, array('label'=>'Crear Parte'));

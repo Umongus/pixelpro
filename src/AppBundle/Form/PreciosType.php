@@ -17,7 +17,7 @@ class PreciosType extends AbstractType
         $builder->add('mes'
         , ChoiceType::class, array('choices' => ['Enero'=>'Enero',
         'Febrero'=>'Febrero',
-        'Marzo'=>'Merzo',
+        'Marzo'=>'Marzo',
         'Abril'=>'Abril',
         'Mayo'=>'Mayo',
         'Junio'=>'Junio',
