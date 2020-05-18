@@ -974,6 +974,16 @@ class ParteTrabajoController extends Controller
     }
 
     /**
+     * Prueba de paso de varios parametros
+     *
+     * @Route("/paso/{param1}/{param2}", name="paso_parametros")
+     * @Method({"GET", "POST"})
+     */
+    public function pasoAction($param1,$param2){
+      return $this->render('partetrabajo/paso.html.twig', array('param1'=>$param1, 'param2'=>$param2));
+    }
+
+    /**
      * Displays a form to edit an existing parteTrabajo entity.
      *
      * @Route("/{id}/edit", name="partetrabajo_edit")
