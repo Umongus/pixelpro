@@ -100,7 +100,7 @@
       {% endif %}
       <td>
 
-      <a href=" {{ path('partetrabajo_edit', { 'id': parteTrabajo.id }) }}">Editar |</a>
+      <a href=" {{ path('partetrabajo_edit', { 'id': parteTrabajo.id , 'procede': 'PartesDeTrabajo' }) }}">Editar |</a>
       <a href="{{ path('partetrabajo_show', { 'id': parteTrabajo.id }) }}">Mostrar |</a>
       <a href="{{ path('partetrabajo_delete', { 'id': parteTrabajo.id }) }}">Eliminar</a>
       </td>

@@ -44,7 +44,14 @@ class ParteTrabajoController extends Controller
   public function listadosAction (Request $request){
     $em = $this->getDoctrine()->getManager();
     $calculo = new TratArray();
-    $ary = ['Las 13','Rancho'];
+    $ary = ['Las 130','Rancholl'];
+    $desastre='Tiene esta cadena';
+    $session = $request->getSession();
+    $session->start();
+    $desastre = (string)$session->get('Aleatorio');
+    if ($desastre=='') {
+      $desastre='VACIO';
+    }
     //Inicializamos el parte por defecto
     $query = $em->createQuery(
       "SELECT p
@@ -86,15 +93,22 @@ class ParteTrabajoController extends Controller
       $Gproductos = $form->get('Ejercicio')->getData();
       $Gfincas = $form->get('Finca')->getData();
       $Gtrabajos = $form->get('Trabajo')->getData();
+      $Gtrabajadores = $form->get('Trabajador')->getData();
+      $Gtipos = $form->get('Tipo')->getData();
       $mes = $form->get('Mes')->getData();
-
       $ano = $form->get('Ano')->getData();//$em->getRepository('AppBundle:Producto')->findOneBy(array('nombre' => $Gproductos));
+
+      $session->set('Gproductos', $Gproductos);
+      $session->set('Gfincas', $Gfincas);
+      $session->set('Gtrabajos', $Gtrabajos);
+      $session->set('Gtrabajadores', $Gtrabajadores);
+      $session->set('Gtipos', $Gtipos);
+      $session->set('Gmes', $mes);
+      $session->set('Gano', $ano);
+
       $Intervalo = $calculo->dameElIntervalo($mes,$ano);
       $fecha1= new \DateTime($Intervalo[0] .'-'. $Intervalo[1] .'-01');
       $fecha2= new \DateTime($Intervalo[2] .'-'. $Intervalo[3] .'-01');
-
-      $Gtrabajadores = $form->get('Trabajador')->getData();
-      $Gtipos = $form->get('Tipo')->getData();
 
       $b=0;
       foreach ($Atrabajador as $trabajador) {
@@ -150,11 +164,85 @@ class ParteTrabajoController extends Controller
 
     $suma = $this->sumaTipos($quimera);
 
-    return $this->render('partetrabajo/listados.html.twig', ['sumaP'=>$suma[0], 'sumaH'=>$suma[1],'partes'=>$quimera, 'form'=>$form->createView()]);
+    return $this->render('partetrabajo/listados.html.twig', ['desastre'=>$desastre,'sumaP'=>$suma[0], 'sumaH'=>$suma[1],'partes'=>$quimera, 'form'=>$form->createView()]);
     }
 
+    $desastre = (string)$session->get('Gproductos');
+    if ($desastre <> '') {
+      $Gproductos = $session->get('Gproductos');
+      $Gfincas = $session->get('Gfincas');
+      $Gtrabajos = $session->get('Gtrabajos');
+      $Gtrabajadores = $session->get('Gtrabajadores');
+      $Gtipos = $session->get('Gtipos');
+      $mes = $session->get('Gmes');
+      $ano = $session->get('Gano');
+
+      $Intervalo = $calculo->dameElIntervalo($mes,$ano);
+      $fecha1= new \DateTime($Intervalo[0] .'-'. $Intervalo[1] .'-01');
+      $fecha2= new \DateTime($Intervalo[2] .'-'. $Intervalo[3] .'-01');
+
+      $b=0;
+      foreach ($Atrabajador as $trabajador) {
+        $Btrabajadores[$b]=$trabajador;
+        $b++;
+      }
+
+      $Gtrabajadores = ($Gtrabajadores == 'Todos') ? $Btrabajadores : $Gtrabajadores ;
+
+      $b=0;
+      foreach ($Afinca as $finca) {
+        $Bfincas[$b]=$finca;
+        $b++;
+      }
+
+      $Gfincas = ($Gfincas == 'Todos') ? $Bfincas : $Gfincas ;
+
+      $b=0;
+      foreach ($Atrabajo as $trabajo) {
+        $Btrabajos[$b]=$trabajo;
+        $b++;
+      }
+
+      $Gtrabajos = ($Gtrabajos == 'Todos') ? $Btrabajos : $Gtrabajos ;
+
+      $b=0;
+      foreach ($Atipo as $tipo) {
+        $Btipos[$b]=$tipo;
+        $b++;
+      }
+
+      $Gtipos = ($Gtipos == 'Todos') ? $Btipos : $Gtipos ;
+
+      $b=0;
+      foreach ($Aejercicio as $ejercicio) {
+        $Bejercicios[$b]=$ejercicio;
+        $b++;
+      }
+
+      $Gproductos = ($Gproductos == 'Todos') ? $Bejercicios : $Gproductos ;
+
+      $query = $em->createQuery(
+      "SELECT p
+      FROM AppBundle:ParteTrabajo p
+      JOIN p.producto pr JOIN p.finca f JOIN p.trabajo t JOIN p.trabajador tr JOIN p.tipo ti
+      WHERE pr.nombre IN (:producto) AND f.nombre IN (:finca) AND t.nombre IN (:trabajo) AND tr.nombre IN (:trabajador)
+      AND ti.nombre IN (:tipo) AND p.fecha >= :fecha1 AND p.fecha < :fecha2
+      ORDER BY p.id ASC"
+     )->setParameter('producto', $Gproductos )->setParameter('finca', $Gfincas )
+     ->setParameter('trabajo', $Gtrabajos)->setParameter('fecha1', $fecha1)->setParameter('fecha2',$fecha2)
+     ->setParameter('trabajador', $Gtrabajadores)->setParameter('tipo', $Gtipos);
+    $quimera = $query->getResult();
+
+    $suma = $this->sumaTipos($quimera);
+    $partes = $quimera;
+
+    } else {
+      $suma = $this->sumaTipos($partes);
+    }
+
+
   $suma = $this->sumaTipos($partes);
-  return $this->render('partetrabajo/listados.html.twig', ['sumaP'=>$suma[0], 'sumaH'=>$suma[1],'partes'=>$partes,'form'=>$form->createView()]);
+  return $this->render('partetrabajo/listados.html.twig', ['desastre'=>$desastre,'sumaP'=>$suma[0], 'sumaH'=>$suma[1],'partes'=>$partes,'form'=>$form->createView()]);
   }
 
   public function sumaTipos($partesTrabajo){
@@ -986,16 +1074,16 @@ class ParteTrabajoController extends Controller
     /**
      * Displays a form to edit an existing parteTrabajo entity.
      *
-     * @Route("/{id}/edit", name="partetrabajo_edit")
+     * @Route("/{id}/{procede}/edit", name="partetrabajo_edit")
      * @Method({"GET", "POST"})
      */
-    public function editAction(Request $request, $id)
+    public function editAction(Request $request, $id, $procede='NoSabemos')
     {
 
       $em = $this->getDoctrine()->getManager();
       $parteTrabajo = $em->getRepository('AppBundle:ParteTrabajo')->find($id);
 
-      $form = $this->createForm(ParteTrabajoType::class, $parteTrabajo, array('action'=>$this->generateUrl('partetrabajo_edit', array('id'=>$parteTrabajo->getId())), 'method'=>'PUT'));
+      $form = $this->createForm(ParteTrabajoType::class, $parteTrabajo, array('action'=>$this->generateUrl('partetrabajo_edit', array('id'=>$parteTrabajo->getId(),'procede'=>$procede)), 'method'=>'PUT'));
       $form->add('fecha', DateType::class);
       $form->add('cuadrilla');
       $form->add('trabajador');
@@ -1005,8 +1093,12 @@ class ParteTrabajoController extends Controller
       $form->handlerequest($request);
       if($form->isValid()){
         $em->flush();
+        if ($procede == 'PartesDeTrabajo' ) {
 
-      return $this->redirect($this->generateUrl('partetrabajo_show', array('id'=>$parteTrabajo->getId())));
+          return $this->redirect($this->generateUrl('partetrabajo_show', array('id'=>$parteTrabajo->getId())));
+        }else {
+          return $this->redirect($this->generateUrl('listados'));
+        }
       }
 
     return $this->render('partetrabajo/edit.html.twig', array('form'=>$form->createView()));

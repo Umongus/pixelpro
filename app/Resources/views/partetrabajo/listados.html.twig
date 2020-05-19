@@ -49,7 +49,7 @@
   {% endif %}
   <td>
 
-  <a href=" {{ path('partetrabajo_edit', { 'id': parte.id }) }}">Editar |</a>
+  <a href=" {{ path('partetrabajo_edit', { 'id': parte.id , 'procede':'Listados'}) }}">Editar |</a>
   <a href="{{ path('partetrabajo_show', { 'id': parte.id }) }}">Mostrar |</a>
   <a href="{{ path('partetrabajo_delete', { 'id': parte.id }) }}">Eliminar</a>
   </td>
@@ -57,6 +57,8 @@
   {% endfor %}
   </tbody>
   </table>
+  <br>
+  <p>El contenido de desastre vale: {{desastre}}</p>
   </div>
 </div>
 
