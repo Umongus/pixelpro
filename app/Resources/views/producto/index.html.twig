@@ -19,6 +19,10 @@
       <th>ID</th>
       <th>NOMBRE</th>
       <th>AÑO</th>
+      <th>INICIO CAMP</th>
+      <th>FIN CAMP</th>
+      <th>INICIO ALM</th>
+      <th>FIN ALM</th>
       <th>OPCIONES</th>
 
       </tr>
@@ -29,6 +33,10 @@
       <th scope="row">{{ producto.id }}</th>
       <td>{{ producto.nombre }}</td>
       <td>{{ producto.year }}</td>
+      <td>{{ producto.fechaInicioCampo|date('d-m-Y') }}</td>
+      <td>{{ producto.fechaFinCampo|date('d-m-Y') }}</td>
+      <td>{{ producto.fechaInicioAlmacen|date('d-m-Y') }}</td>
+      <td>{{ producto.fechaFinAlmacen|date('d-m-Y') }}</td>
       <td>
 
       <a href=" {{ path('producto_edit', { 'id': producto.id }) }}">Editar |</a>

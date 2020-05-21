@@ -12,6 +12,10 @@ class ProductoType extends AbstractType{
     $builder
     ->add('nombre')
     ->add('year')
+    ->add('fechaInicioCampo')
+    ->add('fechaFinCampo')
+    ->add('fechaInicioAlmacen')
+    ->add('fechaFinAlmacen')
     ->add('save', SubmitType::class, array('label'=>'Crear Producto'));
   }
 

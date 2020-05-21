@@ -14,6 +14,22 @@
   <strong>{{ form_label(form.year, 'Año:') }}</strong><br>
   <span>{{ form_widget(form.year) }}</span>
   </div><br>
+  <div>
+  <strong>{{ form_label(form.fechaInicioCampo, 'Inicio Campo:') }}</strong><br>
+  <span>{{ form_widget(form.fechaInicioCampo) }}</span>
+  </div><br>
+  <div>
+  <strong>{{ form_label(form.fechaFinCampo, 'Fin Campo') }}</strong><br>
+  <span>{{ form_widget(form.fechaFinCampo) }}</span>
+  </div><br>
+  <div>
+  <strong>{{ form_label(form.fechaInicioAlmacen, 'Inicio Almacen') }}</strong><br>
+  <span>{{ form_widget(form.fechaInicioAlmacen) }}</span>
+  </div><br>
+  <div>
+  <strong>{{ form_label(form.fechaFinAlmacen, 'Fin Almacen') }}</strong><br>
+  <span>{{ form_widget(form.fechaFinAlmacen) }}</span>
+  </div><br>
   </fieldset>
 {{ form_end(form) }}
 </div>

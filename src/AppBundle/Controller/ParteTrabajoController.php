@@ -79,7 +79,7 @@ class ParteTrabajoController extends Controller
          ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
         ->add('Finca', ChoiceType::class, array('choices' => $Afinca
          ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
-        ->add('Trabajo', ChoiceType::class, array('choices' => $Atrabajo
+        ->add('Trabajo', ChoiceType::class, array('choices' => $Atrabajo, 'preferred_choices' => array('Limpia','Desbareto','RecoVerde')
          ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
         ->add('Trabajador', ChoiceType::class, array('choices' => $Atrabajador
            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
@@ -163,6 +163,8 @@ class ParteTrabajoController extends Controller
     $quimera = $query->getResult();
 
     $suma = $this->sumaTipos($quimera);
+
+    $form->get('Mes')->setData('Enero');
 
     return $this->render('partetrabajo/listados.html.twig', ['desastre'=>$desastre,'sumaP'=>$suma[0], 'sumaH'=>$suma[1],'partes'=>$quimera, 'form'=>$form->createView()]);
     }
@@ -889,6 +891,7 @@ class ParteTrabajoController extends Controller
      */
     public function indexAction(Request $request, $dia='NULL')
     {
+      $productoFinalNombre = 'Algun ERROR';
       $masDeDos = 'Correcto';
       $primeraVez = 'Correcto';
       $calculo = new TratArray();
@@ -951,6 +954,27 @@ class ParteTrabajoController extends Controller
           $parteTrabajo->setFecha($fecha);
           $parteTrabajo->setCuadrilla($cuadrilla);
 
+          $Aproductos = $em->getRepository('AppBundle:Producto')->findAll();
+          for ($i=0; $i < count($Aproductos); $i++) {
+            if ($objetoFinca[0]->getNombre() == 'Almacen') {
+              $inicio = $Aproductos[$i]->getFechaInicioAlmacen();
+              $fin = $Aproductos[$i]->getFechaFinAlmacen();
+              if ($fech > $inicio && $fech < $fin) {
+                $productoFinal = $Aproductos[$i];
+                $productoFinalNombre = $productoFinal->getNombre();
+              }
+            } else {
+              $inicio = $Aproductos[$i]->getFechaInicioCampo();
+              $fin = $Aproductos[$i]->getFechaFinCampo();
+              if ($fech > $inicio && $fech < $fin) {
+                $productoFinal = $Aproductos[$i];
+                $productoFinalNombre = $productoFinal->getNombre();
+              }
+            }
+          }
+
+          $parteTrabajo->setProducto($productoFinal);
+
           if ($parteTrabajo->getCantidad() <= 0) {
             $desastre = "La cantidad insertada debe ser mayor que 0";
           }else {
@@ -1001,6 +1025,7 @@ class ParteTrabajoController extends Controller
        $form->add('finca', ChoiceType::class, array('choices' => $Afincas, 'mapped'=>false));
 
        return $this->render('partetrabajo/index.html.twig', array(
+            'producto' => $productoFinalNombre,
             'fecha1' => $fechaUno,
             'fecha2' => $fechaDos,
             'prueba' => $primeraVez,
