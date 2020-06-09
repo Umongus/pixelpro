@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+<div class="row">
+<div class="col-4">
+<br>
+<h1 class="page-header">Selecciona año y mes:</h1>
+{{form_start(form)}}
+{{form_widget(form)}}
+{{ form_end(form) }}
+</div>
+</div>
+<br>
+
+{% endblock %}

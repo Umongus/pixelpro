@@ -10,6 +10,45 @@ use AppBundle\Entity\ParteTrabajo;
 
 class TratArray {
 
+public function pagoTrabajador($nombre, $partes, $altas, $precioPeonada, $precioHora){
+  $peonadas = 0;
+  $horas = 0;
+  $ApagoMes[0]=0;
+  $ApagoMes[1]=0;
+  $ApagoMes[2]=0;
+
+  for ($i=0; $i < count($partes) ; $i++) {
+    if ($nombre == $partes[$i]->getTrabajador()->getNombre()) {
+      if ($partes[$i]->getTipo()->getNombre() == 'Peonada') {
+        $peonadas = $peonadas + $partes[$i]->getCantidad();
+      }elseif ($partes[$i]->getTipo()->getNombre() == 'Hora') {
+        $horas = $horas + $partes[$i]->getCantidad();
+      }
+    }
+  }//SALIMOS DEL FOR
+
+  $ApagoMes[0]=($peonadas-$altas)*$precioPeonada;
+  $ApagoMes[1]=$altas*$precioPeonada-($altas*3);
+  $ApagoMes[2]=$horas*$precioHora;
+
+  if ($ApagoMes[0] < 0) {
+    $ApagoMes[1]=$ApagoMes[1]+$ApagoMes[0];
+    if ($ApagoMes[1] < 0) {
+      $ApagoMes[2]=$ApagoMes[2]+$ApagoMes[1];
+      $CHcon = $altas*$precioPeonada-($altas*3);
+      $CHHoras = $ApagoMes[2] - $CHcon;
+
+      $ApagoMes[0]=0;
+      $ApagoMes[1]=$CHcon;
+      $ApagoMes[2]=$CHHoras;
+    }
+  }
+
+
+
+  return $ApagoMes;
+}
+
 public function comparaProducto ($partesTrabajo, $fincas, $cosecha){
   $horas = 0;
   $peonadas = 0;

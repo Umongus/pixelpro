@@ -36,6 +36,121 @@ use AppBundle\Funciones\TratArray;
 class ParteTrabajoController extends Controller
 {
   /**
+   * INICIA EL Metodo para la confeccion de pagos de los trabajadores
+   *
+   * @Route("/iniciaPagos/",name="iniciaPagos")
+   * @Method({"GET", "POST"})
+   */
+  public function iniciaPagosAction (Request $request){
+    $session = $request->getSession();
+    $session->start();
+
+    $meses  = array('Enero'=>'Enero',
+    'Febrero'=>'Febrero',
+    'Marzo'=>'Marzo',
+    'Abril'=>'Abril',
+    'Mayo'=>'Mayo',
+    'Junio'=>'Junio',
+    'Julio'=>'Julio',
+    'Agosto'=>'Agosto',
+    'Septiembre'=>'Septiembre',
+    'Octubre'=>'Octubre',
+    'Noviembre'=>'Noviembre',
+    'Diciembre'=>'Diciembre');
+
+    $opcion = 'Formulario Inicio Pagos';
+    $defaultData = array('message' => $opcion);
+    $form = $this->createFormBuilder($defaultData)
+        ->add('mes', ChoiceType::class, array('choices' => $meses
+          ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+        ->add('ano', ChoiceType::class, array('choices' => ['2017'=>2017, '2018'=>2018, '2019'=>2019, '2020'=>2020]
+           ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+        ->add('Enviar', SubmitType::class)
+        ->getForm();
+    $form->handleRequest($request);
+    if ($form->isSubmitted() && $form->isValid()) {
+      $mesPago = $form->get('mes')->getData();
+      $anoPago = $form->get('ano')->getData();
+      $session->set('mesPago', $mesPago);
+      $session->set('anoPago', $anoPago);
+      return $this->redirect($this->generateUrl('Pagos'));
+    }
+
+    return $this->render('partetrabajo/inicioPagos.html.twig', ['form'=>$form->createView()]);
+  }
+
+  /**
+   * Metodo para la confeccion de pagos de los trabajadores
+   *
+   * @Route("/Pagos/{enCurso}",name="Pagos")
+   * @Method({"GET", "POST"})
+   */
+  public function pagosAction(Request $request, $enCurso=0){
+    $fin = 'no';
+    $em = $this->getDoctrine()->getManager();
+    $calculo = new TratArray();
+    $session = $request->getSession();
+    $session->start();
+    $mesPago = $session->get('mesPago');
+    $anoPago = $session->get('anoPago');
+    $Intervalo = $calculo->dameElIntervalo($mesPago,$anoPago);
+    $fecha1= new \DateTime($Intervalo[0] .'-'. $Intervalo[1] .'-01');
+    $fecha2= new \DateTime($Intervalo[2] .'-'. $Intervalo[3] .'-01');
+
+    $query = $em->createQuery(
+      "SELECT p
+      FROM AppBundle:ParteTrabajo p
+      JOIN p.trabajador t
+      WHERE p.fecha >= :fecha1 AND p.fecha < :fecha2
+      ORDER BY t.nombre ASC"
+    )->setParameter('fecha1', $fecha1)
+    ->setParameter('fecha2', $fecha2);
+    $partes = $query->getResult();
+
+    $trabajadores = $calculo->dameArrayTrabajadores($partes);
+
+    $Trabajador = $em->getRepository('AppBundle:Trabajadores')->findBy(['nombre'=>$trabajadores[$enCurso]]);
+    $AAltas = $em->getRepository('AppBundle:Altas')->findBy(['nombre'=>$Trabajador[0]->getId(), 'mes'=>$mesPago, 'ano'=>$anoPago]);
+
+    $Tipo = $em->getRepository('AppBundle:Tipo')->findBy(['nombre'=>'Peonada']);
+    $AprecioPeonada = $em->getRepository('AppBundle:Precios')->findBy(['tipo'=>$Tipo[0]->getId(), 'mes'=>$mesPago, 'ano'=>$anoPago]);
+    $Tipo = $em->getRepository('AppBundle:Tipo')->findBy(['nombre'=>'Hora']);
+    $AprecioHora = $em->getRepository('AppBundle:Precios')->findBy(['tipo'=>$Tipo[0]->getId(), 'mes'=>$mesPago, 'ano'=>$anoPago]);
+
+    //$Gtrabajadores = (count($AAltas) == 0) ? 0 : $AAltas[0]->getCantidad() ;
+    $precioPeonada = (count($AprecioPeonada) == 0) ? 0 : $AprecioPeonada[0]->getValor() ;
+    $precioHora = (count($AprecioHora) == 0) ? 0 : $AprecioHora[0]->getValor() ;
+
+    if (count($AAltas) == 0) {
+      $Altas = 0;
+    }else{
+      $Altas = $AAltas[0]->getCantidad();
+    }
+
+    $ApagoTrabajador = $calculo->pagoTrabajador($trabajadores[$enCurso], $partes, $Altas, $precioPeonada, $precioHora);
+
+    $siguiente = $enCurso + 1;
+    $anterior = $enCurso -1;
+
+    $fin = ($enCurso == count($trabajadores)-1) ? 'si' : 'no' ;
+
+    return $this->render('partetrabajo/pagos.html.twig', array(
+      'numeroTrabajadores'=>count($trabajadores),
+      'idTrabahjador'=>$Trabajador[0]->getId(),
+      'mes'=>$mesPago,
+      'ano'=>$anoPago,
+      'altas'=>$Altas,
+      'peonada'=>$precioPeonada,
+      'hora'=>$precioHora,
+      'siguiente'=>$siguiente,
+      'anterior'=>$anterior,
+      'enCurso'=>$enCurso+1,
+      'fin'=>$fin,
+      'trabajador'=>$trabajadores[$enCurso],
+      'pagoTrabajador'=>$ApagoTrabajador
+    ));
+  }
+  /**
    * Lista la comparatiza de gastos en trabajos realizados en una determinada finca y año.
    *
    * @Route("/listados/", name="listados")
@@ -164,7 +279,7 @@ class ParteTrabajoController extends Controller
 
     $suma = $this->sumaTipos($quimera);
 
-    $form->get('Mes')->setData('Enero');
+    //$form->get('Mes')->setData('Enero');
 
     return $this->render('partetrabajo/listados.html.twig', ['desastre'=>$desastre,'sumaP'=>$suma[0], 'sumaH'=>$suma[1],'partes'=>$quimera, 'form'=>$form->createView()]);
     }
@@ -1113,6 +1228,7 @@ class ParteTrabajoController extends Controller
       $form->add('cuadrilla');
       $form->add('trabajador');
       $form->add('finca');
+      $form->add('producto');
       $form->add('save', SubmitType::class, array('label'=>'Editar Parte'));
 
       $form->handlerequest($request);

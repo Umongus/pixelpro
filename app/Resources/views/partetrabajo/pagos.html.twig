@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<br>
+<h3> <strong> {{trabajador}}</strong></h3>
+<br>
+<p><h4>Cheque sin: <strong> {{pagoTrabajador[0]}} </strong></h4></p>
+<p><h4>Cheque con: <strong>{{pagoTrabajador[1]}}</strong></h4></p>
+<p><h4>Cheque horas:<strong> {{pagoTrabajador[2]}}</strong></h4></p>
+<br>
+<p>Precio Hora: {{hora}}</p>
+<p>Precio Peonada: {{peonada}}</p>
+<p>Altas: {{altas}}</p>
+<br>
+<p>Mes: {{mes}}</p>
+<p>Ano: {{ano}}</p>
+<p>Ide Trabajador: {{idTrabahjador}}</p>
+<p>Número de trabajadores: {{numeroTrabajadores}}</p>
+<p>Variable fin vale: {{fin}}</p>
+
+<a href="{{ path('Pagos', { 'enCurso': anterior }) }}">ANTERIOR | </a>
+<a href="#">{{enCurso}}</a>
+{% if fin == 'si' %}
+<a href="#">ESTE ES EL ÚLTIMO TRABAJADOR</a>
+{% else %}
+<a href="{{ path('Pagos', { 'enCurso': siguiente }) }}"> | SIGUIENTE</a>
+{% endif %}
+{% endblock %}
