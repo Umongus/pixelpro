@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Entradasalidas list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Fecha</th>
+                <th>Accion</th>
+                <th>Peso</th>
+                <th>Lote</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for entradaSalida in entradaSalidas %}
+            <tr>
+                <td><a href="{{ path('entradasalida_show', { 'id': entradaSalida.id }) }}">{{ entradaSalida.id }}</a></td>
+                <td>{% if entradaSalida.fecha %}{{ entradaSalida.fecha|date('Y-m-d') }}{% endif %}</td>
+                <td>{{ entradaSalida.accion }}</td>
+                <td>{{ entradaSalida.peso }}</td>
+                <td>{{ entradaSalida.producto.nombre }}</td>
+                <td>{{ entradaSalida.lote }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('entradasalida_show', { 'id': entradaSalida.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('entradasalida_edit', { 'id': entradaSalida.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('entradasalida_new') }}">Create a new entradaSalida</a>
+        </li>
+    </ul>
+{% endblock %}

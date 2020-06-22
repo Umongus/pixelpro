@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Entradasalida</h1>
+
+    <table>
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ entradaSalida.id }}</td>
+            </tr>
+            <tr>
+                <th>Fecha</th>
+                <td>{% if entradaSalida.fecha %}{{ entradaSalida.fecha|date('Y-m-d') }}{% endif %}</td>
+            </tr>
+            <tr>
+                <th>Accion</th>
+                <td>{{ entradaSalida.accion }}</td>
+            </tr>
+            <tr>
+                <th>Producto</th>
+                <td>{{ entradaSalida.producto.nombre }}</td>
+            </tr>
+            <tr>
+                <th>Peso</th>
+                <td>{{ entradaSalida.peso }}</td>
+            </tr>
+            <tr>
+                <th>Lote</th>
+                <td>{{ entradaSalida.lote }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('entradasalida_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('entradasalida_edit', { 'id': entradaSalida.id }) }}">Edit</a>
+        </li>
+        <li>
+            {{ form_start(delete_form) }}
+                <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

@@ -912,6 +912,7 @@ class ParteTrabajoController extends Controller
        $fecha = $parteTrabajo->getFecha();
        $cuadrilla = $parteTrabajo->getCuadrilla();
        $session->set('fecha', $fecha);
+       $session->set('fechaCopiada', 'Ninguno');
        //$session->set('fechaSiguiente', $fecha);
        $session->set('cuadrilla', $cuadrilla);
        return $this->redirect($this->generateUrl('partetrabajo_index'));
@@ -1006,6 +1007,7 @@ class ParteTrabajoController extends Controller
      */
     public function indexAction(Request $request, $dia='NULL')
     {
+
       $productoFinalNombre = 'Algun ERROR';
       $masDeDos = 'Correcto';
       $primeraVez = 'Correcto';
@@ -1015,8 +1017,10 @@ class ParteTrabajoController extends Controller
       $session = $request->getSession();
       $session->start();
 
+
       $fech = $session->get('fecha');
       $cuadrilla = $session->get('cuadrilla');
+      $fechaCopiada = $session->get('fechaCopiada');
 
       if ($dia == 'Siguiente') {
         $fecha = clone $fech;
@@ -1026,6 +1030,11 @@ class ParteTrabajoController extends Controller
         $fecha = clone $fech;
         $fecha->modify('-1 day');
         $session->set('fecha', $fecha);
+      }elseif ($dia == 'Copiar') {
+
+        $fechaCopiada = clone $fech;
+        $session->set('fechaCopiada', $fechaCopiada);
+        $fecha = $fech;
       }else {
         $fecha = $fech;
       }
@@ -1115,6 +1124,28 @@ class ParteTrabajoController extends Controller
 
        $arrayResumen = $Calculo->calcula($aceituna2017);
 
+       if ($dia == 'Pegar') {
+         $fechaPegar = $session->get('fechaCopiada');
+         $partesPegar = $em->getRepository('AppBundle:ParteTrabajo')->findBy(['fecha'=>$fechaPegar, 'cuadrilla'=>$cuadrilla]);
+
+         for ($i=0; $i < count($partesPegar); $i++) {
+         $pegado = new ParteTrabajo();
+         $pegado->setFecha($fecha);
+         $pegado->setTrabajador($partesPegar[$i]->getTrabajador());
+         $pegado->setTrabajo($partesPegar[$i]->getTrabajo());
+         $pegado->setTipo($partesPegar[$i]->getTipo());
+         $pegado->setCantidad($partesPegar[$i]->getCantidad());
+         $pegado->setFinca($partesPegar[$i]->getFinca());
+         $pegado->setCuadrilla($partesPegar[$i]->getCuadrilla());
+         $pegado->setProducto($partesPegar[$i]->getProducto());
+         $pegado->setObservacion($partesPegar[$i]->getObservacion());
+         $em->persist($pegado);
+         $em->flush();
+       }
+         return $this->redirectToRoute('partetrabajo_index', array('dia' => 'NULL'));
+       }
+
+
        $em = $this->getDoctrine()->getManager();
        $parteTrabajos = $em->getRepository('AppBundle:ParteTrabajo')->findBy(['fecha'=>$fechaNueva, 'cuadrilla'=>$cuadrilla]);
        $partesDia = $em->getRepository('AppBundle:ParteTrabajo')->findBy(['fecha'=>$fechaNueva]);
@@ -1139,7 +1170,10 @@ class ParteTrabajoController extends Controller
        $form->add('trabajador', ChoiceType::class, array('choices' => $Atrabajadores, 'mapped'=>false));
        $form->add('finca', ChoiceType::class, array('choices' => $Afincas, 'mapped'=>false));
 
+
+
        return $this->render('partetrabajo/index.html.twig', array(
+            'fechaCopiada' => $fechaCopiada,
             'producto' => $productoFinalNombre,
             'fecha1' => $fechaUno,
             'fecha2' => $fechaDos,

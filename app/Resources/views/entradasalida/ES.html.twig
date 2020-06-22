@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+CAPAZ Y CAPATAZ!!
+<br>
+{{productoES}}
+
+{% for parte in partes %}
+<p>Serian, {{parte.peso}} kg de aceituna, {{parte.variedad.nombre}} de la finca, {{parte.finca.nombre}} y campaña {{parte.producto.nombre}}</p>
+{% endfor %}
+
+<br>
+{{ form_start(form) }}
+    {{ form_widget(form) }}
+{{ form_end(form) }}
+
+<br>
+{% if entradaSalida == 'No iniciada' %}
+{{entradaSalida}}
+{% else %}
+{{entradaSalida.variedad.nombre}}
+{% endif %}
+
+
+{% endblock %}
