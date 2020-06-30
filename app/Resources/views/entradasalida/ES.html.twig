@@ -2,25 +2,95 @@
 
 {% block body %}
 
-CAPAZ Y CAPATAZ!!
-<br>
-{{productoES}}
+<div class="row">
+ <div class="col-3">
+ <div class="m-4">
 
-{% for parte in partes %}
-<p>Serian, {{parte.peso}} kg de aceituna, {{parte.variedad.nombre}} de la finca, {{parte.finca.nombre}} y campaña {{parte.producto.nombre}}</p>
-{% endfor %}
+   <h2 class="page-header">Add Registro de Entrada/Salida</h2>
+   {{form_start(form)}}
+   <fieldset>
+
+     <br>
+     <div>
+     <strong>{{ form_label(form.peso) }}</strong><br>
+     <span>{{ form_widget(form.peso) }}</span>
+     </div>
+     <div>
+     <strong>{{ form_label(form.variedad) }}</strong><br>
+     <span>{{ form_widget(form.variedad) }}</span>
+     </div>
+     <div>
+     <strong>{{ form_label(form.finca) }}</strong><br>
+     <span>{{ form_widget(form.finca) }}</span>
+     </div>
+     <div>
+     <strong>{{ form_label(form.cuadrilla) }}</strong><br>
+     <span>{{ form_widget(form.cuadrilla) }}</span>
+     </div>
+     <div>
+     <strong>{{ form_label(form.entidad) }}</strong><br>
+     <span>{{ form_widget(form.entidad) }}</span>
+     </div>
+     <br>
+     </fieldset>
+   {{ form_end(form) }}
+ </div>
+ </div>
+ <div class="col-9">
+  <div class="m-4">
+
+  <h2 class="page header">Registros de E/S: Día en curso( {{fechaActual|date('d-m-Y')}} )</h2>
+
+  <h2> <a href="{{ path('ES', { 'dia': 'Anterior' }) }}">Día anterior </a>Cosecha: <strong> {{cosecha}} </strong> <a href="{{ path('ES', { 'dia': 'Siguiente' }) }}"> Día siguiente</a></h2>
+  <hr>
+  <h3> <strong>Resumen (Entrada): Listar  <a href="{{ path('ListadosES') }}"> {{cosecha}} </a> </strong> </h3>
+  <h3> Gordal =<strong> {{gordal}} </strong>| Manzanilla = <strong> 0 </strong>| Molino = <strong> 0 </strong>| G.Morada = <strong> 0 </strong>| M.Morada = <strong> 0 </strong>| Z.Morada = <strong> 0 </strong></h3>
+  <table class="table table-striped table-sm">
+  <thead>
+  <tr>
+  <th>ID</th>
+  <th>FECHA</th>
+  <th>KILOS</th>
+  <th>VARIEDAD</th>
+  <th>FINCA</th>
+  <th>CUADRILLA</th>
+  <th>ENTIDAD</th>
+  <th>COSECHA</th>
+
+
+  </tr>
+  </thead>
+  <tbody>
+  {% for parte in partes %}
+  <tr>
+  <th scope="row">{{ parte.id }}</th>
+  <td>{{ parte.fecha|date('d-m-Y') }}</td>
+  <td>{{ parte.peso }}</td>
+  <td>{{ parte.variedad }}</td>
+  <td>{{ parte.finca }}</td>
+  <td>{{ parte.cuadrilla }}</td>
+  <td>{{ parte.entidad }}</td>
+  <td>{{ parte.producto }}</td>
+  <td>
+  <a href=" {{ path('entradasalida_edit', { 'id': parte.id, 'procede': 'EntradasSalidas' }) }}">Editar |</a>
+  <a href="{{ path('entradasalida_show', { 'id': parte.id }) }}">Mostrar |</a>
+  <a href="{{ path('entradasalida_delete', { 'id': parte.id }) }}">Eliminar</a>
+  </td>
+  </tr>
+  {% endfor %}
+  </tbody>
+  </table>
+  </div>
+ </div>
+</div>
+
+
 
 <br>
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-{{ form_end(form) }}
 
-<br>
-{% if entradaSalida == 'No iniciada' %}
-{{entradaSalida}}
-{% else %}
-{{entradaSalida.variedad.nombre}}
-{% endif %}
+
+
+
 
 
 {% endblock %}

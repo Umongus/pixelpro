@@ -12,17 +12,16 @@
     </head>
     <body>
       <nav class="navbar navbar-expand navbar-dark bg-dark">
-        <a class="navbar-brand" href="#">Grupo Araceli</a>
+        <a class="navbar-brand" href="#">GRUPO ARACELI</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample02" aria-controls="navbarsExample02" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-
         <div class="collapse navbar-collapse" id="navbarsExample02">
           <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
               <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
             </li>
-            <li class="nav-item"><a class="nav-link" href="/pixelpro/web/app_dev.php/partetrabajo/inicio">Partes de Trabajo |</a></li>
+            <li class="nav-item"><a class="nav-link" href="/pixelpro/web/app_dev.php/partetrabajo/inicio">Partes |</a></li>
             <li class="nav-item"><a class="nav-link" href="/pixelpro/web/app_dev.php/sitio/inicio">Trabajadores |</a></li>
             <li class="nav-item"><a class="nav-link" href="/pixelpro/web/app_dev.php/trabajos">Trabajos |</a></li>
             <li class="nav-item"><a class="nav-link" href="/pixelpro/web/app_dev.php/fincas/inicio">Fincas |</a></li>
@@ -36,6 +35,15 @@
             <li class="nav-item"><a class="nav-link" href="{{ path('listados') }}">Listados |</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ path('iniciaPagos') }}">Pagos |</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ path('iniciaES') }}">ES</a></li>
+            <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Drop
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="/pixelpro/web/app_dev.php/altas/inicioAltas">Action</a>
+          <a class="dropdown-item" href="#">Another action</a>
+
+      </li>
           </ul>
           <form class="form-inline my-2 my-md-0">
             <input class="form-control" type="text" placeholder="Search">
@@ -51,6 +59,8 @@
     </div>
 
         {% block javascripts %}
+        <script src="{{asset('jq/jquery-3.2.1.slim.min.js')}}"></script>
+
           <script src="{{asset('js/bootstrap.js')}}"></script>
         {% endblock %}
 

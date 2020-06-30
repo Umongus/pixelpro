@@ -12,6 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\HttpFoundation\Session\Session;
+use AppBundle\Form\EntradaSalidaType;
 
 /**
  * Entradasalida controller.
@@ -20,14 +21,49 @@ use Symfony\Component\HttpFoundation\Session\Session;
  */
 class EntradaSalidaController extends Controller
 {
+  /**
+   * Funcion ListadosES.
+   *
+   * @Route("/ListadosES", name="ListadosES")
+   * @Method({"GET", "POST"})
+   */
+  public function ListadoESAction (Request $request){
+    $session = $request->getSession();
+    $session->start();
+    $em = $this->getDoctrine()->getManager();
+
+    $fechaES = $session->get('fechaES');
+    $nombreEntidad = $session->get('cosechaES');
+    $Aentidad = $em->getRepository('AppBundle:Producto')->findBy(['nombre'=>$nombreEntidad]);
+
+    $suma = (int)$fechaES->format('m');
+    $suma = $suma +1;
+    $cadena = (string)$suma;
+    $fechaUno= new \DateTime($fechaES->format('Y') .'-'. $fechaES->format('m') .'-01');
+    $fechaDos= new \DateTime($fechaES->format('Y') .'-'. $cadena .'-01');
+
+    $fechaUno = $Aentidad[0]->getFechaInicioCampo();
+    $fechaDos = $Aentidad[0]->getFechaFinCampo();
+
+    $query = $em->createQuery(
+      "SELECT es
+      FROM AppBundle:EntradaSalida es
+      WHERE es.fecha >= :fecha1 AND es.fecha < :fecha2"
+    )->setParameter('fecha1', $fechaUno)
+    ->setParameter('fecha2', $fechaDos);
+    $registros = $query->getResult();
+    return $this->render('entradasalida/listadosES.html.twig', [
+      'partes'=>$registros
+    ]);
+  }
 
   /**
    * Funcion ES.
    *
-   * @Route("/ES", name="ES")
+   * @Route("/ES/{dia}", defaults={ "dia" = "NULL" }, name="ES")
    * @Method({"GET", "POST"})
    */
-  public function ESAction (Request $request){
+  public function ESAction (Request $request, $dia='NULL'){
     //DESASTRES
     $productoES = 'No inicializado';
     //DESASTRES
@@ -37,22 +73,38 @@ class EntradaSalidaController extends Controller
     $entradaSalida = new Entradasalida();
     $clon = 'No iniciada';
 
-    $nombre = $session->get('productoES');
+    //$nombre = $session->get('productoES');
     $accionES = $session->get('accionES');
     $fechaES = $session->get('fechaES');
 
+    if ($dia == 'Siguiente') {
+      $fecha = clone $fechaES;
+      $fecha->modify('+1 day');
+      $session->set('fechaES', $fecha);
+    }elseif ($dia == 'Anterior') {
+      $fecha = clone $fechaES;
+      $fecha->modify('-1 day');
+      $session->set('fechaES', $fecha);
+    }else {
+      $fecha = $fechaES;
+    }
+
     $Avariedad = $this->dame('Variedad');
     $Afincas = $this->dame('Fincas');
+    $Aentidades = $this->dame('Entidad');
+    unset($Aentidades['Todos']);
     unset($Avariedad['Todos']);
     unset($Afincas['Todos']);
     $defaultData = array('message' => 'iniciaES');
-    $form = $this->createFormBuilder($defaultData)
+    $form = $this->createFormBuilder($defaultData, array('action'=>$this->generateUrl('ES'), 'method'=>'POST'))
         ->add('peso', IntegerType::class, array('attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
         ->add('variedad', ChoiceType::class, array('choices' => $Avariedad
           ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
         ->add('finca', ChoiceType::class, array('choices' => $Afincas, 'preferred_choices' => array('Caseron','Palomar','Las 13','Las 16')
           ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
         ->add('cuadrilla', ChoiceType::class, array('choices' => [1=>1,2=>2,3=>3]
+          ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+        ->add('entidad', ChoiceType::class, array('choices' => $Aentidades
           ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
         ->add('Enviar', SubmitType::class)
         ->getForm();
@@ -65,48 +117,86 @@ class EntradaSalidaController extends Controller
           $entradaSalida->setPeso($pesoES);
           $entradaSalida->setLote('NoAsignado');
            $nombreVariedad = $form->get('variedad')->getData();
-           $Avariedad = $em->getRepository('AppBundle:Variedad')->findBy(['nombre'=>$nombreVariedad]);
-          $entradaSalida->setVariedad($Avariedad[0]);
+           $Avariedades = $em->getRepository('AppBundle:Variedad')->findBy(['nombre'=>$nombreVariedad]);
+          $entradaSalida->setVariedad($Avariedades[0]);
            $nombreFinca = $form->get('finca')->getData();
            $Afinca = $em->getRepository('AppBundle:Fincas')->findBy(['nombre'=>$nombreFinca]);
           $entradaSalida->setFinca($Afinca[0]);
+           $nombreEntidad = $form->get('entidad')->getData();
+           $Aentidad = $em->getRepository('AppBundle:Entidad')->findBy(['nombre'=>$nombreEntidad]);
+          $entradaSalida->setEntidad($Aentidad[0]);
 
           $Aproductos = $em->getRepository('AppBundle:Producto')->findAll();
           for ($i=0; $i < count($Aproductos); $i++) {
 
               $inicio = $Aproductos[$i]->getFechaInicioCampo();
               $fin = $Aproductos[$i]->getFechaFinCampo();
-              if ($fechaES > $inicio && $fechaES < $fin) {
+              if ($fechaES >= $inicio && $fechaES <= $fin) {
                 $productoFinal = $Aproductos[$i];
                 $productoFinalNombre = $productoFinal->getNombre();
               }
 
           }
 
+          $session->set('cosechaES', $productoFinalNombre);
+
           $entradaSalida->setProducto($productoFinal);
             $cuadrilla = $form->get('cuadrilla')->getData();
           $entradaSalida->setCuadrilla($cuadrilla);
-            $Aentidad = $em->getRepository('AppBundle:Entidad')->findBy(['nombre'=>'Agrícola Araceli SL']);
-          $entradaSalida->setEntidad($Aentidad[0]);
+
           $clon = clone $entradaSalida;
           $em->persist($entradaSalida);
           $em->flush();
         }
 
+        $Aproductos = $em->getRepository('AppBundle:Producto')->findAll();
+        for ($i=0; $i < count($Aproductos); $i++) {
+
+            $inicio = $Aproductos[$i]->getFechaInicioCampo();
+            $fin = $Aproductos[$i]->getFechaFinCampo();
+            if ($fechaES >= $inicio && $fechaES <= $fin) {
+              $productoFinal = $Aproductos[$i];
+              $productoFinalNombre = $productoFinal->getNombre();
+            }
+
+        }
+
+        $session->set('cosechaES', $productoFinalNombre);
+
+        $nombre = $productoFinal->getNombre();
         $query = $em->createQuery(
           "SELECT e
           FROM AppBundle:EntradaSalida e
           JOIN e.producto p
-          WHERE p.nombre = :nombre
+          WHERE p.nombre = :nombre AND e.fecha = :fecha1
           ORDER BY e.fecha ASC"
-        )->setParameter('nombre', $nombre);
-        $partes = $query->getResult();
+        )->setParameter('nombre', $nombre)
+        ->setParameter('fecha1', $fecha);
+        $AentradasSalidas = $query->getResult();
+
+        $defaultData = array('message' => 'iniciaES');
+        $form = $this->createFormBuilder($defaultData, array('action'=>$this->generateUrl('ES'), 'method'=>'POST'))
+            ->add('peso', IntegerType::class, array('attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+            ->add('variedad', ChoiceType::class, array('choices' => $Avariedad
+              ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+            ->add('finca', ChoiceType::class, array('choices' => $Afincas, 'preferred_choices' => array('Caseron','Palomar','Las 13','Las 16')
+              ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+            ->add('cuadrilla', ChoiceType::class, array('choices' => [1=>1,2=>2,3=>3]
+              ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+            ->add('entidad', ChoiceType::class, array('choices' => $Aentidades
+              ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+            ->add('Enviar', SubmitType::class)
+            ->getForm();
+          $sumaGordal = $this->suma('Gordal', $nombre);
 
     return $this->render('entradasalida/ES.html.twig', array(
+      'gordal'=>$sumaGordal,
+      'cosecha'=>$nombre,
+      'fechaActual'=>$fecha,
       'entradaSalida'=>$clon,
       'form'=>$form->createView(),
       'productoES'=>$productoES,
-      'partes'=>$partes
+      'partes'=>$AentradasSalidas
       ));
   }
 
@@ -128,25 +218,23 @@ class EntradaSalidaController extends Controller
     $fincas = $this->dame('Fincas');
 
     $Aproductos = $this->dame('Ejercicios');
+    unset($Aproductos['Todos']);
 
     $defaultData = array('message' => 'iniciaES');
     $form = $this->createFormBuilder($defaultData)
         ->add('fecha', DateType::class, ['widget' => 'single_text', 'format' => 'yyyy-MM-dd'
           ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')])
-        ->add('producto', ChoiceType::class, array('choices' => $Aproductos
-          ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
         ->add('accion', ChoiceType::class, array('choices' => ['Entrada'=>'Entrada','Salida'=>'Salida']
           ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
-          ->add('kilos', IntegerType::class, array('attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
         ->add('Enviar', SubmitType::class)
         ->getForm();
     $form->handleRequest($request);
     if ($form->isSubmitted() && $form->isValid()) {
 
-      $productoES = $form->get('producto')->getData();
+
       $accionES = $form->get('accion')->getData();
       $fechaES = $form->get('fecha')->getData();
-      $session->set('productoES', $productoES);
+
       $session->set('accionES', $accionES);
       $session->set('fechaES', $fechaES);
       $productoES = $session->get('productoES');
@@ -221,49 +309,51 @@ class EntradaSalidaController extends Controller
         ));
     }
 
-    /**
-     * Displays a form to edit an existing entradaSalida entity.
-     *
-     * @Route("/{id}/edit", name="entradasalida_edit")
-     * @Method({"GET", "POST"})
-     */
-    public function editAction(Request $request, EntradaSalida $entradaSalida)
-    {
-        $deleteForm = $this->createDeleteForm($entradaSalida);
-        $editForm = $this->createForm('AppBundle\Form\EntradaSalidaType', $entradaSalida);
-        $editForm->handleRequest($request);
 
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+     /**
+      * Displays a form to edit an existing parteTrabajo entity.
+      *
+      * @Route("/{id}/{procede}/edit", name="entradasalida_edit")
+      * @Method({"GET", "POST"})
+      */
+     public function editAction(Request $request, $id, $procede='NoSabemos')
+     {
 
-            return $this->redirectToRoute('entradasalida_edit', array('id' => $entradaSalida->getId()));
-        }
+       $em = $this->getDoctrine()->getManager();
+       $entradaSalida = $em->getRepository('AppBundle:EntradaSalida')->find($id);
 
-        return $this->render('entradasalida/edit.html.twig', array(
-            'entradaSalida' => $entradaSalida,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
-    }
+       $form = $this->createForm(EntradaSalidaType::class, $entradaSalida, array('action'=>$this->generateUrl('entradasalida_edit', array('id'=>$entradaSalida->getId(),'procede'=>$procede)), 'method'=>'PUT'));
 
+       $form->add('save', SubmitType::class, array('label'=>'Editar E/S'));
+
+       $form->handlerequest($request);
+       if($form->isValid()){
+         $em->flush();
+         if ($procede == 'EntradasSalidas' ) {
+
+           return $this->redirect($this->generateUrl('entradasalida_show', array('id'=>$entradaSalida->getId())));
+         }else {
+           return $this->redirect($this->generateUrl('listadosES'));
+         }
+       }
+       return $this->render('entradasalida/edit.html.twig', array('form'=>$form->createView()));
+     }
     /**
      * Deletes a entradaSalida entity.
      *
-     * @Route("/{id}", name="entradasalida_delete")
-     * @Method("DELETE")
+     * @Route("/{id}/remove", name="entradasalida_delete")
+     *
      */
-    public function deleteAction(Request $request, EntradaSalida $entradaSalida)
+    public function deleteAction($id)
     {
-        $form = $this->createDeleteForm($entradaSalida);
-        $form->handleRequest($request);
+      $em = $this->getDoctrine()->getManager();
+      $entradaSalida = $em->getRepository('AppBundle:EntradaSalida')->find($id);
+      $em->remove($entradaSalida);
+      $em->flush();
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->remove($entradaSalida);
-            $em->flush();
-        }
+      return $this->redirect($this->generateUrl('ES'));
 
-        return $this->redirectToRoute('entradasalida_index');
+
     }
 
     /**
@@ -283,6 +373,23 @@ class EntradaSalidaController extends Controller
     }
 
     //FUNCIONES//
+    public function suma($opcion, $cosecha){
+      $em = $this->getDoctrine()->getManager();
+      $suma = 0;
+      $query = $em->createQuery(
+        "SELECT e
+        FROM AppBundle:EntradaSalida e
+        JOIN e.producto p JOIN e.variedad v
+        WHERE p.nombre = :nombre1 AND v.nombre = :nombre2
+        ORDER BY e.fecha ASC"
+      )->setParameter('nombre1', $cosecha)
+      ->setParameter('nombre2', $opcion);
+      $AentradasSalidas = $query->getResult();
+      for ($i=0; $i < count($AentradasSalidas); $i++) {
+        $suma = $suma + $AentradasSalidas[$i]->getPeso();
+      }
+      return $suma;
+    }
 
     public function dame($opcion){
     $em = $this->getDoctrine()->getManager();
@@ -342,6 +449,13 @@ class EntradaSalidaController extends Controller
         'SELECT v
         FROM AppBundle:Variedad v
         ORDER BY v.nombre ASC'
+      );
+      $result = $query->getResult();
+    }elseif ($opcion == 'Entidad') {
+      $query = $em->createQuery(
+        'SELECT e
+        FROM AppBundle:Entidad e
+        ORDER BY e.nombre ASC'
       );
       $result = $query->getResult();
     }

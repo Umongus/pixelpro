@@ -34,15 +34,11 @@
 
     <ul>
         <li>
-            <a href="{{ path('entradasalida_index') }}">Back to the list</a>
+            <a href="{{ path('ES') }}">Registros Entrada/Salidat</a>
         </li>
         <li>
             <a href="{{ path('entradasalida_edit', { 'id': entradaSalida.id }) }}">Edit</a>
         </li>
-        <li>
-            {{ form_start(delete_form) }}
-                <input type="submit" value="Delete">
-            {{ form_end(delete_form) }}
-        </li>
+
     </ul>
 {% endblock %}

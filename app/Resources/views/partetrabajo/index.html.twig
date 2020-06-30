@@ -111,8 +111,7 @@
       {% endfor %}
       </tbody>
       </table>
-      <p>Las fechas son: {{fecha1|date('d-m-Y')}} y {{fecha2|date('d-m-Y')}}</p>
-      <p>El nombre del producto es: {{producto}}</p>
+      
 
       {% if prueba != 'Correcto' %}
         <h4>  Es la primera vez que el trabajador: <strong>{{prueba}}</strong> trabaja este mes!! </h4>
@@ -140,17 +139,6 @@
   </div>
 
   <div class="col-5">
-    <ul>
-      <li>
-        <a href="{{ path('inicio_parte') }}">Valor desastre vale= {{desastre}}</a>
-      </li>
-    </ul>
-    <ul>
-      <li>
-        <a href="{{ path('paso_parametros', {'param1':'Parametro1', 'param2':'Parametro2'}) }}">Pasamos varios parametros!!</a>
-      </li>
-    </ul>
-
 
   </div>
 </div>

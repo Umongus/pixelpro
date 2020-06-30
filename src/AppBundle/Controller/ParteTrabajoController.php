@@ -1017,7 +1017,6 @@ class ParteTrabajoController extends Controller
       $session = $request->getSession();
       $session->start();
 
-
       $fech = $session->get('fecha');
       $cuadrilla = $session->get('cuadrilla');
       $fechaCopiada = $session->get('fechaCopiada');
@@ -1083,14 +1082,14 @@ class ParteTrabajoController extends Controller
             if ($objetoFinca[0]->getNombre() == 'Almacen') {
               $inicio = $Aproductos[$i]->getFechaInicioAlmacen();
               $fin = $Aproductos[$i]->getFechaFinAlmacen();
-              if ($fech > $inicio && $fech < $fin) {
+              if ($fech >= $inicio && $fech <= $fin) {
                 $productoFinal = $Aproductos[$i];
                 $productoFinalNombre = $productoFinal->getNombre();
               }
             } else {
               $inicio = $Aproductos[$i]->getFechaInicioCampo();
               $fin = $Aproductos[$i]->getFechaFinCampo();
-              if ($fech > $inicio && $fech < $fin) {
+              if ($fech >= $inicio && $fech <= $fin) {
                 $productoFinal = $Aproductos[$i];
                 $productoFinalNombre = $productoFinal->getNombre();
               }
