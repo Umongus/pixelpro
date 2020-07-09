@@ -34,26 +34,44 @@ class EntradaSalidaController extends Controller
 
     $fechaES = $session->get('fechaES');
     $nombreEntidad = $session->get('cosechaES');
+    $accionES = $session->get('accionES');
     $Aentidad = $em->getRepository('AppBundle:Producto')->findBy(['nombre'=>$nombreEntidad]);
 
+    //ESTE CODIGO ESTA AQUI SOLO POR CARACTER DIDACTICO
     $suma = (int)$fechaES->format('m');
     $suma = $suma +1;
     $cadena = (string)$suma;
     $fechaUno= new \DateTime($fechaES->format('Y') .'-'. $fechaES->format('m') .'-01');
     $fechaDos= new \DateTime($fechaES->format('Y') .'-'. $cadena .'-01');
+    //ESTE CODIGO ESTA AQUI SOLO POR CARACTER DIDACTICO
 
-    $fechaUno = $Aentidad[0]->getFechaInicioCampo();
-    $fechaDos = $Aentidad[0]->getFechaFinCampo();
+    if ($accionES == 'Entrada') {
+      $fechaUno = $Aentidad[0]->getFechaInicioCampo();
+      $fechaDos = $Aentidad[0]->getFechaFinCampo();
+    }else {
+      $fechaUno = $Aentidad[0]->getFechaInicioAlmacen();
+      $fechaDos = $Aentidad[0]->getFechaFinAlmacen();
+    }
 
     $query = $em->createQuery(
       "SELECT es
       FROM AppBundle:EntradaSalida es
-      WHERE es.fecha >= :fecha1 AND es.fecha < :fecha2"
+      WHERE es.fecha >= :fecha1 AND es.fecha < :fecha2 AND es.accion = :accion"
     )->setParameter('fecha1', $fechaUno)
-    ->setParameter('fecha2', $fechaDos);
+    ->setParameter('fecha2', $fechaDos)
+    ->setParameter('accion', $accionES);
+
     $registros = $query->getResult();
+
+    $sumaGordal = $this->suma('Gordal', $nombreEntidad, $accionES);
+    $sumaManzanilla = $this->suma('Manzanilla', $nombreEntidad, $accionES);
+
     return $this->render('entradasalida/listadosES.html.twig', [
-      'partes'=>$registros
+      'cosecha'=>$nombreEntidad,
+      'manzanilla'=>$sumaManzanilla,
+      'gordal'=>$sumaGordal,
+      'partes'=>$registros,
+      'accion'=>$accionES
     ]);
   }
 
@@ -88,6 +106,10 @@ class EntradaSalidaController extends Controller
     }else {
       $fecha = $fechaES;
     }
+
+    $partesTrabajo = $em->getRepository('AppBundle:ParteTrabajo')->findBy(['fecha'=>$fechaES]);
+    //ESTA FUNCINALIDAD ESTA POR HACER
+    $arrayCuadrillas = $this->dameArrayCuadrillas($partesTrabajo);
 
     $Avariedad = $this->dame('Variedad');
     $Afincas = $this->dame('Fincas');
@@ -127,16 +149,31 @@ class EntradaSalidaController extends Controller
           $entradaSalida->setEntidad($Aentidad[0]);
 
           $Aproductos = $em->getRepository('AppBundle:Producto')->findAll();
-          for ($i=0; $i < count($Aproductos); $i++) {
 
-              $inicio = $Aproductos[$i]->getFechaInicioCampo();
-              $fin = $Aproductos[$i]->getFechaFinCampo();
-              if ($fechaES >= $inicio && $fechaES <= $fin) {
-                $productoFinal = $Aproductos[$i];
-                $productoFinalNombre = $productoFinal->getNombre();
-              }
+          if ($accionES == 'Entrada') {
+            for ($i=0; $i < count($Aproductos); $i++) {
 
+                $inicio = $Aproductos[$i]->getFechaInicioCampo();
+                $fin = $Aproductos[$i]->getFechaFinCampo();
+                if ($fechaES >= $inicio && $fechaES <= $fin) {
+                  $productoFinal = $Aproductos[$i];
+                  $productoFinalNombre = $productoFinal->getNombre();
+                }
+
+            }
+          }else {
+            for ($i=0; $i < count($Aproductos); $i++) {
+
+                $inicio = $Aproductos[$i]->getFechaInicioAlmacen();
+                $fin = $Aproductos[$i]->getFechaFinAlmacen();
+                if ($fechaES >= $inicio && $fechaES <= $fin) {
+                  $productoFinal = $Aproductos[$i];
+                  $productoFinalNombre = $productoFinal->getNombre();
+                }
+
+            }
           }
+
 
           $session->set('cosechaES', $productoFinalNombre);
 
@@ -150,15 +187,28 @@ class EntradaSalidaController extends Controller
         }
 
         $Aproductos = $em->getRepository('AppBundle:Producto')->findAll();
-        for ($i=0; $i < count($Aproductos); $i++) {
+        if ($accionES == 'Entrada') {
+          for ($i=0; $i < count($Aproductos); $i++) {
 
-            $inicio = $Aproductos[$i]->getFechaInicioCampo();
-            $fin = $Aproductos[$i]->getFechaFinCampo();
-            if ($fechaES >= $inicio && $fechaES <= $fin) {
-              $productoFinal = $Aproductos[$i];
-              $productoFinalNombre = $productoFinal->getNombre();
-            }
+              $inicio = $Aproductos[$i]->getFechaInicioCampo();
+              $fin = $Aproductos[$i]->getFechaFinCampo();
+              if ($fechaES >= $inicio && $fechaES <= $fin) {
+                $productoFinal = $Aproductos[$i];
+                $productoFinalNombre = $productoFinal->getNombre();
+              }
 
+          }
+        }else {
+          for ($i=0; $i < count($Aproductos); $i++) {
+
+              $inicio = $Aproductos[$i]->getFechaInicioAlmacen();
+              $fin = $Aproductos[$i]->getFechaFinAlmacen();
+              if ($fechaES >= $inicio && $fechaES <= $fin) {
+                $productoFinal = $Aproductos[$i];
+                $productoFinalNombre = $productoFinal->getNombre();
+              }
+
+          }
         }
 
         $session->set('cosechaES', $productoFinalNombre);
@@ -187,9 +237,11 @@ class EntradaSalidaController extends Controller
               ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
             ->add('Enviar', SubmitType::class)
             ->getForm();
-          $sumaGordal = $this->suma('Gordal', $nombre);
+          $sumaGordal = $this->suma('Gordal', $nombre, $accionES);
 
     return $this->render('entradasalida/ES.html.twig', array(
+      'desastre'=>count($partesTrabajo),
+      'accion'=>$accionES,
       'gordal'=>$sumaGordal,
       'cosecha'=>$nombre,
       'fechaActual'=>$fecha,
@@ -214,6 +266,13 @@ class EntradaSalidaController extends Controller
     $session = $request->getSession();
     $session->start();
     $em = $this->getDoctrine()->getManager();
+
+    $query = $em->createQuery(
+     'SELECT es
+      FROM AppBundle:EntradaSalida es
+      ORDER BY es.id DESC'
+     );
+     $EntradaSalidas = $query->getResult();
 
     $fincas = $this->dame('Fincas');
 
@@ -242,9 +301,10 @@ class EntradaSalidaController extends Controller
       return $this->redirect($this->generateUrl('ES'));
     }
 
-
+    $form->get('fecha')->setData($EntradaSalidas[0]->getFecha());
 
     return $this->render('entradasalida/iniciaES.html.twig', array(
+      'ultima'=>$EntradaSalidas[0],
       'productoES'=>$productoES,
       'form'=>$form->createView(),
       'productos'=>$Aproductos
@@ -373,17 +433,36 @@ class EntradaSalidaController extends Controller
     }
 
     //FUNCIONES//
-    public function suma($opcion, $cosecha){
+
+    public function dameArrayCuadrillas($partes){
+      $ACuadrillas[0]=-1;
+      for ($i=0; $i < count($partes); $i++) {
+        $cuadrilla = $partes[$i]->getCuadrilla();
+        $encontrado = 'Falso';
+        for ($j=0; $j <count($ACuadrillas) ; $j++) {
+          if ($cuadrilla == $ACuadrillas[$j]) {
+            $encontrado = 'Verddero';
+          }
+        }
+        if ($encontrado == 'Falso') {
+          $ACuadrillas[$i]=$cuadrilla;
+        }
+      }
+      return $ACuadrillas;
+    }
+
+    public function suma($opcion, $cosecha, $accionES){
       $em = $this->getDoctrine()->getManager();
       $suma = 0;
       $query = $em->createQuery(
         "SELECT e
         FROM AppBundle:EntradaSalida e
         JOIN e.producto p JOIN e.variedad v
-        WHERE p.nombre = :nombre1 AND v.nombre = :nombre2
+        WHERE p.nombre = :nombre1 AND v.nombre = :nombre2 AND e.accion = :accion
         ORDER BY e.fecha ASC"
       )->setParameter('nombre1', $cosecha)
-      ->setParameter('nombre2', $opcion);
+      ->setParameter('nombre2', $opcion)
+      ->setParameter('accion', $accionES);
       $AentradasSalidas = $query->getResult();
       for ($i=0; $i < count($AentradasSalidas); $i++) {
         $suma = $suma + $AentradasSalidas[$i]->getPeso();

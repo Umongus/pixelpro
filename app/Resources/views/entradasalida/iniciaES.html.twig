@@ -2,16 +2,37 @@
 
 {% block body %}
 
-HOLA CARA DE BOLA
-{% for producto in productos %}
-<p>{{producto}}</p>
-{% endfor %}
+
+
+<div class="row">
+<div class="col-4">
+
+</div>
+<div class="col-4">
+
+<h3>
+<br>
+<strong>
+INICIA REGISTRO ENTRADA SALIDA
+</strong>
+</h3>
+<br>
+
+<br>
+<p>El último registro insertado: <strong>{{ultima.fecha|date('d-m-Y')}} | {{ultima.accion}} | {{ultima.variedad}} | {{ultima.peso}}</strong> </p>
 <br>
 {{ form_start(form) }}
     {{ form_widget(form) }}
 {{ form_end(form) }}
+</div>
+<div class="col-4">
 
-<br>
-{{productoES}}
+</div>
+
+</div>
+
+
+
+
 
 {% endblock %}

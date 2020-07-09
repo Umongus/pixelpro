@@ -41,16 +41,19 @@
             <a href="{{ path('altas_index') }}">Back to the list</a>
         </li>
     </ul>
-    {% if mensaje != 'Verdadero'%}
+    {% if existe != 'Verdadero'%}
     <ul>
         <li>
               <p><h4>{{mensaje}}</h4></p>
         </li>
     </ul>
   {% endif %}
-    <ul>
-        <li>
-            <p>Valor desastre vale: {{desastre}}</p>
-        </li>
-    </ul>
+  {% if declarado != 'Falso'%}
+  <ul>
+      <li>
+            <p><h4>{{mensaje2}}</h4></p>
+      </li>
+  </ul>
+{% endif %}
+    
 {% endblock %}

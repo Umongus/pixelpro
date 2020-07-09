@@ -132,6 +132,8 @@ class AltasController extends Controller
      */
     public function newAction(Request $request, $mesAlta='nada')
     {
+        $declarado = 'Falso';
+        $existe = 'Falso';
         $session = $request->getSession();
         $session->start();
         $alta = new Altas();
@@ -155,28 +157,37 @@ class AltasController extends Controller
         if ($form->isSubmitted() && $form->isValid()) {
 
             $existe = $this->compruebaTrabajador($mesAlta,$anoAlta,$trabajador);
+            $declarado = $this->declaradoTrabajador($mesAlta,$anoAlta,$trabajador);
 
-            if ($existe == 'Verdadero') {
+            
+
+            if ($existe == 'Verdadero' && $declarado == 'Falso') {
             $alta->setNombre($trabajador[0]);
             $em->persist($alta);
             $em->flush();
            }else{
              $desastre = $this->compruebaTrabajador($mesAlta,$anoAlta,$trabajador);
             return $this->render('altas/new.html.twig', array(
+                'declarado' => $declarado,
+                'existe' => $existe,
                 'desastre' => $desastre,
                 'mensaje' => 'El trabajador ('.$nombre.') no ha realizado trabajos en el mes de: '.$mesAlta ,
+                'mensaje2' => 'El trabajador ('.$nombre.') ya ha sido dado de alta en el mes de: '.$mesAlta ,
                 'mesAlta' => $mesAlta,
                 'anoAlta' => $anoAlta,
                 'alta' => $alta,
                 'form' => $form->createView()));
           }
-            return $this->render('altas/show.html.twig', array('alta'=>$alta, 'desastre' => $existe));
+            return $this->render('altas/show.html.twig', array('alta'=>$alta, 'declarado' => $declarado, 'desastre' => $existe));
             //return $this->redirectToRoute('altas_show', array('id' => $alta->getId()));
         }
 
         return $this->render('altas/new.html.twig', array(
+          'existe' => $existe,
+            'declarado' => $declarado,
             'desastre' => 'Nda todavia',
             'mensaje' => 'Verdadero',
+            'mensaje' => 'Falso',
             'mesAlta' => $mesAlta,
             'anoAlta' => $anoAlta,
             'alta' => $alta,
@@ -284,8 +295,30 @@ class AltasController extends Controller
       return $Atrabajadores;
     }
 
+    //FUNCIONES AUXILIARES
+    public function declaradoTrabajador($mesAlta, $anoAlta, $trabajador){
+      $existe = 'Falso';
+      $calculo = new TratArray();
+      $em = $this->getDoctrine()->getManager();
+
+      $query = $em->createQuery(
+       'SELECT a
+        FROM AppBundle:Altas a
+        WHERE a.mes = :mes AND a.ano = :ano AND a.nombre = :nombre'
+       )->setParameter('mes', $mesAlta)
+       ->setParameter('ano', $anoAlta)
+       ->setParameter('nombre', $trabajador);
+       $altas = $query->getResult();
+
+       if (count($altas)>0) {
+         $existe = 'Verdadero';
+       }
+       return $existe;
+
+    }
+
     public function compruebaTrabajador ($mesAlta, $anoAlta, $trabajador){
-      $existe = 'Verdadero';
+      $existe = 'Falso';
       $calculo = new TratArray();
       $em = $this->getDoctrine()->getManager();
       $arrayIntervalo = $calculo->dameElIntervalo($mesAlta, $anoAlta);
@@ -303,7 +336,7 @@ class AltasController extends Controller
        ->setParameter('fecha2', $fecha2);
        $partes = $query->getResult();
 
-       $existe = 'Falso';
+
        for ($i=0; $i < count($partes); $i++) {
          if ($trabajador[0]->getId() == $partes[$i]->getTrabajador()->getId()) {
            $existe = 'Verdadero';

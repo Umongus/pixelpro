@@ -10,6 +10,17 @@ use AppBundle\Entity\ParteTrabajo;
 
 class TratArray {
 
+public function datosPartes($nombre, $partes, $opcion){
+  $suma = 0;
+
+     for ($i=0; $i < count($partes); $i++) {
+       if ($nombre == $partes[$i]->getTrabajador()->getNombre() && $opcion == $partes[$i]->getTipo()->getNombre()) {
+         $suma = $suma + $partes[$i]->getCantidad();
+       }
+     }
+return $suma;
+}
+
 public function pagoTrabajador($nombre, $partes, $altas, $precioPeonada, $precioHora){
   $peonadas = 0;
   $horas = 0;

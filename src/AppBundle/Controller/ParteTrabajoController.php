@@ -129,12 +129,17 @@ class ParteTrabajoController extends Controller
 
     $ApagoTrabajador = $calculo->pagoTrabajador($trabajadores[$enCurso], $partes, $Altas, $precioPeonada, $precioHora);
 
+    $diasTrabajados = $calculo->datosPartes($trabajadores[$enCurso], $partes, 'Peonada');
+    $horasTrabajadas = $calculo->datosPartes($trabajadores[$enCurso], $partes, 'Hora');
+
     $siguiente = $enCurso + 1;
     $anterior = $enCurso -1;
 
     $fin = ($enCurso == count($trabajadores)-1) ? 'si' : 'no' ;
 
     return $this->render('partetrabajo/pagos.html.twig', array(
+      'diasTrabajados'=>$diasTrabajados,
+      'horasTrabajadas'=>$horasTrabajadas,
       'numeroTrabajadores'=>count($trabajadores),
       'idTrabahjador'=>$Trabajador[0]->getId(),
       'mes'=>$mesPago,

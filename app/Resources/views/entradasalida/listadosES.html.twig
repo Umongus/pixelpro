@@ -9,13 +9,13 @@
   </div>
   <div class="col-9">
 
-  
-  <h2 class="page header">Registros de E/S: Cosecha </h2>
 
-  <h2> <a href="{{ path('ES', { 'dia': 'Anterior' }) }}">Cosecha Anterior </a>Cosecha: <strong> ------ </strong> <a href="#">Cosecha Siguiente</a></h2>
+  <h2 class="page header">Registros de E/S: <strong> {{cosecha}} </strong></h2>
+
+  <h2> <a href="{{ path('ES', { 'dia': 'Anterior' }) }}">Cosecha Anterior </a>|| <a href="#">Cosecha Siguiente</a></h2>
   <hr>
-  <h3> <strong>Resumen (Entrada): </strong> </h3>
-  <h3> Gordal =<strong> 0 </strong>| Manzanilla = <strong> 0 </strong>| Molino = <strong> 0 </strong>| G.Morada = <strong> 0 </strong>| M.Morada = <strong> 0 </strong>| Z.Morada = <strong> 0 </strong></h3>
+  <h3> <strong>Resumen ({{accion}}): </strong> </h3>
+  <h3> Gordal =<strong> {{gordal}} </strong>| Manzanilla = <strong> {{manzanilla}} </strong>| Molino = <strong> 0 </strong>| G.Morada = <strong> 0 </strong>| M.Morada = <strong> 0 </strong>| Z.Morada = <strong> 0 </strong></h3>
 
 
   <table class="table table-striped table-sm">

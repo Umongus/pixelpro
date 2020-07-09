@@ -7,12 +7,7 @@
 
 <div class="row">
   <div class="col-2">
-    <p>El valor desastre vale: {{desastre}}</p>
-    <p>El numero de partes de trabajo es: {{partes}}</p>
-    <p>El numero de trabajdores distintos es es: {{trabajadores}}</p>
-    <p>La primera fecha vale:{{fecha1|date('d-m-Y')}}</p>
-    <p>La segunda fecha vale:{{fecha2|date('d-m-Y')}}</p>
-    <p>El numero de elementos de array peonadas: {{arrPeonadas}}</p><br>
+    
     <p>Cambiar mes: <a href="{{ path('Inicia_Listado', { 'opcion': 'mes' }) }}">{{mes}}</a></p>
     <p>Cambiar año: <a href="{{ path('Inicia_Listado', { 'opcion': 'ano' }) }}">{{ano}}</a></p>
   </div>
@@ -63,9 +58,7 @@
   {% endif %}
   </div>
   <div class="col-2">
-    {% for trabajador in arrTrabajadores %}
-    <p>{{trabajador}}</p><br>
-    {% endfor %}
+
   </div>
 
 </div>
