@@ -38,6 +38,50 @@ class ParteTrabajoController extends Controller
   /**
    * INICIA EL Metodo para la confeccion de pagos de los trabajadores
    *
+   * @Route("/resumenPagos/",name="resumenPagos")
+   * @Method({"GET", "POST"})
+   */
+  public function resumenPagosAction (Request $request){
+    $session = $request->getSession();
+    $session->start();
+    $partes = $session->get('partesPago');
+    $calculo = new TratArray();
+    $em = $this->getDoctrine()->getManager();
+    $trabajadores = $calculo->dameArrayTrabajadores($partes);
+
+    $mesPago = $session->get('mesPago');
+    $anoPago = $session->get('anoPago');
+
+    //CALCULAMOS EL PRECIO DE LOS TIPOS DE ESE MES
+    $Tipo = $em->getRepository('AppBundle:Tipo')->findBy(['nombre'=>'Peonada']);
+    $AprecioPeonada = $em->getRepository('AppBundle:Precios')->findBy(['tipo'=>$Tipo[0]->getId(), 'mes'=>$mesPago, 'ano'=>$anoPago]);
+    $Tipo = $em->getRepository('AppBundle:Tipo')->findBy(['nombre'=>'Hora']);
+    $AprecioHora = $em->getRepository('AppBundle:Precios')->findBy(['tipo'=>$Tipo[0]->getId(), 'mes'=>$mesPago, 'ano'=>$anoPago]);
+    $precioPeonada = (count($AprecioPeonada) == 0) ? 0 : $AprecioPeonada[0]->getValor() ;
+    $precioHora = (count($AprecioHora) == 0) ? 0 : $AprecioHora[0]->getValor() ;
+
+    for ($i=0; $i < count($trabajadores); $i++) {
+      //CALCULAMOS LAS ALTAS DEL TRABAJADOR DENTRO DEL BUCLE
+      $Trabajador = $em->getRepository('AppBundle:Trabajadores')->findBy(['nombre'=>$trabajadores[$i]]);
+      $AAltas = $em->getRepository('AppBundle:Altas')->findBy(['nombre'=>$Trabajador[0]->getId(), 'mes'=>$mesPago, 'ano'=>$anoPago]);
+      if (count($AAltas) == 0) {
+        $Altas = 0;
+      }else{
+        $Altas = $AAltas[0]->getCantidad();
+      }
+      $AApagoTrabajador[$trabajadores[$i]] = $calculo->pagoTrabajador($trabajadores[$i], $partes, $Altas, $precioPeonada, $precioHora);
+    }
+
+
+    return $this->render('partetrabajo/resumenPagos.htmal.twig', ['partes'=>$AApagoTrabajador,
+    'numeroTrab'=>count($AApagoTrabajador),
+    'mesPago'=>$mesPago,
+    'anoPago'=>$anoPago
+    ]);
+  }
+  /**
+   * INICIA EL Metodo para la confeccion de pagos de los trabajadores
+   *
    * @Route("/iniciaPagos/",name="iniciaPagos")
    * @Method({"GET", "POST"})
    */
@@ -106,6 +150,8 @@ class ParteTrabajoController extends Controller
     )->setParameter('fecha1', $fecha1)
     ->setParameter('fecha2', $fecha2);
     $partes = $query->getResult();
+
+    $session->set('partesPago', $partes);
 
     $trabajadores = $calculo->dameArrayTrabajadores($partes);
 

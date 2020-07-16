@@ -107,9 +107,17 @@ class EntradaSalidaController extends Controller
       $fecha = $fechaES;
     }
 
-    $partesTrabajo = $em->getRepository('AppBundle:ParteTrabajo')->findBy(['fecha'=>$fechaES]);
+    $partesTrabajo = $em->getRepository('AppBundle:ParteTrabajo')->findBy(['fecha'=>$fecha]);
     //ESTA FUNCINALIDAD ESTA POR HACER
-    $arrayCuadrillas = $this->dameArrayCuadrillas($partesTrabajo);
+    if (count($partesTrabajo) > 0) {
+
+      $arrayCuadrillas = $this->dameArrayCuadrillas($partesTrabajo);
+
+      $desastre = count($arrayCuadrillas);
+    }else {
+      $desastre = 'Nohay cuadrillas';
+      return $this->redirectToRoute('iniciaES', array('vacio' => 'OK'));
+    }
 
     $Avariedad = $this->dame('Variedad');
     $Afincas = $this->dame('Fincas');
@@ -124,7 +132,7 @@ class EntradaSalidaController extends Controller
           ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
         ->add('finca', ChoiceType::class, array('choices' => $Afincas, 'preferred_choices' => array('Caseron','Palomar','Las 13','Las 16')
           ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
-        ->add('cuadrilla', ChoiceType::class, array('choices' => [1=>1,2=>2,3=>3]
+        ->add('cuadrilla', ChoiceType::class, array('choices' => $arrayCuadrillas
           ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
         ->add('entidad', ChoiceType::class, array('choices' => $Aentidades
           ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
@@ -231,7 +239,7 @@ class EntradaSalidaController extends Controller
               ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
             ->add('finca', ChoiceType::class, array('choices' => $Afincas, 'preferred_choices' => array('Caseron','Palomar','Las 13','Las 16')
               ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
-            ->add('cuadrilla', ChoiceType::class, array('choices' => [1=>1,2=>2,3=>3]
+            ->add('cuadrilla', ChoiceType::class, array('choices' => $arrayCuadrillas
               ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
             ->add('entidad', ChoiceType::class, array('choices' => $Aentidades
               ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
@@ -240,7 +248,7 @@ class EntradaSalidaController extends Controller
           $sumaGordal = $this->suma('Gordal', $nombre, $accionES);
 
     return $this->render('entradasalida/ES.html.twig', array(
-      'desastre'=>count($partesTrabajo),
+      'desastre'=>$desastre,
       'accion'=>$accionES,
       'gordal'=>$sumaGordal,
       'cosecha'=>$nombre,
@@ -255,17 +263,23 @@ class EntradaSalidaController extends Controller
   /**
    * Inicializa la funcion ES.
    *
-   * @Route("/iniciaES", name="iniciaES")
+   * @Route("/iniciaES/{vacio}", defaults={ "vacio" = "NULL" }, name="iniciaES")
    * @Method({"GET", "POST"})
    */
-  public function iniciaESAction(Request $request)
+  public function iniciaESAction(Request $request, $vacio = 'NULL')
   {
     //DESASTRES
     $productoES = 'No inicializado';
+    $mensaje = 'NULL';
     //DESASTRES
     $session = $request->getSession();
     $session->start();
     $em = $this->getDoctrine()->getManager();
+
+    if ($vacio <> 'NULL') {
+      $fechaES = $session->get('fechaES');
+      $mensaje = 'El dia '.$fechaES->format('d-m-Y').' selecionado no tiene ninguna cuadrilla';
+    }
 
     $query = $em->createQuery(
      'SELECT es
@@ -304,6 +318,7 @@ class EntradaSalidaController extends Controller
     $form->get('fecha')->setData($EntradaSalidas[0]->getFecha());
 
     return $this->render('entradasalida/iniciaES.html.twig', array(
+      'mensaje'=>$mensaje,
       'ultima'=>$EntradaSalidas[0],
       'productoES'=>$productoES,
       'form'=>$form->createView(),
@@ -435,17 +450,19 @@ class EntradaSalidaController extends Controller
     //FUNCIONES//
 
     public function dameArrayCuadrillas($partes){
-      $ACuadrillas[0]=-1;
+      $ACuadrillas = array();
+      //$ACuadrillas[0] = $partes[0]->getCuadrilla();
       for ($i=0; $i < count($partes); $i++) {
-        $cuadrilla = $partes[$i]->getCuadrilla();
+        $cuadrilla1 = $partes[$i]->getCuadrilla();
         $encontrado = 'Falso';
-        for ($j=0; $j <count($ACuadrillas) ; $j++) {
-          if ($cuadrilla == $ACuadrillas[$j]) {
-            $encontrado = 'Verddero';
+        foreach ($ACuadrillas as $cuadrilla2 ) {
+
+          if ($cuadrilla1 == $cuadrilla2) {
+            $encontrado = 'Verdadero';
           }
         }
         if ($encontrado == 'Falso') {
-          $ACuadrillas[$i]=$cuadrilla;
+          $ACuadrillas[$cuadrilla1]=$cuadrilla1;
         }
       }
       return $ACuadrillas;

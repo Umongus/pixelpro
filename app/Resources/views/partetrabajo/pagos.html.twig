@@ -2,7 +2,7 @@
 
 {% block body %}
 <br>
-<h3> <strong> {{trabajador}}</strong></h3>
+<h3> <strong> {{trabajador}} <a href="{{ path('resumenPagos') }}">(Resumen Mes)</a> </strong></h3>
 <br>
 <h4> Total dias Trabajados: <strong>{{diasTrabajados}}</strong></h4>
 <br>
@@ -20,13 +20,16 @@
 <p>Ano: {{ano}}</p>
 <p>Ide Trabajador: {{idTrabahjador}}</p>
 <p>Número de trabajadores: {{numeroTrabajadores}}</p>
-<p>Variable fin vale: {{fin}}</p>
+
 
 <a href="{{ path('Pagos', { 'enCurso': anterior }) }}">ANTERIOR | </a>
 <a href="#">{{enCurso}}</a>
 {% if fin == 'si' %}
-<a href="#">ESTE ES EL ÚLTIMO TRABAJADOR</a>
+<a href="{{ path('resumenPagos') }}"> | RESUMEN DEL MES: {{mes}}</a>
 {% else %}
 <a href="{{ path('Pagos', { 'enCurso': siguiente }) }}"> | SIGUIENTE</a>
 {% endif %}
+<br>
+<br>
+<p>Variable fin vale: {{fin}}</p>
 {% endblock %}
