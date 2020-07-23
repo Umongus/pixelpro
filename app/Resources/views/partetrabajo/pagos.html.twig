@@ -2,7 +2,8 @@
 
 {% block body %}
 <br>
-<h3> <strong> {{trabajador}} <a href="{{ path('resumenPagos') }}">(Resumen Mes)</a> </strong></h3>
+<h3> <strong> {{trabajador}} <a href="{{ path('resumenPagos') }}">(Resumen Mes1), <a href="{{ path('resumenPagos', { 'listado': 2 }) }}">(Resumen Mes2)</a> </strong></h3>
+
 <br>
 <h4> Total dias Trabajados: <strong>{{diasTrabajados}}</strong></h4>
 <br>

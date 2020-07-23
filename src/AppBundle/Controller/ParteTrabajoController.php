@@ -38,10 +38,10 @@ class ParteTrabajoController extends Controller
   /**
    * INICIA EL Metodo para la confeccion de pagos de los trabajadores
    *
-   * @Route("/resumenPagos/",name="resumenPagos")
+   * @Route("/resumenPagos/{listado}",name="resumenPagos")
    * @Method({"GET", "POST"})
    */
-  public function resumenPagosAction (Request $request){
+  public function resumenPagosAction (Request $request, $listado=1){
     $session = $request->getSession();
     $session->start();
     $partes = $session->get('partesPago');
@@ -70,14 +70,26 @@ class ParteTrabajoController extends Controller
         $Altas = $AAltas[0]->getCantidad();
       }
       $AApagoTrabajador[$trabajadores[$i]] = $calculo->pagoTrabajador($trabajadores[$i], $partes, $Altas, $precioPeonada, $precioHora);
+      $AApagoTrabajador[$trabajadores[$i]][3] = $calculo->datosPartes($trabajadores[$i], $partes, 'Peonada');
+      $AApagoTrabajador[$trabajadores[$i]][4] = $calculo->datosPartes($trabajadores[$i], $partes, 'Hora');
+      $AApagoTrabajador[$trabajadores[$i]][5] = $Altas;
+    }
+
+    if ($listado == 1) {
+      return $this->render('partetrabajo/resumenPagos.html.twig', ['partes'=>$AApagoTrabajador,
+      'numeroTrab'=>count($AApagoTrabajador),
+      'mesPago'=>$mesPago,
+      'anoPago'=>$anoPago
+      ]);
+    } else {
+      return $this->render('partetrabajo/resumenPagos2.html.twig', ['partes'=>$AApagoTrabajador,
+      'numeroTrab'=>count($AApagoTrabajador),
+      'mesPago'=>$mesPago,
+      'anoPago'=>$anoPago
+      ]);
     }
 
 
-    return $this->render('partetrabajo/resumenPagos.htmal.twig', ['partes'=>$AApagoTrabajador,
-    'numeroTrab'=>count($AApagoTrabajador),
-    'mesPago'=>$mesPago,
-    'anoPago'=>$anoPago
-    ]);
   }
   /**
    * INICIA EL Metodo para la confeccion de pagos de los trabajadores

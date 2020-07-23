@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Vencimiento</h1>
+
+    <table>
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ vencimiento.id }}</td>
+            </tr>
+            <tr>
+                <th>Fecha</th>
+                <td>{% if vencimiento.fecha %}{{ vencimiento.fecha|date('Y-m-d H:i:s') }}{% endif %}</td>
+            </tr>
+            <tr>
+                <th>Descripcion</th>
+                <td>{{ vencimiento.descripcion }}</td>
+            </tr>
+            <tr>
+                <th>Cantidad</th>
+                <td>{{ vencimiento.cantidad }}</td>
+            </tr>
+            <tr>
+                <th>Estado</th>
+                <td>{{ vencimiento.estado }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('vencimiento_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('vencimiento_edit', { 'id': vencimiento.id }) }}">Edit</a>
+        </li>
+        <li>
+            {{ form_start(delete_form) }}
+                <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

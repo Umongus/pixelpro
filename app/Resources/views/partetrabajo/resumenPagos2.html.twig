@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+<div class="row">
+<div class="col-7">
+<h2>He recibido por parte de <strong>Hnos. Gallego Brenes</strong> el pago por mi trabajo realizado en el mes de <strong>{{mesPago}}</strong> de <strong>{{anoPago}}</strong>. Firmado: </h3>
+<br>
+<p>El numeroTrab es igual: {{numeroTrab}}</p>
+<br>
+{% set foo = 0 %}
+  {% for key, parte in partes %}
+     {% set foo = foo + 1 %}
+        <h3>{{foo}} - <strong> {{key}} </strong>|</h3>
+
+
+        <br>
+  {% endfor %}
+</div>
+<div class="col-5">
+
+
+</div>
+</div>
+
+{% endblock %}

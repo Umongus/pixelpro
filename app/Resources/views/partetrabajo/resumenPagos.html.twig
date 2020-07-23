@@ -3,7 +3,7 @@
 {% block body %}
 
 <div class="row">
-<div class="col-6">
+<div class="col-7">
 <h2>He recibido por parte de Hnos. Gallego Brenes el pago por mi trabajo realizado en el mes de {{mesPago}} de {{anoPago}}. Firmado: </h3>
 <br>
 <p>El numeroTrab es igual: {{numeroTrab}}</p>
@@ -11,12 +11,13 @@
 {% set foo = 0 %}
   {% for key, parte in partes %}
      {% set foo = foo + 1 %}
-        <h3>{{foo}} - {{key}} | Cheque sin: <strong> {{parte[0]}} | Cheque con: <strong>{{parte[1]}} | Cheque horas:<strong> {{parte[2]}}</h3>
-        
+        <h3>{{foo}} - {{key}} | <strong> Sin: </strong>   {{parte[0]}} |<strong> Con: </strong>{{parte[1]}} | <strong>Horas:</strong> {{parte[2]}}</h3>
+        <h3>-- Dias Trabajados: {{parte[3]}} -- Horas: {{parte[4]}} -- Altas: {{parte[3]}} -- </h3>
+
         <br>
   {% endfor %}
 </div>
-<div class="col-6">
+<div class="col-5">
 
 
 </div>

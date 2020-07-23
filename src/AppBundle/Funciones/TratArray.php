@@ -50,12 +50,14 @@ public function pagoTrabajador($nombre, $partes, $altas, $precioPeonada, $precio
       $CHHoras = $ApagoMes[2] - $CHcon;
 
       $ApagoMes[0]=0;
+
       $ApagoMes[1]=$CHcon;
       $ApagoMes[2]=$CHHoras;
     }
   }
-
-
+  $ApagoMes[0] = ($ApagoMes[0] < 0) ? 0 : $ApagoMes[0] ;
+  $ApagoMes[1] = ($ApagoMes[1] < 0) ? 0 : $ApagoMes[1] ;
+  $ApagoMes[2] = ($ApagoMes[2] < 0) ? 0 : $ApagoMes[2] ;
 
   return $ApagoMes;
 }

@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Vencimientos list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Fecha</th>
+                <th>Descripcion</th>
+                <th>Cantidad</th>
+                <th>Estado</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for vencimiento in vencimientos %}
+            <tr>
+                <td><a href="{{ path('vencimiento_show', { 'id': vencimiento.id }) }}">{{ vencimiento.id }}</a></td>
+                <td>{% if vencimiento.fecha %}{{ vencimiento.fecha|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{{ vencimiento.descripcion }}</td>
+                <td>{{ vencimiento.cantidad }}</td>
+                <td>{{ vencimiento.estado }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('vencimiento_show', { 'id': vencimiento.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('vencimiento_edit', { 'id': vencimiento.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('vencimiento_new') }}">Create a new vencimiento</a>
+        </li>
+    </ul>
+{% endblock %}

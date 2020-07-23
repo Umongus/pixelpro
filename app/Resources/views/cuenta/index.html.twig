@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Cuentas list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Numeracion</th>
+                <th>Clase</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for cuentum in cuentas %}
+            <tr>
+                <td><a href="{{ path('cuenta_show', { 'id': cuentum.id }) }}">{{ cuentum.id }}</a></td>
+                <td>{{ cuentum.numeracion }}</td>
+                <td>{{ cuentum.clase }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('cuenta_show', { 'id': cuentum.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('cuenta_edit', { 'id': cuentum.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('cuenta_new') }}">Create a new cuentum</a>
+        </li>
+    </ul>
+{% endblock %}
