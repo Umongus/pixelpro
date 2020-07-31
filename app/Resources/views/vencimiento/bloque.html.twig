@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+Este es el bloque que queremos insertar
+<br>
+<a href="{{ path('insertaBloque', { 'opcion': 'CORRECTO'}) }}">Insertar |</a>
+<br>
+Nuero de bloques: {{cantidad}}
+<br>
+<ul>
+{% for bloq in bloque %}
+      <li>{{bloq.fecha|date('d-m-Y')}}||{{bloq.clase}}||{{bloq.entidad.nombre}}</li>
+{% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Listado de Registros a ELIMINAR</h1>
+
+    <div class="row">
+      <div class="col-3">
+
+      </div>
+      <div class="col-6">
+      <ol>
+
+      {% for reg in registros %}
+        <li>{{reg.fecha|date('d-m-Y')}} -- {{reg.clase.nombre}} -- {{reg.entidad.nombre}} -- {{reg.descripcion}} -- {{reg.cantidad}} -- {{reg.cuenta.numeracion}}</li>
+        
+        <br>
+      {% endfor %}
+
+      </ol>
+      </div>
+      <div class="col-3">
+
+      </div>
+
+    </div>
+
+    <ol type=”A”>
+      <li>Julio</li>
+      <li>Carmen</li>
+      <li>Ignacio</li>
+      <li>Elena</li>
+    </ol>
+    <br>
+    <p>{{desastre}}</p>
+
+
+
+
+
+
+
+{% endblock %}

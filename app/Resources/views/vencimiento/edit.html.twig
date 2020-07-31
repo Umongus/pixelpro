@@ -1,21 +1,49 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>Vencimiento edit</h1>
+    <h1>Vencimiento proceso</h1>
 
-    {{ form_start(edit_form) }}
-        {{ form_widget(edit_form) }}
-        <input type="submit" value="Edit" />
-    {{ form_end(edit_form) }}
+    {{form_start(form)}}
+    <fieldset>
 
-    <ul>
-        <li>
-            <a href="{{ path('vencimiento_index') }}">Back to the list</a>
-        </li>
-        <li>
-            {{ form_start(delete_form) }}
-                <input type="submit" value="Delete">
-            {{ form_end(delete_form) }}
-        </li>
-    </ul>
+      <br>
+      <div>
+      <strong>{{ form_label(form.fecha) }}</strong><br>
+      <span>{{ form_widget(form.fecha) }}</span>
+      </div>
+      <div>
+      <strong>{{ form_label(form.clase) }}</strong><br>
+      <span>{{ form_widget(form.clase) }}</span>
+      </div>
+      <div>
+      <strong>{{ form_label(form.entidad) }}</strong><br>
+      <span>{{ form_widget(form.entidad) }}</span>
+      </div>
+      <div>
+      <strong>{{ form_label(form.descripcion) }}</strong><br>
+      <span>{{ form_widget(form.descripcion) }}</span>
+      </div>
+      <div>
+      <strong>{{ form_label(form.cantidad) }}</strong><br>
+      <span>{{ form_widget(form.cantidad) }}</span>
+      </div>
+      <div>
+      <strong>{{ form_label(form.estado) }}</strong><br>
+      <span>{{ form_widget(form.estado) }}</span>
+      </div>
+
+      <div>
+      <strong>{{ form_label(form.cuenta) }}</strong><br>
+      <span>{{ form_widget(form.cuenta) }}</span><br>
+      </div><br>
+
+    
+      </fieldset>
+    {{ form_end(form) }}
+
+
+
+
+
+
 {% endblock %}

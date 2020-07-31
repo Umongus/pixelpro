@@ -22,9 +22,9 @@ class Vencimiento
     private $id;
 
     /**
-     * @var \DateTime
+     * @var \Date
      *
-     * @ORM\Column(name="fecha", type="datetime")
+     * @ORM\Column(name="fecha", type="date")
      */
     private $fecha;
 
@@ -57,7 +57,7 @@ class Vencimiento
 
     /** @ORM\ManyToOne(targetEntity="AppBundle\Entity\Cuenta") */
     private $cuenta;
-
+  
 
     /**
      * Get id
@@ -72,7 +72,7 @@ class Vencimiento
     /**
      * Set fecha
      *
-     * @param \DateTime $fecha
+     * @param \Date $fecha
      *
      * @return Vencimiento
      */
@@ -86,7 +86,7 @@ class Vencimiento
     /**
      * Get fecha
      *
-     * @return \DateTime
+     * @return \Date
      */
     public function getFecha()
     {

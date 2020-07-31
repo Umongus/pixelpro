@@ -39,7 +39,7 @@ class CuentaController extends Controller
      */
     public function newAction(Request $request)
     {
-        $cuentum = new Cuentum();
+        $cuentum = new Cuenta();
         $form = $this->createForm('AppBundle\Form\CuentaType', $cuentum);
         $form->handleRequest($request);
 
