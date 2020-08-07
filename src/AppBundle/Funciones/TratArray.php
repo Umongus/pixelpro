@@ -39,14 +39,14 @@ public function pagoTrabajador($nombre, $partes, $altas, $precioPeonada, $precio
   }//SALIMOS DEL FOR
 
   $ApagoMes[0]=($peonadas-$altas)*$precioPeonada;
-  $ApagoMes[1]=$altas*$precioPeonada-($altas*3);
+  $ApagoMes[1]=$altas*$precioPeonada-($altas*3.07);
   $ApagoMes[2]=$horas*$precioHora;
 
   if ($ApagoMes[0] < 0) {
     $ApagoMes[1]=$ApagoMes[1]+$ApagoMes[0];
     if ($ApagoMes[1] < 0) {
       $ApagoMes[2]=$ApagoMes[2]+$ApagoMes[1];
-      $CHcon = $altas*$precioPeonada-($altas*3);
+      $CHcon = $altas*$precioPeonada-($altas*3.07);
       $CHHoras = $ApagoMes[2] - $CHcon;
 
       $ApagoMes[0]=0;
