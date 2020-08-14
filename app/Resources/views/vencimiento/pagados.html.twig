@@ -4,10 +4,10 @@
 REGISTROS PAGADOS!!
 <br>
 <div class="row">
-  <div class="col-3">
+  <div class="col-2">
   <h4> <a href="{{ path('inicioVencimiento')}}">POR PAGAR</a> </h4>
   </div>
-  <div class="col-8">
+  <div class="col-9">
 
   <table class="table table-striped table-sm">
   <thead>
@@ -35,12 +35,10 @@ REGISTROS PAGADOS!!
   <td>{{ parte.cuenta.numeracion }}</td>
   <td>{{ parte.estado }}</td>
   <td>
-  <a href="{{ path('vencimiento_procesar', { 'id': parte.id, 'opcion': 'pagar' }) }}">Pagar |</a>
-  {% if parte.estado == 'Suspendido' %}
-  <a href="{{ path('vencimiento_procesar', { 'id': parte.id, 'opcion': 'seDebe' }) }}">SeDebe</a>
-  {% else %}
-  <a href="{{ path('vencimiento_procesar', { 'id': parte.id, 'opcion': 'suspender' }) }}">Suspender</a>
-  {% endif %}
+  <a href="{{ path('vencimiento_procesar', { 'id': parte.id, 'opcion': 'seDebe' }) }}">SeDebe |</a>
+  <a href="{{ path('vencimiento_delete', { 'id': parte.id}) }}">Eliminar </a>
+
+
   </td>
   </tr>
   {% endfor %}

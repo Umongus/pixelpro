@@ -4,21 +4,26 @@
     <h1>Listado de Registros a ELIMINAR</h1>
 
     <div class="row">
-      <div class="col-3">
+      <div class="col-2">
 
       </div>
-      <div class="col-6">
+      <div class="col-9">
       <ol>
-
+    {% if desastre == 0 %}
+        <h3>NO HAY NINGUN REGISTRO CON ESA ESPECIFICACION!!</h3>
+    {% else %}
       {% for reg in registros %}
-        <li>{{reg.fecha|date('d-m-Y')}} -- {{reg.clase.nombre}} -- {{reg.entidad.nombre}} -- {{reg.descripcion}} -- {{reg.cantidad}} -- {{reg.cuenta.numeracion}}</li>
-        
+        <li>{{reg.fecha|date('d-m-Y')}} -- {{reg.clase.nombre}} -- {{reg.entidad.nombre}} -- {{reg.descripcion}} -- {{reg.cantidad}} -- {{reg.cuenta.numeracion}} -- |<a href="{{ path('vencimiento_delete', { 'id': reg.id}) }}">BORRAR</a>|</li>
+
         <br>
       {% endfor %}
+    {% endif %}
+
+
 
       </ol>
       </div>
-      <div class="col-3">
+      <div class="col-1">
 
       </div>
 

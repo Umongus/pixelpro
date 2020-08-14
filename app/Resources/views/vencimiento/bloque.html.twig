@@ -9,7 +9,7 @@ Nuero de bloques: {{cantidad}}
 <br>
 <ul>
 {% for bloq in bloque %}
-      <li>{{bloq.fecha|date('d-m-Y')}}||{{bloq.clase}}||{{bloq.entidad.nombre}}</li>
+      <li> <strong> {{bloq.fecha|date('d-m-Y')}}</strong>| |{{bloq.clase}}| |{{bloq.entidad.nombre}}| |{{bloq.descripcion}}| | <strong> {{bloq.cantidad}}</strong>| |{{bloq.cuenta.numeracion}}</li>
 {% endfor %}
 </ul>
 {% endblock %}

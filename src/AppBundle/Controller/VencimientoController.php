@@ -144,6 +144,7 @@ class VencimientoController extends Controller
         //$finDeAno = new \DateTime($fecha->format('Y') .'-12-'. $fecha->format('d'));
       }elseif ($form->get('periodo')->getData() == 'Mensual') {
         $bloque = $this->bloque($form->get('fecha')->getData(),'Mensual', $form->get('ejercicios')->getData(),$vencimiento);
+        $session->set('bloque', $bloque);
         return $this->render('vencimiento/bloque.html.twig', ['bloque'=>$bloque,'cantidad'=>count($bloque)]);
       }elseif ($form->get('periodo')->getData() == 'Trimestral') {
         $bloque = $this->bloque($form->get('fecha')->getData(),'Trimestral', $form->get('ejercicios')->getData(),$vencimiento);
@@ -151,9 +152,11 @@ class VencimientoController extends Controller
         return $this->render('vencimiento/bloque.html.twig', ['bloque'=>$bloque,'cantidad'=>count($bloque)]);
       }elseif ($form->get('periodo')->getData() == 'Semestral') {
         $bloque = $this->bloque($form->get('fecha')->getData(),'Semestral', $form->get('ejercicios')->getData(),$vencimiento);
+        $session->set('bloque', $bloque);
         return $this->render('vencimiento/bloque.html.twig', ['bloque'=>$bloque,'cantidad'=>count($bloque)]);
       }elseif ($form->get('periodo')->getData() == 'Anual') {
         $bloque = $this->bloque($form->get('fecha')->getData(),'Anual', $form->get('ejercicios')->getData(),$vencimiento);
+        $session->set('bloque', $bloque);
         return $this->render('vencimiento/bloque.html.twig', ['bloque'=>$bloque,'cantidad'=>count($bloque)]);
       }
     }
@@ -249,8 +252,11 @@ class VencimientoController extends Controller
       if ($opcion == 'pagar') {
         $vencimiento->setEstado('Pagado');
         // code...
-      }else {
+      }elseif($opcion == 'suspender'){
         $vencimiento->setEstado('Suspendido');
+        // code...
+      }elseif ($opcion == 'seDebe') {
+        $vencimiento->setEstado('SeDebe');
         // code...
       }
 
@@ -275,21 +281,18 @@ class VencimientoController extends Controller
     /**
      * Deletes a vencimiento entity.
      *
-     * @Route("/{id}", name="vencimiento_delete")
+     * @Route("/borrar/{id}", name="vencimiento_delete")
      * @Method("DELETE")
      */
-    public function deleteAction(Request $request, Vencimiento $vencimiento)
+    public function deleteAction($id)
     {
-        $form = $this->createDeleteForm($vencimiento);
-        $form->handleRequest($request);
+      $em = $this->getDoctrine()->getManager();
+      $vencimiento = $em->getRepository('AppBundle:Vencimiento')->find($id);
+      $identificador = $vencimiento->getId();
+      $em->remove($vencimiento);
+      $em->flush();
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->remove($vencimiento);
-            $em->flush();
-        }
-
-        return $this->redirectToRoute('vencimiento_index');
+      return $this->redirect($this->generateUrl('inicioVencimiento'));
     }
 
     /**

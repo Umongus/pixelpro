@@ -10,7 +10,7 @@ Hola mundo VENCIMIENTOS!!
       {{ form_widget(form) }}
   {{ form_end(form) }}
   </div>
-  <div class="col-8">
+  <div class="col-9">
   <h4>El valor de desastre es: {{desastre}}</h4>
   <h4> <a href="{{ path('vencimiento_pagados')}}">PAGADOS</a> </h4>
   <table class="table table-striped table-sm">
@@ -32,9 +32,28 @@ Hola mundo VENCIMIENTOS!!
   <tr>
   <th scope="row">{{ parte.id }}</th>
   <td>{{ parte.fecha|date('d-m-Y') }}</td>
-  <td><a href="{{ path('vencimiento_listar', { 'id': parte.id }) }}">{{ parte.clase.nombre }}</a></td>
+
+  {% if parte.clase.nombre == 'Cuota Prestamo' %}
+        <td><a href="{{ path('vencimiento_listar', { 'id': parte.id }) }}" class="text-success">{{ parte.clase.nombre }}</a></td>
+  {% else %}
+        <td><a href="{{ path('vencimiento_listar', { 'id': parte.id }) }}" >{{ parte.clase.nombre }}</a></td>
+  {% endif %}
+
+
   <td>{{ parte.entidad.nombre }}</td>
-  <td>{{ parte.descripcion }}</td>
+
+{% if parte.clase.nombre == 'Cuota Prestamo'%}
+    <td class="bg-success text-white">
+      {{ parte.descripcion }}
+    </td>
+{% else %}
+  <td >
+   {{ parte.descripcion }}
+  </td>
+{% endif %}
+
+
+
   <td>{{ parte.cantidad }}</td>
   <td>{{ parte.cuenta.numeracion }}</td>
   <td>{{ parte.estado }}</td>
@@ -43,7 +62,7 @@ Hola mundo VENCIMIENTOS!!
   <a href="{{ path('vencimiento_procesar', { 'id': parte.id, 'opcion': 'seDebe' }) }}">ACTIVAR</a>
   {% else %}
   <a href="{{ path('vencimiento_procesar', { 'id': parte.id, 'opcion': 'pagar' }) }}">Pagar |</a>
-  <a href="{{ path('vencimiento_procesar', { 'id': parte.id, 'opcion': 'suspender' }) }}">Anular</a>
+  <a href="{{ path('vencimiento_procesar', { 'id': parte.id, 'opcion': 'suspender' }) }}">Anular |</a>
   {% endif %}
   </td>
   </tr>
@@ -51,9 +70,7 @@ Hola mundo VENCIMIENTOS!!
   </tbody>
   </table>
   </div>
-  <div class="col-1">
-    <p>La fecha vale </p>
-  </div>
+
 </div>
 
 

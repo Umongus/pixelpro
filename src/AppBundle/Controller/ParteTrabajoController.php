@@ -42,6 +42,7 @@ class ParteTrabajoController extends Controller
    * @Method({"GET", "POST"})
    */
   public function resumenPagosAction (Request $request, $listado=1){
+    $totalMes = 0;
     $session = $request->getSession();
     $session->start();
     $partes = $session->get('partesPago');
@@ -73,10 +74,12 @@ class ParteTrabajoController extends Controller
       $AApagoTrabajador[$trabajadores[$i]][3] = $calculo->datosPartes($trabajadores[$i], $partes, 'Peonada');
       $AApagoTrabajador[$trabajadores[$i]][4] = $calculo->datosPartes($trabajadores[$i], $partes, 'Hora');
       $AApagoTrabajador[$trabajadores[$i]][5] = $Altas;
+      $totalMes = $totalMes + $AApagoTrabajador[$trabajadores[$i]][0] + $AApagoTrabajador[$trabajadores[$i]][1] + $AApagoTrabajador[$trabajadores[$i]][2];
     }
 
     if ($listado == 1) {
       return $this->render('partetrabajo/resumenPagos.html.twig', ['partes'=>$AApagoTrabajador,
+      'totalMes'=>$totalMes,
       'numeroTrab'=>count($AApagoTrabajador),
       'mesPago'=>$mesPago,
       'anoPago'=>$anoPago
@@ -1228,6 +1231,7 @@ class ParteTrabajoController extends Controller
        $fechaSiguiente = clone $fecha;
 
        $parteTrabajo = new Partetrabajo();
+       $parteTrabajo->setCantidad(1);
        $form = $this->createForm(ParteTrabajoType::class, $parteTrabajo, array('action'=>$this->generateUrl('partetrabajo_index'), 'method'=>'POST'));
        $form->add('trabajador', ChoiceType::class, array('choices' => $Atrabajadores, 'mapped'=>false));
        $form->add('finca', ChoiceType::class, array('choices' => $Afincas, 'mapped'=>false));
