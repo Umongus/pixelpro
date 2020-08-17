@@ -30,22 +30,37 @@ class VencimientoController extends Controller
   /**
    * Inserta o no el bloque creado.
    *
-   * @Route("/listar/{id}", name="vencimiento_listar")
+   * @Route("/listar/{id}/{opcion}", name="vencimiento_listar")
    * @Method({"GET", "POST"})
    */
-  public function listarAction($id){
+  public function listarAction($id, $opcion){
     $em = $this->getDoctrine()->getManager();
     $vencimiento = $em->getRepository('AppBundle:Vencimiento')->find($id);
 
-    $query = $em->createQuery(
-     'SELECT v
-      FROM AppBundle:Vencimiento v
-      JOIN v.clase c
-      WHERE c.nombre = :att AND v.cantidad = :attr
-      ORDER BY v.fecha ASC'
-     )->setParameter('att',$vencimiento->getClase()->getNombre())
-     ->setParameter('attr',$vencimiento->getCantidad());
-     $Avencimientos = $query->getResult();
+    if ($opcion == 'Entidad') {
+
+      $query = $em->createQuery(
+       'SELECT v
+        FROM AppBundle:Vencimiento v
+        JOIN v.entidad e
+        WHERE e.nombre = :att
+        ORDER BY v.fecha ASC'
+       )->setParameter('att',$vencimiento->getEntidad()->getNombre());
+       $Avencimientos = $query->getResult();
+
+    }elseif ($opcion == 'Clase') {
+      $query = $em->createQuery(
+       'SELECT v
+        FROM AppBundle:Vencimiento v
+        JOIN v.clase c
+        WHERE c.nombre = :att AND v.cantidad = :attr
+        ORDER BY v.fecha ASC'
+       )->setParameter('att',$vencimiento->getClase()->getNombre())
+       ->setParameter('attr',$vencimiento->getCantidad());
+       $Avencimientos = $query->getResult();
+    }
+
+
 
     return $this->render('vencimiento/listadoVencimientos.html.twig',[
       'registros'=>$Avencimientos,

@@ -11,8 +11,8 @@ Hola mundo VENCIMIENTOS!!
   {{ form_end(form) }}
   </div>
   <div class="col-9">
-  <h4>El valor de desastre es: {{desastre}}</h4>
-  <h4> <a href="{{ path('vencimiento_pagados')}}">PAGADOS</a> </h4>
+  <h2 class="p-3 mb-2 bg-warning text-dark border border-dark"> <strong> VENCIMIENTOS...</strong></h2>
+  <h4> <a href="{{ path('vencimiento_pagados')}}">PAGADOS</a> ||Numero de registros sin pagar: {{desastre}}</h4>
   <table class="table table-striped table-sm">
   <thead>
   <tr>
@@ -34,13 +34,15 @@ Hola mundo VENCIMIENTOS!!
   <td>{{ parte.fecha|date('d-m-Y') }}</td>
 
   {% if parte.clase.nombre == 'Cuota Prestamo' %}
-        <td><a href="{{ path('vencimiento_listar', { 'id': parte.id }) }}" class="text-success">{{ parte.clase.nombre }}</a></td>
+        <td><a href="{{ path('vencimiento_listar', { 'id': parte.id, 'opcion': 'Clase' }) }}" class="text-success">{{ parte.clase.nombre }}</a></td>
   {% else %}
-        <td><a href="{{ path('vencimiento_listar', { 'id': parte.id }) }}" >{{ parte.clase.nombre }}</a></td>
+        <td><a href="{{ path('vencimiento_listar', { 'id': parte.id, 'opcion': 'Clase' }) }}" >{{ parte.clase.nombre }}</a></td>
   {% endif %}
 
 
-  <td>{{ parte.entidad.nombre }}</td>
+  <td>
+  <a href="{{ path('vencimiento_listar', { 'id': parte.id, 'opcion': 'Entidad'}) }}">  {{ parte.entidad.nombre }}</a>
+  </td>
 
 {% if parte.clase.nombre == 'Cuota Prestamo'%}
     <td class="bg-success text-white">
