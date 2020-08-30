@@ -873,8 +873,12 @@ class ParteTrabajoController extends Controller
     $ano = $session->get('year2');
     $mes = $session->get('mes2');
 
+    //$tormento = 0;
+    //return $this->render('partetrabajo/tormento.html.twig', ['tormento'=>$mes]);
+
 
       $arrayIntervalo = $calculo->dameElIntervalo($mes, $ano);
+
 
       $fecha1= new \DateTime($arrayIntervalo[0] .'-'. $arrayIntervalo[1] .'-01');
       $fecha2= new \DateTime($arrayIntervalo[2] .'-'. $arrayIntervalo[3] .'-01');
@@ -1142,13 +1146,14 @@ class ParteTrabajoController extends Controller
           $parteTrabajo->setTrabajador($queEs[0]);
           $parteTrabajo->setFecha($fecha);
           $parteTrabajo->setCuadrilla($cuadrilla);
-
           $Aproductos = $em->getRepository('AppBundle:Producto')->findAll();
           for ($i=0; $i < count($Aproductos); $i++) {
             if ($objetoFinca[0]->getNombre() == 'Almacen') {
+
               $inicio = $Aproductos[$i]->getFechaInicioAlmacen();
               $fin = $Aproductos[$i]->getFechaFinAlmacen();
               if ($fech >= $inicio && $fech <= $fin) {
+
                 $productoFinal = $Aproductos[$i];
                 $productoFinalNombre = $productoFinal->getNombre();
               }
@@ -1217,6 +1222,8 @@ class ParteTrabajoController extends Controller
        $arrayCuadrilla2 = $Calculo->calculaCuadrillas($partesDia);
        $arrayHoras2 = $Calculo->calculaTipos($arrayCuadrilla2, $partesDia, 'Hora');
        $arrayPeonadas2 = $Calculo->calculaTipos($arrayCuadrilla2, $partesDia, 'Peonada');
+
+       
 
        $totPeonadas2 = 0;
        foreach ($arrayPeonadas2 as $peonada) {

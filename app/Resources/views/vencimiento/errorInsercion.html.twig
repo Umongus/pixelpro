@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+<div class="row">
+  <div class="col-2">
+
+  </div>
+  <div class="col-8">
+  <br>
+  <h1 class="p-3 mb-2 bg-danger text-white">ATENCION ERROR!!</h1>
+  <br>
+  <h2>EL REGISTRO {{registro.id}}--{{registro.clase.nombre}}--{{registro.entidad.nombre}}--{{registro.cantidad}} YA EXISTE EN EL SISTEMA!!</h2>
+  <br>
+  <h4>
+  <a href="{{ path('inicioVencimiento'}) }}">Volver a Vencimientos</a>
+  </h4>
+  </div>
+  <div class="col-2">
+
+  </div>
+</div>
+
+
+{% endblock %}

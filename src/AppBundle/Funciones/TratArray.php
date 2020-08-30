@@ -274,7 +274,7 @@ public function dameElIntervalo($mes, $ano){
         $arrayIntervalo[2] = $ano;
         $arrayIntervalo[3] = 8;
           break;
-      case 'Agostò':
+      case 'Agosto':
         $arrayIntervalo[0] = $ano;
         $arrayIntervalo[1] = 8;
         $arrayIntervalo[2] = $ano;

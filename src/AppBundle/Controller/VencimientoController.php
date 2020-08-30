@@ -58,6 +58,16 @@ class VencimientoController extends Controller
        )->setParameter('att',$vencimiento->getClase()->getNombre())
        ->setParameter('attr',$vencimiento->getCantidad());
        $Avencimientos = $query->getResult();
+
+    }elseif ($opcion == 'Genero') {
+      $query = $em->createQuery(
+       'SELECT v
+        FROM AppBundle:Vencimiento v
+        JOIN v.clase c
+        WHERE c.nombre = :att
+        ORDER BY v.fecha ASC'
+       )->setParameter('att',$vencimiento->getClase()->getNombre());
+       $Avencimientos = $query->getResult();
     }
 
 
@@ -154,8 +164,15 @@ class VencimientoController extends Controller
         $fechaClone = new \DateTime($fecha->format('Y') .'-'.$fecha->format('m').'-'. $fecha->format('d'));
         $vencimiento->setFecha($fechaClone);
 
-        $em->persist($vencimiento);
-        $em->flush();
+        $busqueda = $this->busqueda($vencimiento);
+
+        if ($busqueda == 'ENCONTRADO') {
+          return $this->render('vencimiento/errorInsercion.html.twig', ['registro'=>$vencimiento]);
+        }else {
+          $em->persist($vencimiento);
+          $em->flush();
+        }
+
         //$finDeAno = new \DateTime($fecha->format('Y') .'-12-'. $fecha->format('d'));
       }elseif ($form->get('periodo')->getData() == 'Mensual') {
         $bloque = $this->bloque($form->get('fecha')->getData(),'Mensual', $form->get('ejercicios')->getData(),$vencimiento);
@@ -327,6 +344,40 @@ class VencimientoController extends Controller
     }
 
     //FUNCIONES
+    public function busqueda($registro){
+      $resultado = 'NO ENCONTRADO';
+      $em = $this->getDoctrine()->getManager();
+
+      $query = $em->createQuery(
+        'SELECT v
+        FROM AppBundle:Vencimiento v
+        WHERE v.cantidad = :cantidad '
+      )->setParameter('cantidad',$registro->getCantidad());
+      $result = $query->getResult();
+
+      $fecha1= $registro->getFecha();
+      $clase1= $registro->getClase();
+      $entidad1= $registro->getEntidad();
+      $descripcion1= $registro->getDescripcion();
+      $total1= $registro->getCantidad();
+      $cuenta1= $registro->getCuenta();
+
+      for ($i=0; $i < count($result); $i++) {
+        $fecha2= $result[$i]->getFecha();
+        $clase2= $result[$i]->getClase();
+        $entidad2= $result[$i]->getEntidad();
+        $descripcion2= $result[$i]->getDescripcion();
+        $total2= $result[$i]->getCantidad();
+        $cuenta2= $result[$i]->getCuenta();
+        if ($fecha1 == $fecha2 && $clase1 == $clase2 && $entidad1 == $entidad2 && $total1 == $total2) {
+          $resultado = 'ENCONTRADO';
+        }
+      }
+
+      return $resultado;
+    }
+
+
     public function dameFormaulario($opcion){
       if ($opcion == 'Vencimiento') {
         $Aclases = $this->dame('Clase');

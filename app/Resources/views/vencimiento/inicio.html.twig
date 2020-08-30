@@ -2,13 +2,19 @@
 
 {% block body %}
 
-Hola mundo VENCIMIENTOS!!
+
 <br>
 <div class="row">
-  <div class="col-3">
+  <div class="col-2">
+  <br>
+  <h2> <strong>ADD NUEVO!!</strong> </h2>
+  <br>
   {{ form_start(form) }}
       {{ form_widget(form) }}
   {{ form_end(form) }}
+  </div>
+  <div class="col-1">
+
   </div>
   <div class="col-9">
   <h2 class="p-3 mb-2 bg-warning text-dark border border-dark"> <strong> VENCIMIENTOS...</strong></h2>
@@ -31,10 +37,11 @@ Hola mundo VENCIMIENTOS!!
   {% for parte in vencimiento %}
   <tr>
   <th scope="row">{{ parte.id }}</th>
-  <td>{{ parte.fecha|date('d-m-Y') }}</td>
+  <td> <a href="{{ path('vencimiento_listar', { 'id': parte.id, 'opcion': 'Genero'}) }}" class="text-dark" >{{ parte.fecha|date('d-m-Y') }}</a> </td>
 
   {% if parte.clase.nombre == 'Cuota Prestamo' %}
         <td><a href="{{ path('vencimiento_listar', { 'id': parte.id, 'opcion': 'Clase' }) }}" class="text-success">{{ parte.clase.nombre }}</a></td>
+
   {% else %}
         <td><a href="{{ path('vencimiento_listar', { 'id': parte.id, 'opcion': 'Clase' }) }}" >{{ parte.clase.nombre }}</a></td>
   {% endif %}
@@ -46,6 +53,10 @@ Hola mundo VENCIMIENTOS!!
 
 {% if parte.clase.nombre == 'Cuota Prestamo'%}
     <td class="bg-success text-white">
+      {{ parte.descripcion }}
+    </td>
+{% elseif parte.clase.nombre == 'Pagare' %}
+    <td class="bg-warning text-dark">
       {{ parte.descripcion }}
     </td>
 {% else %}
