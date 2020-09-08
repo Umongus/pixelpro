@@ -61,6 +61,14 @@
       <h2 class="page header">Listado de Partes de trabajo: Día en curso( {{fecha|date('d-m-Y')}} )</h2>
 
       <h2> <a href="{{ path('partetrabajo_index', { 'dia': 'Anterior' }) }}">Día anterior </a>Cuadrilla:{{cuadrilla}}<a href="{{ path('partetrabajo_index', { 'dia': 'Siguiente' }) }}"> Día siguiente</a></h2>
+      {% if prueba != 'Correcto' %}
+        <h4 class="p-3 mb-2 bg-danger text-white">  Es la primera vez que el trabajador: <strong>{{prueba}}</strong> trabaja este mes!! </h4>
+      {% endif %}
+
+      {% if desastre != 'Correcto' %}
+        <h4 class="p-3 mb-2 bg-danger text-white"> <strong> {{desastre}} </strong> </h4>
+      {% endif %}
+
       <hr>
       {% if fechaCopiada == 'Ninguno' %}
       <h2> <a href="{{ path('partetrabajo_index', { 'dia': 'Copiar' }) }}"> COPIAR </a>({{fecha|date('d-m-Y')}}) || PEGAR(Ninguno)</h2>
@@ -113,13 +121,7 @@
       </table>
 
 
-      {% if prueba != 'Correcto' %}
-        <h4 class="p-3 mb-2 bg-danger text-white">  Es la primera vez que el trabajador: <strong>{{prueba}}</strong> trabaja este mes!! </h4>
-      {% endif %}
-
-      {% if desastre != 'Correcto' %}
-        <h3> <strong> {{desastre}} </strong> </h3>
-      {% endif %}
+      
     </div>
     </div>
   </div>

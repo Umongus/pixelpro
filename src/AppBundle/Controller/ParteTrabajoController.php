@@ -120,22 +120,41 @@ class ParteTrabajoController extends Controller
     $opcion = 'Formulario Inicio Pagos';
     $defaultData = array('message' => $opcion);
     $form = $this->createFormBuilder($defaultData)
+    ->add('fechaInicio', DateType::class, ['widget' => 'single_text', 'format' => 'yyyy-MM-dd'
+      ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')])
+      ->add('fechaFin', DateType::class, ['widget' => 'single_text', 'format' => 'yyyy-MM-dd'
+        ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')])
         ->add('mes', ChoiceType::class, array('choices' => $meses
           ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
         ->add('ano', ChoiceType::class, array('choices' => ['2017'=>2017, '2018'=>2018, '2019'=>2019, '2020'=>2020]
            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
         ->add('Enviar', SubmitType::class)
         ->getForm();
+
+    $opcion = 'Formulario Por Intervalo';
+    $defaultData = array('message' => $opcion);
+    $form2 = $this->createFormBuilder($defaultData)
+    ->add('fechaInicio', DateType::class, ['widget' => 'single_text', 'format' => 'yyyy-MM-dd'
+      ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')])
+      ->add('fechaFin', DateType::class, ['widget' => 'single_text', 'format' => 'yyyy-MM-dd'
+        ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')])
+            ->add('Enviar', SubmitType::class)
+            ->getForm();
+
     $form->handleRequest($request);
     if ($form->isSubmitted() && $form->isValid()) {
       $mesPago = $form->get('mes')->getData();
       $anoPago = $form->get('ano')->getData();
+      $fechaInicio = $form->get('fechaInicio')->getData();
+      $fechaFin = $form->get('fechaFin')->getData();
       $session->set('mesPago', $mesPago);
       $session->set('anoPago', $anoPago);
+      $session->set('fechaInicio', $fechaInicio);
+      $session->set('fechaFin', $fechaFin);
       return $this->redirect($this->generateUrl('Pagos'));
     }
 
-    return $this->render('partetrabajo/inicioPagos.html.twig', ['form'=>$form->createView()]);
+    return $this->render('partetrabajo/inicioPagos.html.twig', ['form'=>$form->createView(), 'form2'=>$form2->createView()]);
   }
 
   /**
@@ -152,6 +171,8 @@ class ParteTrabajoController extends Controller
     $session->start();
     $mesPago = $session->get('mesPago');
     $anoPago = $session->get('anoPago');
+    $fechaInicio = $session->get('fechaInicio');
+    $fechaFin = $session->get('fechaFin');
     $Intervalo = $calculo->dameElIntervalo($mesPago,$anoPago);
     $fecha1= new \DateTime($Intervalo[0] .'-'. $Intervalo[1] .'-01');
     $fecha2= new \DateTime($Intervalo[2] .'-'. $Intervalo[3] .'-01');
@@ -162,8 +183,8 @@ class ParteTrabajoController extends Controller
       JOIN p.trabajador t
       WHERE p.fecha >= :fecha1 AND p.fecha < :fecha2
       ORDER BY t.nombre ASC"
-    )->setParameter('fecha1', $fecha1)
-    ->setParameter('fecha2', $fecha2);
+    )->setParameter('fecha1', $fechaInicio)
+    ->setParameter('fecha2', $fechaFin);
     $partes = $query->getResult();
 
     $session->set('partesPago', $partes);
@@ -1223,7 +1244,7 @@ class ParteTrabajoController extends Controller
        $arrayHoras2 = $Calculo->calculaTipos($arrayCuadrilla2, $partesDia, 'Hora');
        $arrayPeonadas2 = $Calculo->calculaTipos($arrayCuadrilla2, $partesDia, 'Peonada');
 
-       
+
 
        $totPeonadas2 = 0;
        foreach ($arrayPeonadas2 as $peonada) {

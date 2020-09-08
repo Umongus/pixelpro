@@ -2,6 +2,7 @@
 
 {% block body %}
 
+
 <div class="row">
 <div class="col-4">
 <br>
@@ -9,6 +10,13 @@
 {{form_start(form)}}
 {{form_widget(form)}}
 {{ form_end(form) }}
+</div>
+<div class="col-4">
+<br>
+<h1 class="page-header">Selecciona Intervalo:</h1>
+{{form_start(form2)}}
+{{form_widget(form2)}}
+{{ form_end(form2) }}
 </div>
 </div>
 <br>
