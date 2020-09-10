@@ -56,12 +56,22 @@ class EntradaSalidaController extends Controller
     $query = $em->createQuery(
       "SELECT es
       FROM AppBundle:EntradaSalida es
-      WHERE es.fecha >= :fecha1 AND es.fecha < :fecha2 AND es.accion = :accion"
+      WHERE es.fecha >= :fecha1 AND es.fecha <= :fecha2 AND es.accion = :accion"
     )->setParameter('fecha1', $fechaUno)
     ->setParameter('fecha2', $fechaDos)
     ->setParameter('accion', $accionES);
 
     $registros = $query->getResult();
+
+    $query = $em->createQuery(
+      "SELECT es
+      FROM AppBundle:EntradaSalida es
+      JOIN es.producto p
+      WHERE p.nombre = :nombre AND es.accion = :accion"
+    )->setParameter('nombre', $nombreEntidad)
+    ->setParameter('accion', $accionES);
+
+    $resultados = $query->getResult();
 
     $sumaGordal = $this->suma('Gordal', $nombreEntidad, $accionES);
     $sumaManzanilla = $this->suma('Manzanilla', $nombreEntidad, $accionES);
@@ -70,7 +80,7 @@ class EntradaSalidaController extends Controller
       'cosecha'=>$nombreEntidad,
       'manzanilla'=>$sumaManzanilla,
       'gordal'=>$sumaGordal,
-      'partes'=>$registros,
+      'partes'=>$resultados,
       'accion'=>$accionES
     ]);
   }

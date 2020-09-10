@@ -181,7 +181,7 @@ class ParteTrabajoController extends Controller
       "SELECT p
       FROM AppBundle:ParteTrabajo p
       JOIN p.trabajador t
-      WHERE p.fecha >= :fecha1 AND p.fecha < :fecha2
+      WHERE p.fecha >= :fecha1 AND p.fecha <= :fecha2
       ORDER BY t.nombre ASC"
     )->setParameter('fecha1', $fechaInicio)
     ->setParameter('fecha2', $fechaFin);
