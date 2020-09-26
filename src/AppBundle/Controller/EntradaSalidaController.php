@@ -22,6 +22,15 @@ use AppBundle\Form\EntradaSalidaType;
 class EntradaSalidaController extends Controller
 {
   /**
+   * Funcion ListadosFincas.
+   *
+   * @Route("/ListadosFincas", name="ListadosFincas")
+   * @Method({"GET", "POST"})
+   */
+  public function ListadosFincas(){
+
+  }
+  /**
    * Funcion ListadosES.
    *
    * @Route("/ListadosES", name="ListadosES")
@@ -75,9 +84,11 @@ class EntradaSalidaController extends Controller
 
     $sumaGordal = $this->suma('Gordal', $nombreEntidad, $accionES);
     $sumaManzanilla = $this->suma('Manzanilla', $nombreEntidad, $accionES);
+    $sumaGMorada = $this->suma('Gordal Morado', $nombreEntidad, $accionES);
 
     return $this->render('entradasalida/listadosES.html.twig', [
       'cosecha'=>$nombreEntidad,
+      'gMorada'=>$sumaGMorada,
       'manzanilla'=>$sumaManzanilla,
       'gordal'=>$sumaGordal,
       'partes'=>$resultados,
@@ -256,8 +267,11 @@ class EntradaSalidaController extends Controller
             ->add('Enviar', SubmitType::class)
             ->getForm();
           $sumaGordal = $this->suma('Gordal', $nombre, $accionES);
-
+          $sumaManzanilla = $this->suma('Manzanilla', $nombre, $accionES);
+          $sumaGMorada = $this->suma('Gordal Morado', $nombre, $accionES);
     return $this->render('entradasalida/ES.html.twig', array(
+      'manzanilla'=>$sumaManzanilla,
+      'gMorada'=>$sumaGMorada,
       'desastre'=>$desastre,
       'accion'=>$accionES,
       'gordal'=>$sumaGordal,

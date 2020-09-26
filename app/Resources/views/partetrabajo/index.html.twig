@@ -65,6 +65,11 @@
         <h4 class="p-3 mb-2 bg-danger text-white">  Es la primera vez que el trabajador: <strong>{{prueba}}</strong> trabaja este mes!! </h4>
       {% endif %}
 
+      {% if cambios != 'vacio' %}
+        <h4 class="p-3 mb-2 bg-warning text-dark">CAMBIOS EN: <strong> {{cambios}} </strong> </h4>
+      {% endif %}
+
+
       {% if desastre != 'Correcto' %}
         <h4 class="p-3 mb-2 bg-danger text-white"> <strong> {{desastre}} </strong> </h4>
       {% endif %}
@@ -121,7 +126,7 @@
       </table>
 
 
-      
+
     </div>
     </div>
   </div>

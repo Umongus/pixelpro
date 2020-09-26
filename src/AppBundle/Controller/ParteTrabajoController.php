@@ -1006,6 +1006,7 @@ class ParteTrabajoController extends Controller
        $session->set('fechaCopiada', 'Ninguno');
        //$session->set('fechaSiguiente', $fecha);
        $session->set('cuadrilla', $cuadrilla);
+       $session->set('ultimo','vacio');
        return $this->redirect($this->generateUrl('partetrabajo_index'));
      }
      return $this->render('partetrabajo/inicioParte.html.twig', array(
@@ -1107,10 +1108,12 @@ class ParteTrabajoController extends Controller
       $em = $this->getDoctrine()->getManager();
       $session = $request->getSession();
       $session->start();
+      $cambios = 'vacio';
 
       $fech = $session->get('fecha');
       $cuadrilla = $session->get('cuadrilla');
       $fechaCopiada = $session->get('fechaCopiada');
+      $ultimo = $session->get('ultimo');
 
       if ($dia == 'Siguiente') {
         $fecha = clone $fech;
@@ -1196,6 +1199,24 @@ class ParteTrabajoController extends Controller
 
             $primeraVez = $this->aviso($fech, 'PrimeraVez', $trabajadorName);
 
+
+
+            if ($ultimo <> 'vacio') {
+
+              if ($ultimo->getTrabajo() != $parteTrabajo->getTrabajo()) {
+                $cambios = 'Trabajo';
+                if ($ultimo->getFinca() != $parteTrabajo->getFinca()) {
+                  $cambios = $cambios.', Finca';
+                }
+              }elseif ($ultimo->getFinca() != $parteTrabajo->getFinca()) {
+                $cambios = 'Finca';
+              }
+
+            }
+
+            $ultimo = $parteTrabajo;
+            $session->set('ultimo', $ultimo);
+
             $em->persist($parteTrabajo);
             $em->flush();
           }
@@ -1267,6 +1288,7 @@ class ParteTrabajoController extends Controller
 
 
        return $this->render('partetrabajo/index.html.twig', array(
+            'cambios' => $cambios,
             'fechaCopiada' => $fechaCopiada,
             'producto' => $productoFinalNombre,
             'fecha1' => $fechaUno,
