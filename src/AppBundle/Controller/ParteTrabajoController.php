@@ -1069,9 +1069,18 @@ class ParteTrabajoController extends Controller
       case 'PrimeraVez':
       $suma = (int)$fecha->format('m');
       $suma = $suma +1;
+
+      if ($suma == 13) {
+        $suma = 1;
+        $anoSegundo = (int)$fecha->format('Y');
+        $anoSegundo = $anoSegundo+1;
+        $cadenaSegunda = (string)$anoSegundo;
+      }else{
+        $cadenaSegunda = $fech->format('Y');
+      }
       $cadena = (string)$suma;
       $fechaUno= new \DateTime($fecha->format('Y') .'-'. $fecha->format('m') .'-01');
-      $fechaDos= new \DateTime($fecha->format('Y') .'-'. $cadena .'-01');
+      $fechaDos= new \DateTime($cadenaSegunda .'-'. $cadena .'-01');
 
       $query = $em->createQuery(
         "SELECT p
@@ -1158,9 +1167,17 @@ class ParteTrabajoController extends Controller
 //PARTE DE LA FUNCION AVISO
       $suma = (int)$fech->format('m');
       $suma = $suma +1;
+      if ($suma == 13) {
+        $suma = 1;
+        $anoSegundo = (int)$fech->format('Y');
+        $anoSegundo = $anoSegundo+1;
+        $cadenaSegunda = (string)$anoSegundo;
+      }else{
+        $cadenaSegunda = $fech->format('Y');
+      }
       $cadena = (string)$suma;
       $fechaUno= new \DateTime($fech->format('Y') .'-'. $fech->format('m') .'-01');
-      $fechaDos= new \DateTime($fech->format('Y') .'-'. $cadena .'-01');
+      $fechaDos= new \DateTime($cadenaSegunda .'-'. $cadena .'-01');
 //PARTE DE LA FUNCION AVISO
       if ($form->isSubmitted() && $form->isValid()) {
         $nombresito = $form->get('finca')->getData();
