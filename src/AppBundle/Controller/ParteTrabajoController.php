@@ -1076,7 +1076,7 @@ class ParteTrabajoController extends Controller
         $anoSegundo = $anoSegundo+1;
         $cadenaSegunda = (string)$anoSegundo;
       }else{
-        $cadenaSegunda = $fech->format('Y');
+        $cadenaSegunda = $fecha->format('Y');
       }
       $cadena = (string)$suma;
       $fechaUno= new \DateTime($fecha->format('Y') .'-'. $fecha->format('m') .'-01');
