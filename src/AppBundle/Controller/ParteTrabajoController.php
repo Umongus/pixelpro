@@ -557,6 +557,7 @@ class ParteTrabajoController extends Controller
   $cosecha[1] = $session->get('Cosecha2');
   $cosecha[2] = $session->get('Cosecha3');
   $cosecha[3] = $session->get('Cosecha4');
+  $resumen = 0;
 
   $finca = $session->get('Finca');
   $opcion = $session->get('opcion');
@@ -592,6 +593,7 @@ class ParteTrabajoController extends Controller
       $partes2 = $em->getRepository('AppBundle:ParteTrabajo')->findAll();
       $primero[$cosecha[$i]] = $comp->comparaProducto($partes2, $fincas, $cosecha[$i]);
       $cabecera = ' ';
+
     }else {
 
       $primero[$cosecha[$i]] = $comp->comparafinca($partes, $trabajos, $cosecha[$i]);
@@ -599,7 +601,9 @@ class ParteTrabajoController extends Controller
     }
   }
 
-  return $this->render('parteTrabajo/comparativa.html.twig', array('partes'=>$primero,'cabecera'=>$cabecera, 'cosas'=>$cosecha ));
+  $resumen = $comp->resumenCampanas($em, 'Aceituna 2019');
+
+  return $this->render('parteTrabajo/comparativa.html.twig', array('partes'=>$primero,'cabecera'=>$cabecera, 'cosas'=>$cosecha, 'resumen'=>$resumen ));
   }
   /**
    * Inicializa las dos tipos de comparativas, por finca y por año.

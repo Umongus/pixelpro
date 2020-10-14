@@ -10,6 +10,33 @@ use AppBundle\Entity\ParteTrabajo;
 
 class TratArray {
 
+public function resumenCampanas($em, $producto){
+  $resumen = 0;
+  //$partes = $em->getRepository('AppBundle:ParteTrabajo')->findAll();
+  $query = $em->createQuery(
+   'SELECT p
+    FROM AppBundle:ParteTrabajo p
+    JOIN p.producto pr JOIN p.finca f
+    WHERE pr.nombre = :producto'
+   )->setParameter('producto', $producto);
+
+   $partes = $query->getResult();
+   for ($i=0; $i < count($partes); $i++) {
+     $AlmacenPeonadas = 0;
+     $AlmacenHoras = 0;
+     if ($partes[$i]->getFinca()->getNombre() == 'Almacen') {
+       if ($partes[$i]->getTipo()->getNombre() == 'Peonada') {
+        $AlmacenPeonadas = $AlmacenPeonadas + $partes[$i]->getCantidad();
+       }else {
+        $AlmacenHoras = $AlmacenHoras + $partes[$i]->getCantidad();
+       }
+     }
+   }
+
+  $resumen = count($partes);
+  return $resumen;
+}
+
 public function datosPartes($nombre, $partes, $opcion){
   $suma = 0;
 
