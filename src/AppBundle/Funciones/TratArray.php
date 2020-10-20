@@ -21,20 +21,45 @@ public function resumenCampanas($em, $producto){
    )->setParameter('producto', $producto);
 
    $partes = $query->getResult();
+
+   $AlmacenPeonadas = 0;
+   $AlmacenHoras = 0;
+   $RecoleccionP = 0;
+   $RecoleccionH = 0;
+   $CampoP = 0;
+   $CampoH = 0;
    for ($i=0; $i < count($partes); $i++) {
-     $AlmacenPeonadas = 0;
-     $AlmacenHoras = 0;
      if ($partes[$i]->getFinca()->getNombre() == 'Almacen') {
        if ($partes[$i]->getTipo()->getNombre() == 'Peonada') {
         $AlmacenPeonadas = $AlmacenPeonadas + $partes[$i]->getCantidad();
        }else {
         $AlmacenHoras = $AlmacenHoras + $partes[$i]->getCantidad();
        }
+     }elseif ($partes[$i]->getTrabajo()->getNombre() == 'RecoVerde') {
+       if ($partes[$i]->getTipo()->getNombre() == 'Peonada') {
+        $RecoleccionP = $RecoleccionP + $partes[$i]->getCantidad();
+       }else {
+        $RecoleccionH = $RecoleccionH + $partes[$i]->getCantidad();
+       }
+     }else {
+       if ($partes[$i]->getTipo()->getNombre() == 'Peonada') {
+        $CampoP = $CampoP + $partes[$i]->getCantidad();
+       }else {
+        $CampoH = $CampoH + $partes[$i]->getCantidad();
+       }
      }
    }
 
-  $resumen = count($partes);
-  return $resumen;
+   $resultado['PEONADAS'][0]=$CampoP;
+   $resultado['PEONADAS'][1]=$RecoleccionP;
+   $resultado['PEONADAS'][2]=$AlmacenPeonadas;
+   $resultado['PEONADAS'][3]=$AlmacenPeonadas + $RecoleccionP + $CampoP;
+   $resultado['HORAS'][0]=$CampoH;
+   $resultado['HORAS'][1]=$RecoleccionH;
+   $resultado['HORAS'][2]=$AlmacenHoras;
+   $resultado['HORAS'][3]=$AlmacenHoras + $RecoleccionH + $CampoH;
+
+  return $resultado;
 }
 
 public function datosPartes($nombre, $partes, $opcion){
