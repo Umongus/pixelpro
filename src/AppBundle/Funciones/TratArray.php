@@ -58,6 +58,10 @@ public function resumenCampanas($em, $producto){
    $resultado['HORAS'][1]=$RecoleccionH;
    $resultado['HORAS'][2]=$AlmacenHoras;
    $resultado['HORAS'][3]=$AlmacenHoras + $RecoleccionH + $CampoH;
+   $resultado['COSTE'][0]=$CampoH*7 + $CampoP*50;
+   $resultado['COSTE'][1]=$RecoleccionH*7 + $RecoleccionP*50;
+   $resultado['COSTE'][2]=$AlmacenHoras*7 + $AlmacenPeonadas*50;
+   $resultado['COSTE'][3]= $resultado['COSTE'][0] + $resultado['COSTE'][1] + $resultado['COSTE'][2];
 
   return $resultado;
 }

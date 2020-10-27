@@ -104,6 +104,7 @@ class AltasController extends Controller
          ->setParameter('anoAlta', $anoAlta);
          $altas = $query->getResult();
 
+         $totalTrabajadores = count($altas);
          $totalAltas = 0;
          for ($i=0; $i < count($altas) ; $i++) {
           $totalAltas = $totalAltas + $altas[$i]->getCantidad();
@@ -116,6 +117,7 @@ class AltasController extends Controller
         }
 
         return $this->render('altas/index.html.twig', array(
+            'totalTrabajadores' => $totalTrabajadores,
             'totalALtas' => $totalAltas,
             'altas' => $altas,
             'estado' => $estado,
@@ -159,7 +161,7 @@ class AltasController extends Controller
             $existe = $this->compruebaTrabajador($mesAlta,$anoAlta,$trabajador);
             $declarado = $this->declaradoTrabajador($mesAlta,$anoAlta,$trabajador);
 
-            
+
 
             if ($existe == 'Verdadero' && $declarado == 'Falso') {
             $alta->setNombre($trabajador[0]);

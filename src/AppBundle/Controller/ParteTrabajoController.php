@@ -601,9 +601,10 @@ class ParteTrabajoController extends Controller
     }
   }
 
-  $resultados = $comp->resumenCampanas($em, 'Aceituna 2019');
+  $resultados1 = $comp->resumenCampanas($em, 'Aceituna 2020');
+  $resultados2 = $comp->resumenCampanas($em, 'Aceituna 2020');
 
-  return $this->render('parteTrabajo/comparativa.html.twig', array('partes'=>$primero,'cabecera'=>$cabecera, 'cosas'=>$cosecha, 'resultados'=>$resultados ));
+  return $this->render('parteTrabajo/comparativa.html.twig', array('partes'=>$primero,'cabecera'=>$cabecera, 'cosas'=>$cosecha, 'resultados'=>$resultados1 ));
   }
   /**
    * Inicializa las dos tipos de comparativas, por finca y por año.
