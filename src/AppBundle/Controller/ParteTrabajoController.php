@@ -576,7 +576,6 @@ class ParteTrabajoController extends Controller
     );
     $fincas = $query->getResult();
 
-
    $query = $em->createQuery(
     'SELECT p
      FROM AppBundle:ParteTrabajo p
@@ -585,8 +584,6 @@ class ParteTrabajoController extends Controller
      ORDER BY f.nombre ASC'
     )->setParameter('finca', $finca);
     $partes = $query->getResult();
-
-
 
   for ($i=0; $i < 4; $i++) {
     if ($opcion == 'campana') {
@@ -601,10 +598,16 @@ class ParteTrabajoController extends Controller
     }
   }
 
-  $resultados1 = $comp->resumenCampanas($em, 'Aceituna 2020');
-  $resultados2 = $comp->resumenCampanas($em, 'Aceituna 2020');
+  for ($i=0; $i < 4; $i++) {
+    // code...
+    $arrayResultados[$cosecha[$i]] = $comp->resumenCampanas($em, $cosecha[$i]);
+  }
 
-  return $this->render('parteTrabajo/comparativa.html.twig', array('partes'=>$primero,'cabecera'=>$cabecera, 'cosas'=>$cosecha, 'resultados'=>$resultados1 ));
+  $elementos = count($resultados1);
+
+  return $this->render('parteTrabajo/comparativa.html.twig', array('partes'=>$primero,'cabecera'=>$cabecera,
+    'resumen'=>$arrayResultados,
+     ));
   }
   /**
    * Inicializa las dos tipos de comparativas, por finca y por año.

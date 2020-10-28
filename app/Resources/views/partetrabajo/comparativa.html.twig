@@ -36,8 +36,10 @@
 <a href=" {{ path('Inicia_Comparativa', { 'opcion': 'cosecha' }) }}">Cosecha |</a>
 <a href=" {{ path('Inicia_Comparativa', { 'opcion': 'ambos' }) }}">Ambos</a>
 </p>
-<p>El valor de reumen es: </p>
 
+{% for key, resultados in resumen %}
+
+<p>RESUMEN COSECHA: {{key}}</p>
 <table class="table table-sm">
 <thead>
 <tr>
@@ -59,15 +61,9 @@
 {% endfor %}
 </tbody>
 </table>
-
 <br>
 <hr>
-<br>
-{% for cos in cosas %}
-<p>Accediendo al primer nivel: {{cos}}</p>
 {% endfor %}
-<br>
-
 
 
 {% endblock %}
