@@ -603,7 +603,7 @@ class ParteTrabajoController extends Controller
     $arrayResultados[$cosecha[$i]] = $comp->resumenCampanas($em, $cosecha[$i]);
   }
 
-  $elementos = count($resultados1);
+  
 
   return $this->render('parteTrabajo/comparativa.html.twig', array('partes'=>$primero,'cabecera'=>$cabecera,
     'resumen'=>$arrayResultados,
