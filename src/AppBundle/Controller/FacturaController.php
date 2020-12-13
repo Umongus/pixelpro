@@ -5,7 +5,8 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\Factura;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;use Symfony\Component\HttpFoundation\Request;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Factura controller.
@@ -14,6 +15,44 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;use Symfony\Component
  */
 class FacturaController extends Controller
 {
+  /**
+   * Inicializa la insercion de facturas.
+   *
+   * @Route("/inicioFactura", name="inicioFactura")
+   * @Method("GET", "POST")
+   */
+  public function inicioFacturaAction(Request $request)
+  {
+    //SELECCIONAMOS EL AÑO
+
+    //SELECCIONAMOS AL EMISOR
+
+    //GUARDAMOS EN LA SESION
+    $session = $request->getSession();
+    $session->start();
+
+    $ano  = array('2017'=>'2017',
+    '2018'=>'2018',
+    '2019'=>'2019',
+    '2020'=>'2020',
+    '2021'=>'2021');
+
+    
+
+    $opcion = 'Formulario Inicio Facturas';
+    $defaultData = array('message' => $opcion);
+    $form = $this->createFormBuilder($defaultData)
+    ->add('fechaFactura', DateType::class, ['widget' => 'single_text', 'format' => 'yyyy-MM-dd'
+      ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')])
+      ->add('fechaFin', DateType::class, ['widget' => 'single_text', 'format' => 'yyyy-MM-dd'
+        ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')])
+        ->add('mes', ChoiceType::class, array('choices' => $meses
+          ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+        ->add('ano', ChoiceType::class, array('choices' => ['2017'=>2017, '2018'=>2018, '2019'=>2019, '2020'=>2020]
+           ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+        ->add('Enviar', SubmitType::class)
+        ->getForm();
+  }
     /**
      * Lists all factura entities.
      *

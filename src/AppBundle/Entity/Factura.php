@@ -55,6 +55,11 @@ class Factura
      */
     private $declarada;
 
+    /** @ORM\ManyToOne(targetEntity="AppBundle\Entity\Producto") */
+    private $producto;
+    /** @ORM\ManyToOne(targetEntity="AppBundle\Entity\Fincas") */
+    private $finca;
+
     /**
      * @var string
      *
@@ -78,6 +83,54 @@ class Factura
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * Set finca
+     *
+     * @param string $finca
+     *
+     * @return Factura
+     */
+    public function setFinca(\AppBundle\Entity\Fincas $finca)
+    {
+        $this->finca = $finca;
+
+        return $this;
+    }
+
+    /**
+     * Get finca
+     *
+     * @return string
+     */
+    public function getFinca()
+    {
+        return $this->finca;
+    }
+
+    /**
+     * Set producto
+     *
+     * @param \AppBundle\Entity\Producto $producto
+     *
+     * @return Factura
+     */
+    public function setProducto(\AppBundle\Entity\Producto $producto)
+    {
+        $this->producto = $producto;
+
+        return $this;
+    }
+
+    /**
+     * Get producto
+     *
+     * @return \AppBundle\Entity\Producto
+     */
+    public function getProducto()
+    {
+        return $this->producto;
     }
 
     /**
