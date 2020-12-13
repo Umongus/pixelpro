@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Facturas list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Fecha</th>
+                <th>Numero1</th>
+                <th>Numero2</th>
+                <th>Declarada</th>
+                <th>Tiporetencion</th>
+                <th>Retencion</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for factura in facturas %}
+            <tr>
+                <td><a href="{{ path('factura_show', { 'id': factura.id }) }}">{{ factura.id }}</a></td>
+                <td>{% if factura.fecha %}{{ factura.fecha|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{{ factura.numero1 }}</td>
+                <td>{{ factura.numero2 }}</td>
+                <td>{{ factura.declarada }}</td>
+                <td>{{ factura.tipoRetencion }}</td>
+                <td>{{ factura.retencion }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('factura_show', { 'id': factura.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('factura_edit', { 'id': factura.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('factura_new') }}">Create a new factura</a>
+        </li>
+    </ul>
+{% endblock %}

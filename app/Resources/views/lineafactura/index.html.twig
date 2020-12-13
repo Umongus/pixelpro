@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Lineafacturas list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+                <th>Iva</th>
+                <th>Variable</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for lineaFactura in lineaFacturas %}
+            <tr>
+                <td><a href="{{ path('lineafactura_show', { 'id': lineaFactura.id }) }}">{{ lineaFactura.id }}</a></td>
+                <td>{{ lineaFactura.cantidad }}</td>
+                <td>{{ lineaFactura.precio }}</td>
+                <td>{{ lineaFactura.iva }}</td>
+                <td>{{ lineaFactura.variable }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('lineafactura_show', { 'id': lineaFactura.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('lineafactura_edit', { 'id': lineaFactura.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('lineafactura_new') }}">Create a new lineaFactura</a>
+        </li>
+    </ul>
+{% endblock %}

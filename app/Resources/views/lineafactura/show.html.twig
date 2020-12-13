@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Lineafactura</h1>
+
+    <table>
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ lineaFactura.id }}</td>
+            </tr>
+            <tr>
+                <th>Cantidad</th>
+                <td>{{ lineaFactura.cantidad }}</td>
+            </tr>
+            <tr>
+                <th>Precio</th>
+                <td>{{ lineaFactura.precio }}</td>
+            </tr>
+            <tr>
+                <th>Iva</th>
+                <td>{{ lineaFactura.iva }}</td>
+            </tr>
+            <tr>
+                <th>Variable</th>
+                <td>{{ lineaFactura.variable }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('lineafactura_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('lineafactura_edit', { 'id': lineaFactura.id }) }}">Edit</a>
+        </li>
+        <li>
+            {{ form_start(delete_form) }}
+                <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

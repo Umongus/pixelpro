@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Conceptos list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th>Descripcion1</th>
+                <th>Descripcion2</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for concepto in conceptos %}
+            <tr>
+                <td><a href="{{ path('concepto_show', { 'id': concepto.id }) }}">{{ concepto.id }}</a></td>
+                <td>{{ concepto.nombre }}</td>
+                <td>{{ concepto.descripcion1 }}</td>
+                <td>{{ concepto.descripcion2 }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('concepto_show', { 'id': concepto.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('concepto_edit', { 'id': concepto.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('concepto_new') }}">Create a new concepto</a>
+        </li>
+    </ul>
+{% endblock %}
