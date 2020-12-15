@@ -8,6 +8,12 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\HttpFoundation\Session\Session;
+
 /**
  * Factura controller.
  *
@@ -19,7 +25,7 @@ class FacturaController extends Controller
    * Inicializa la insercion de facturas.
    *
    * @Route("/inicioFactura", name="inicioFactura")
-   * @Method("GET", "POST")
+   * @Method({"GET", "POST"})
    */
   public function inicioFacturaAction(Request $request)
   {
@@ -37,22 +43,65 @@ class FacturaController extends Controller
     '2020'=>'2020',
     '2021'=>'2021');
 
-    
+    $Aentidades = $this->dame('Entidad');
 
     $opcion = 'Formulario Inicio Facturas';
     $defaultData = array('message' => $opcion);
     $form = $this->createFormBuilder($defaultData)
     ->add('fechaFactura', DateType::class, ['widget' => 'single_text', 'format' => 'yyyy-MM-dd'
-      ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')])
-      ->add('fechaFin', DateType::class, ['widget' => 'single_text', 'format' => 'yyyy-MM-dd'
-        ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')])
-        ->add('mes', ChoiceType::class, array('choices' => $meses
-          ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
-        ->add('ano', ChoiceType::class, array('choices' => ['2017'=>2017, '2018'=>2018, '2019'=>2019, '2020'=>2020]
+           ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')])
+    ->add('ano', ChoiceType::class, array('choices' => ['2020'=>2020, '2019'=>2019, '2018'=>2018, '2017'=>2017 ]
            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
-        ->add('Enviar', SubmitType::class)
-        ->getForm();
+    ->add('entidad', ChoiceType::class, array('choices' => $Aentidades
+            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+    ->add('Enviar', SubmitType::class)
+    ->getForm();
+
+    $form->handleRequest($request);
+    if ($form->isSubmitted() && $form->isValid()) {
+
+      $fechaFactura = $form->get('fechaFactura')->getData();
+      $ano = $form->get('ano')->getData();
+      $entidad = $form->get('entidad')->getData();
+
+      $session->set('fechaFacturaF', $fechaFactura);
+      $session->set('anoF', $ano);
+      $session->set('entidadF', $entidad);
+
+      return $this->redirect($this->generateUrl('facturas'));
+    }
+
+    return $this->render('factura/iniciaFactura.html.twig', array(
+      'form'=>$form->createView()
+    ));
   }
+
+  /**
+   * Inserta las facturas.
+   *
+   * @Route("/facturas", name="facturas")
+   * @Method({"GET", "POST"})
+   */
+  public function faturasAction(Request $request){
+    $session = $request->getSession();
+    $session->start();
+
+    $fechaFactura = $session->get('fechaFacturaF');
+    $ano = $session->get('anoF');
+    $entidad = $session->get('entidadF');
+
+    
+
+
+
+    return $this->render('factura/facturas.html.twig', array(
+      'fecha'=>$fechaFactura,
+      'ano'=>$ano,
+      'entidad'=>$entidad
+    ));
+  }
+
+
     /**
      * Lists all factura entities.
      *
@@ -171,5 +220,95 @@ class FacturaController extends Controller
             ->setMethod('DELETE')
             ->getForm()
         ;
+    }
+
+    //FUNCIONES
+    public function dame($opcion){
+    $em = $this->getDoctrine()->getManager();
+
+    if ($opcion == 'Ejercicios') {
+      $query = $em->createQuery(
+        'SELECT e
+        FROM AppBundle:Producto e
+        ORDER BY e.year DESC'
+      );
+      $result = $query->getResult();
+    }elseif ($opcion == 'Meses') {
+      $resultado  = array(
+      'Todos'=>'Todos',
+      'Enero'=>'Enero',
+      'Febrero'=>'Febrero',
+      'Marzo'=>'Marzo',
+      'Abril'=>'Abril',
+      'Mayo'=>'Mayo',
+      'Junio'=>'Junio',
+      'Julio'=>'Julio',
+      'Agosto'=>'Agosto',
+      'Septiembre'=>'Septiembre',
+      'Octubre'=>'Octubre',
+      'Noviembre'=>'Noviembre',
+      'Diciembre'=>'Diciembre');
+    }elseif ($opcion == 'Fincas') {
+      $query = $em->createQuery(
+        'SELECT e
+        FROM AppBundle:Fincas e
+        ORDER BY e.nombre ASC'
+      );
+      $result = $query->getResult();
+    }elseif ($opcion == 'Trabajos') {
+      $query = $em->createQuery(
+        'SELECT e
+        FROM AppBundle:Trabajos e
+        ORDER BY e.nombre ASC'
+      );
+      $result = $query->getResult();
+    }elseif ($opcion == 'Trabajadores') {
+      $query = $em->createQuery(
+        'SELECT e
+        FROM AppBundle:Trabajadores e
+        ORDER BY e.nombre ASC'
+      );
+      $result = $query->getResult();
+    }elseif ($opcion == 'Tipos') {
+      $query = $em->createQuery(
+        'SELECT e
+        FROM AppBundle:Tipo e
+        ORDER BY e.nombre ASC'
+      );
+      $result = $query->getResult();
+    }elseif ($opcion == 'Variedad') {
+      $query = $em->createQuery(
+        'SELECT v
+        FROM AppBundle:Variedad v
+        ORDER BY v.nombre ASC'
+      );
+      $result = $query->getResult();
+    }elseif ($opcion == 'Entidad') {
+      $query = $em->createQuery(
+        'SELECT e
+        FROM AppBundle:Entidad e
+        ORDER BY e.nombre ASC'
+      );
+      $result = $query->getResult();
+    }
+
+    if ($opcion <> 'Meses') {
+
+
+       $final = count($result)+1;
+       for ($i=0; $i < $final; $i++) {
+         if ($i==0) {
+           $resultado['Todos']='Todos';
+         }else {
+           $j = $i-1;
+           $valor = $result[$j];
+           $resultado[$valor->getNombre()]=$valor->getNombre();
+         }
+       }
+
+
+     }
+
+    return $resultado;
     }
 }
