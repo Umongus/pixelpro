@@ -52,7 +52,13 @@ class FacturaController extends Controller
            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')])
     ->add('ano', ChoiceType::class, array('choices' => ['2020'=>2020, '2019'=>2019, '2018'=>2018, '2017'=>2017 ]
            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+    ->add('Trimestre', ChoiceType::class, array('choices' => ['PrimerT'=>'PrimerT', 'SegundoT'=>'SegundoT',
+            'TercerT'=>'TercerT', 'CuartoT'=>'CuartoT' ],'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
     ->add('entidad', ChoiceType::class, array('choices' => $Aentidades
+            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+    ->add('Retencion', ChoiceType::class, array('choices' => ['No Aplica'=>'No Aplica', 'Si Intermedio'=>'Si Intermedio', 'Si FINAL'=>'Si FINAL']
+            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+    ->add('Porcentaje', ChoiceType::class, array('choices' => ['Cero'=>'Cero', '2%'=>0.02, '15%'=>0.15]
             ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
     ->add('Enviar', SubmitType::class)
     ->getForm();
@@ -85,19 +91,21 @@ class FacturaController extends Controller
   public function faturasAction(Request $request){
     $session = $request->getSession();
     $session->start();
+    $em = $this->getDoctrine()->getManager();
 
     $fechaFactura = $session->get('fechaFacturaF');
     $ano = $session->get('anoF');
     $entidad = $session->get('entidadF');
 
-    
+    $Aentidad = $em->getRepository('AppBundle:Entidad')->findBy(['nombre'=>$entidad]);
 
 
 
     return $this->render('factura/facturas.html.twig', array(
       'fecha'=>$fechaFactura,
       'ano'=>$ano,
-      'entidad'=>$entidad
+      'entidad'=>$entidad,
+      'observacion'=>$Aentidad[0]->getObservacion()
     ));
   }
 
