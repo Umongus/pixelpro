@@ -272,7 +272,11 @@ class EntradaSalidaController extends Controller
           $sumaManzanilla = $this->suma('Manzanilla', $nombre, $accionES);
           $sumaGMorada = $this->suma('Gordal Morado', $nombre, $accionES);
           $sumaMolino = $this->suma('ZorzaMolino', $nombre, $accionES);
+          $sumaManzMorada = $this->suma('Manzanilla Morada', $nombre, $accionES);
+          $sumaManzMolino = $this->suma('Manza Molino', $nombre, $accionES);
+          $sumaMolino = $sumaMolino + $sumaManzMolino;
     return $this->render('entradasalida/ES.html.twig', array(
+      'manzMorada'=>$sumaManzMorada,
       'molino'=>$sumaMolino,
       'manzanilla'=>$sumaManzanilla,
       'gMorada'=>$sumaGMorada,
