@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="row">
+<div class="col-4">
+
+</div>
+<div class="col-4">
+<hr>
+<h2>Introduce los datos de la factura:</h2>
+<hr>
+<h2>La opcion es: {{observacion}}</h2>
+<hr>
+{{ form_start(form) }}
+{{ form_widget(form) }}
+{{ form_end(form) }}
+
+<hr>
+
+</div>
+<div class="col-4">
+
+</div>
+</div>
+
+{% endblock %}

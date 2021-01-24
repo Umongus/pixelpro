@@ -9,6 +9,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
@@ -24,10 +25,10 @@ class FacturaController extends Controller
   /**
    * Inicializa la insercion de facturas.
    *
-   * @Route("/inicioFactura", name="inicioFactura")
+   * @Route("/inicioFactura1", name="inicioFactura1")
    * @Method({"GET", "POST"})
    */
-  public function inicioFacturaAction(Request $request)
+  public function inicioFactura1Action(Request $request)
   {
     //SELECCIONAMOS EL AÑO
 
@@ -44,21 +45,12 @@ class FacturaController extends Controller
     '2021'=>'2021');
 
     $Aentidades = $this->dame('Entidad');
+    unset($Aentidades['Todos']);
 
     $opcion = 'Formulario Inicio Facturas';
     $defaultData = array('message' => $opcion);
     $form = $this->createFormBuilder($defaultData)
-    ->add('fechaFactura', DateType::class, ['widget' => 'single_text', 'format' => 'yyyy-MM-dd'
-           ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')])
-    ->add('ano', ChoiceType::class, array('choices' => ['2020'=>2020, '2019'=>2019, '2018'=>2018, '2017'=>2017 ]
-           ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
-    ->add('Trimestre', ChoiceType::class, array('choices' => ['PrimerT'=>'PrimerT', 'SegundoT'=>'SegundoT',
-            'TercerT'=>'TercerT', 'CuartoT'=>'CuartoT' ],'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
     ->add('entidad', ChoiceType::class, array('choices' => $Aentidades
-            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
-    ->add('Retencion', ChoiceType::class, array('choices' => ['No Aplica'=>'No Aplica', 'Si Intermedio'=>'Si Intermedio', 'Si FINAL'=>'Si FINAL']
-            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
-    ->add('Porcentaje', ChoiceType::class, array('choices' => ['Cero'=>'Cero', '2%'=>0.02, '15%'=>0.15]
             ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
     ->add('Enviar', SubmitType::class)
     ->getForm();
@@ -66,19 +58,57 @@ class FacturaController extends Controller
     $form->handleRequest($request);
     if ($form->isSubmitted() && $form->isValid()) {
 
-      $fechaFactura = $form->get('fechaFactura')->getData();
-      $ano = $form->get('ano')->getData();
+      //$fechaFactura = $form->get('fechaFactura')->getData();
+
       $entidad = $form->get('entidad')->getData();
 
-      $session->set('fechaFacturaF', $fechaFactura);
-      $session->set('anoF', $ano);
+      //$session->set('fechaFacturaF', $fechaFactura);
+
       $session->set('entidadF', $entidad);
 
-      return $this->redirect($this->generateUrl('facturas'));
+      //return $this->redirect($this->generateUrl('facturas'));
+      return $this->redirect($this->generateUrl('inicioFactura2'));
     }
 
-    return $this->render('factura/iniciaFactura.html.twig', array(
+    return $this->render('factura/iniciaFactura1.html.twig', array(
       'form'=>$form->createView()
+    ));
+  }
+
+  /**
+   * Inicializa la insercion de facturas.
+   *
+   * @Route("/inicioFactura2", name="inicioFactura2")
+   * @Method({"GET", "POST"})
+   */
+  public function inicioFactura2Action(Request $request){
+    $session = $request->getSession();
+    $session->start();
+    $em = $this->getDoctrine()->getManager();
+
+    $entidad = $session->get('entidadF');
+    $Aentidad = $em->getRepository('AppBundle:Entidad')->findBy(['nombre'=>$entidad]);
+    $Aentidades = $this->dame('Entidad');
+    unset($Aentidades['Todos']);
+
+    $opcion = 'Formulario Inicio Facturas';
+    $defaultData = array('message' => $opcion);
+    $form = $this->createFormBuilder($defaultData)
+    ->add('entidad', ChoiceType::class, array('choices' => $Aentidades
+            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+    ->add('Numero', TextType::class, array('attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+    ->add('fechaFactura', DateType::class, ['widget' => 'single_text', 'format' => 'yyyy-MM-dd'
+          ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')])
+    ->add('Retencion', ChoiceType::class, array('choices' => ['No Aplica'=>'No Aplica', 'Si Intermedio'=>'Si Intermedio', 'Si FINAL'=>'Si FINAL']
+            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+    ->add('Porcentaje', ChoiceType::class, array('choices' => ['Cero'=>'Cero', '2%'=>0.02, '15%'=>0.15]
+            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+    ->add('Enviar', SubmitType::class)
+    ->getForm();
+
+    return $this->render('factura/iniciaFactura2.html.twig', array(
+      'form'=>$form->createView(),
+      'observacion'=>$Aentidad[0]->getObservacion()
     ));
   }
 
@@ -94,16 +124,27 @@ class FacturaController extends Controller
     $em = $this->getDoctrine()->getManager();
 
     $fechaFactura = $session->get('fechaFacturaF');
-    $ano = $session->get('anoF');
     $entidad = $session->get('entidadF');
-
     $Aentidad = $em->getRepository('AppBundle:Entidad')->findBy(['nombre'=>$entidad]);
 
+    $Aentidades = $this->dame('Entidad');
+    unset($Aentidades['Todos']);
 
+    $opcion = 'Formulario Linea de Factura';
+    $defaultData = array('message' => $opcion);
+    $form = $this->createFormBuilder($defaultData)
+    ->add('receptor', ChoiceType::class, array('choices' => $Aentidades
+            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+    ->add('Retencion', ChoiceType::class, array('choices' => ['No Aplica'=>'No Aplica', 'Si Intermedio'=>'Si Intermedio', 'Si FINAL'=>'Si FINAL']
+            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+    ->add('Porcentaje', ChoiceType::class, array('choices' => ['Cero'=>'Cero', '2%'=>0.02, '15%'=>0.15]
+            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+    ->add('Enviar', SubmitType::class)
+    ->getForm();
 
     return $this->render('factura/facturas.html.twig', array(
       'fecha'=>$fechaFactura,
-      'ano'=>$ano,
+
       'entidad'=>$entidad,
       'observacion'=>$Aentidad[0]->getObservacion()
     ));
