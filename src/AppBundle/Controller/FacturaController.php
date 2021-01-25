@@ -88,8 +88,30 @@ class FacturaController extends Controller
 
     $entidad = $session->get('entidadF');
     $Aentidad = $em->getRepository('AppBundle:Entidad')->findBy(['nombre'=>$entidad]);
-    $Aentidades = $this->dame('Entidad');
-    unset($Aentidades['Todos']);
+
+    if ($Aentidad[0]->getObservacion() == 'DelGrupo') {
+      $query = $em->createQuery(
+        "SELECT e
+        FROM AppBundle:Entidad e
+        WHERE e.observacion IN (:observacion) AND e.nombre != :nombre1
+        ORDER BY e.nombre ASC"
+      )->setParameter('observacion', ['DelGrupo','Cliente'])
+      ->setParameter('nombre1', $Aentidad[0]->getNombre());
+    }else {
+      $query = $em->createQuery(
+        "SELECT e
+        FROM AppBundle:Entidad e
+        WHERE e.observacion = :observacion AND e.nombre != :nombre1
+        ORDER BY e.nombre ASC"
+      )->setParameter('observacion', 'DelGrupo')
+      ->setParameter('nombre1', $Aentidad[0]->getNombre());
+    }
+    $reg = $query->getResult();
+    for ($i=0; $i < count($reg); $i++) {
+      $Aentidades[$reg[$i]->getNombre()] = $reg[0]->getNombre();
+    }
+    //$Aentidades = $this->dame('Entidad');
+    //unset($Aentidades['Todos']);
 
     $opcion = 'Formulario Inicio Facturas';
     $defaultData = array('message' => $opcion);
@@ -105,6 +127,10 @@ class FacturaController extends Controller
             ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
     ->add('Enviar', SubmitType::class)
     ->getForm();
+
+    $numeroFactura = 'Numero calculado';
+
+    $form->get('Numero')->setData($numeroFactura);
 
     return $this->render('factura/iniciaFactura2.html.twig', array(
       'form'=>$form->createView(),
