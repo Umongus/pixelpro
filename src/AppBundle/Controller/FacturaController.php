@@ -50,7 +50,11 @@ class FacturaController extends Controller
     $opcion = 'Formulario Inicio Facturas';
     $defaultData = array('message' => $opcion);
     $form = $this->createFormBuilder($defaultData)
-    ->add('entidad', ChoiceType::class, array('choices' => $Aentidades
+    ->add('emisor', ChoiceType::class, array('choices' => $Aentidades
+            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+    ->add('ejercicio', ChoiceType::class, array('choices' => [2021=>2021,2020=>2020,2019=>2019,2018=>2018]
+            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+    ->add('periodo', ChoiceType::class, array('choices' => ['1 Trimestre'=>'1 Trimestre', '2 Trimestre'=>'2 Trimestre', '3 Trimestre'=>'3 Trimestre', '4 Trimestre'=>'4 Trimestre']
             ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
     ->add('Enviar', SubmitType::class)
     ->getForm();
@@ -61,10 +65,14 @@ class FacturaController extends Controller
       //$fechaFactura = $form->get('fechaFactura')->getData();
 
       $entidad = $form->get('entidad')->getData();
+      $ejercicio = $form->get('ejercicio')->getData();
+      $periodo = $form->get('periodo')->getData();
 
       //$session->set('fechaFacturaF', $fechaFactura);
 
       $session->set('entidadF', $entidad);
+      $session->set('ejercicioF', $ejercicio);
+      $session->set('periodoF', $periodo);
 
       //return $this->redirect($this->generateUrl('facturas'));
       return $this->redirect($this->generateUrl('inicioFactura2'));
@@ -116,7 +124,7 @@ class FacturaController extends Controller
     $opcion = 'Formulario Inicio Facturas';
     $defaultData = array('message' => $opcion);
     $form = $this->createFormBuilder($defaultData)
-    ->add('entidad', ChoiceType::class, array('choices' => $Aentidades
+    ->add('receptor', ChoiceType::class, array('choices' => $Aentidades
             ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
     ->add('Numero', TextType::class, array('attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
     ->add('fechaFactura', DateType::class, ['widget' => 'single_text', 'format' => 'yyyy-MM-dd'
@@ -129,8 +137,9 @@ class FacturaController extends Controller
     ->getForm();
 
     $numeroFactura = 'Numero calculado';
-
-    $form->get('Numero')->setData($numeroFactura);
+    if ($Aentidad[0]->getObservacion() == 'DelGrupo') {
+      $form->get('Numero')->setData($numeroFactura);
+     }
 
     return $this->render('factura/iniciaFactura2.html.twig', array(
       'form'=>$form->createView(),
