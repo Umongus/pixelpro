@@ -4,17 +4,21 @@
 <div class="row">
 <div class="col-4">
 <h2>NUEVA FACTURA</h2>
-<h2>EMISOR: <strong> {{entidad}} </strong> </h2>
+<h2>EMISOR: <strong> {{emisor}} </strong> </h2>
+<h2>RECEPTOR: <strong> {{receptor}} </strong> </h2>
 <hr>
+<h2>EJERCICIO: <strong> {{ejercicio}} </strong> </h2>
+<h2>PERIODO: <strong> {{periodo}} </strong> </h2>
+<hr>
+<h2>RETENCION: <strong> {{retencion}} </strong> </h2>
+<h2>PORCENTAJE: <strong> {{porcentaje}} </strong> </h2>
 </div>
 <div class="col-4">
 
-<h2>NUEVA FACTURA</h2>
-<h2>EMISOR: <strong> {{entidad}} </strong> </h2>
-<hr>
-<h1>Aqui esta la fecha y la entidad:  {{fecha|date('d-m-Y')}}  {{entidad}}</h1>
-<hr>
-<h1>Y la observacion es: {{observacion}}</h1>
+<h2>NUMERO: Y FECHA</h2>
+{{ form_start(form) }}
+{{ form_widget(form) }}
+{{ form_end(form) }}
 
 </div>
 <div class="col-4">

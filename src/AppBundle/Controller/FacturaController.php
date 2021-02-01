@@ -25,16 +25,11 @@ class FacturaController extends Controller
   /**
    * Inicializa la insercion de facturas.
    *
-   * @Route("/inicioFactura1", name="inicioFactura1")
+   * @Route("/inicioFactura1/{from}",defaults={ "from" = "NULL" }, name="inicioFactura1")
    * @Method({"GET", "POST"})
    */
-  public function inicioFactura1Action(Request $request)
+  public function inicioFactura1Action(Request $request, $from='NULL')
   {
-    //SELECCIONAMOS EL AÑO
-
-    //SELECCIONAMOS AL EMISOR
-
-    //GUARDAMOS EN LA SESION
     $session = $request->getSession();
     $session->start();
 
@@ -47,14 +42,15 @@ class FacturaController extends Controller
     $Aentidades = $this->dame('Entidad');
     unset($Aentidades['Todos']);
 
-    $opcion = 'Formulario Inicio Facturas';
+    $opcion = 'Formulario Receptor';
     $defaultData = array('message' => $opcion);
     $form = $this->createFormBuilder($defaultData)
-    ->add('emisor', ChoiceType::class, array('choices' => $Aentidades
-            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+
     ->add('ejercicio', ChoiceType::class, array('choices' => [2021=>2021,2020=>2020,2019=>2019,2018=>2018]
             ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
     ->add('periodo', ChoiceType::class, array('choices' => ['1 Trimestre'=>'1 Trimestre', '2 Trimestre'=>'2 Trimestre', '3 Trimestre'=>'3 Trimestre', '4 Trimestre'=>'4 Trimestre']
+            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+    ->add('receptor', ChoiceType::class, array('choices' => $Aentidades
             ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
     ->add('Enviar', SubmitType::class)
     ->getForm();
@@ -62,19 +58,14 @@ class FacturaController extends Controller
     $form->handleRequest($request);
     if ($form->isSubmitted() && $form->isValid()) {
 
-      //$fechaFactura = $form->get('fechaFactura')->getData();
-
-      $entidad = $form->get('entidad')->getData();
+      $receptor = $form->get('receptor')->getData();
       $ejercicio = $form->get('ejercicio')->getData();
       $periodo = $form->get('periodo')->getData();
 
-      //$session->set('fechaFacturaF', $fechaFactura);
-
-      $session->set('entidadF', $entidad);
+      $session->set('receptorF', $receptor);
       $session->set('ejercicioF', $ejercicio);
       $session->set('periodoF', $periodo);
 
-      //return $this->redirect($this->generateUrl('facturas'));
       return $this->redirect($this->generateUrl('inicioFactura2'));
     }
 
@@ -94,17 +85,16 @@ class FacturaController extends Controller
     $session->start();
     $em = $this->getDoctrine()->getManager();
 
-    $entidad = $session->get('entidadF');
-    $Aentidad = $em->getRepository('AppBundle:Entidad')->findBy(['nombre'=>$entidad]);
+    $receptor = $session->get('receptorF');
+    $Aentidad = $em->getRepository('AppBundle:Entidad')->findBy(['nombre'=>$receptor]);
 
     if ($Aentidad[0]->getObservacion() == 'DelGrupo') {
       $query = $em->createQuery(
         "SELECT e
         FROM AppBundle:Entidad e
-        WHERE e.observacion IN (:observacion) AND e.nombre != :nombre1
+        WHERE e.nombre != :nombre1
         ORDER BY e.nombre ASC"
-      )->setParameter('observacion', ['DelGrupo','Cliente'])
-      ->setParameter('nombre1', $Aentidad[0]->getNombre());
+      )->setParameter('nombre1', $Aentidad[0]->getNombre());
     }else {
       $query = $em->createQuery(
         "SELECT e
@@ -116,34 +106,38 @@ class FacturaController extends Controller
     }
     $reg = $query->getResult();
     for ($i=0; $i < count($reg); $i++) {
-      $Aentidades[$reg[$i]->getNombre()] = $reg[0]->getNombre();
+      $Aentidades[$reg[$i]->getNombre()] = $reg[$i]->getNombre();
     }
-    //$Aentidades = $this->dame('Entidad');
-    //unset($Aentidades['Todos']);
 
-    $opcion = 'Formulario Inicio Facturas';
+    $opcion = 'Formulario Emisor';
     $defaultData = array('message' => $opcion);
     $form = $this->createFormBuilder($defaultData)
-    ->add('receptor', ChoiceType::class, array('choices' => $Aentidades
+    ->add('emisor', ChoiceType::class, array('choices' => $Aentidades
             ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
-    ->add('Numero', TextType::class, array('attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
-    ->add('fechaFactura', DateType::class, ['widget' => 'single_text', 'format' => 'yyyy-MM-dd'
-          ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')])
-    ->add('Retencion', ChoiceType::class, array('choices' => ['No Aplica'=>'No Aplica', 'Si Intermedio'=>'Si Intermedio', 'Si FINAL'=>'Si FINAL']
+
+    ->add('retencion', ChoiceType::class, array('choices' => ['No Aplica'=>'No Aplica', 'Si Intermedio'=>'Si Intermedio', 'Si FINAL'=>'Si FINAL']
             ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
-    ->add('Porcentaje', ChoiceType::class, array('choices' => ['Cero'=>'Cero', '2%'=>0.02, '15%'=>0.15]
+    ->add('porcentaje', ChoiceType::class, array('choices' => ['Cero'=>'Cero', '2%'=>0.02, '15%'=>0.15]
             ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
     ->add('Enviar', SubmitType::class)
     ->getForm();
 
-    $numeroFactura = 'Numero calculado';
-    if ($Aentidad[0]->getObservacion() == 'DelGrupo') {
-      $form->get('Numero')->setData($numeroFactura);
-     }
+    $form->handleRequest($request);
+    if ($form->isSubmitted() && $form->isValid()) {
+      $retencion = $form->get('retencion')->getData();
+      $porcentaje = $form->get('porcentaje')->getData();
+      $emisor = $form->get('emisor')->getData();
+
+      $session->set('retencionF', $retencion);
+      $session->set('porcentajeF', $porcentaje);
+      $session->set('emisorF', $emisor);
+      return $this->redirect($this->generateUrl('facturas'));
+    }
+      //$form->get('Numero')->setData($numeroFactura);
 
     return $this->render('factura/iniciaFactura2.html.twig', array(
       'form'=>$form->createView(),
-      'observacion'=>$Aentidad[0]->getObservacion()
+      'receptor'=>$Aentidad[0]->getNombre()
     ));
   }
 
@@ -157,31 +151,31 @@ class FacturaController extends Controller
     $session = $request->getSession();
     $session->start();
     $em = $this->getDoctrine()->getManager();
+    //unset($Aentidades['Todos']);
+    $receptor = $session->get('receptorF');
+    $emisor = $session->get('emisorF');
+    $ejercicio = $session->get('ejercicioF');
+    $periodo = $session->get('periodoF');
+    $retencion = $session->get('retencionF');
+    $porcentaje = $session->get('porcentajeF');
 
-    $fechaFactura = $session->get('fechaFacturaF');
-    $entidad = $session->get('entidadF');
-    $Aentidad = $em->getRepository('AppBundle:Entidad')->findBy(['nombre'=>$entidad]);
-
-    $Aentidades = $this->dame('Entidad');
-    unset($Aentidades['Todos']);
-
-    $opcion = 'Formulario Linea de Factura';
+    $opcion = 'Formulario Fecha';
     $defaultData = array('message' => $opcion);
     $form = $this->createFormBuilder($defaultData)
-    ->add('receptor', ChoiceType::class, array('choices' => $Aentidades
-            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
-    ->add('Retencion', ChoiceType::class, array('choices' => ['No Aplica'=>'No Aplica', 'Si Intermedio'=>'Si Intermedio', 'Si FINAL'=>'Si FINAL']
-            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
-    ->add('Porcentaje', ChoiceType::class, array('choices' => ['Cero'=>'Cero', '2%'=>0.02, '15%'=>0.15]
-            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+    ->add('Numero', TextType::class, array('attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+    ->add('fechaFactura', DateType::class, ['widget' => 'single_text', 'format' => 'yyyy-MM-dd'
+          ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')])
     ->add('Enviar', SubmitType::class)
     ->getForm();
 
     return $this->render('factura/facturas.html.twig', array(
-      'fecha'=>$fechaFactura,
-
-      'entidad'=>$entidad,
-      'observacion'=>$Aentidad[0]->getObservacion()
+      'receptor'=>$receptor,
+      'emisor'=>$emisor,
+      'ejercicio'=>$ejercicio,
+      'periodo'=>$periodo,
+      'porcentaje'=>$porcentaje,
+      'retencion'=>$retencion,
+      'form'=>$form->createView()
     ));
   }
 
