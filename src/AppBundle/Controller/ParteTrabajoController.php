@@ -126,7 +126,7 @@ class ParteTrabajoController extends Controller
         ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')])
         ->add('mes', ChoiceType::class, array('choices' => $meses
           ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
-        ->add('ano', ChoiceType::class, array('choices' => ['2017'=>2017, '2018'=>2018, '2019'=>2019, '2020'=>2020]
+        ->add('ano', ChoiceType::class, array('choices' => ['2017'=>2017, '2018'=>2018, '2019'=>2019, '2020'=>2020, '2021'=>2021]
            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
         ->add('Enviar', SubmitType::class)
         ->getForm();
@@ -603,7 +603,7 @@ class ParteTrabajoController extends Controller
     $arrayResultados[$cosecha[$i]] = $comp->resumenCampanas($em, $cosecha[$i]);
   }
 
-  
+
 
   return $this->render('parteTrabajo/comparativa.html.twig', array('partes'=>$primero,'cabecera'=>$cabecera,
     'resumen'=>$arrayResultados,
