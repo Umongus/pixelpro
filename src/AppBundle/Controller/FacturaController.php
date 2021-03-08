@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Factura;
+use AppBundle\Entity\LineaFactura;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -13,6 +14,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
@@ -62,11 +64,22 @@ class FacturaController extends Controller
       $ejercicio = $form->get('ejercicio')->getData();
       $periodo = $form->get('periodo')->getData();
 
+      $AlineaFactura = array();
+
+      $session->set('AlineaFactura', $AlineaFactura);
+
       $session->set('receptorF', $receptor);
       $session->set('ejercicioF', $ejercicio);
       $session->set('periodoF', $periodo);
-
+    if ($from == 'NULL') {
+      // code...
       return $this->redirect($this->generateUrl('inicioFactura2'));
+    }else {
+      // code...
+      return $this->redirect($this->generateUrl('facturas'));
+      //return $this->redirectToRoute('facturas', array('inicializar' => 'TRUE'));
+    }
+
     }
 
     return $this->render('factura/iniciaFactura1.html.twig', array(
@@ -114,7 +127,6 @@ class FacturaController extends Controller
     $form = $this->createFormBuilder($defaultData)
     ->add('emisor', ChoiceType::class, array('choices' => $Aentidades
             ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
-
     ->add('retencion', ChoiceType::class, array('choices' => ['No Aplica'=>'No Aplica', 'Si Intermedio'=>'Si Intermedio', 'Si FINAL'=>'Si FINAL']
             ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
     ->add('porcentaje', ChoiceType::class, array('choices' => ['Cero'=>'Cero', '2%'=>0.02, '15%'=>0.15]
@@ -128,10 +140,15 @@ class FacturaController extends Controller
       $porcentaje = $form->get('porcentaje')->getData();
       $emisor = $form->get('emisor')->getData();
 
+      $AlineaFactura = array();
+
+      $session->set('AlineaFactura', $AlineaFactura);
+
       $session->set('retencionF', $retencion);
       $session->set('porcentajeF', $porcentaje);
       $session->set('emisorF', $emisor);
       return $this->redirect($this->generateUrl('facturas'));
+      //return $this->redirectToRoute('facturas', array('inicializar' => 'TRUE'));
     }
       //$form->get('Numero')->setData($numeroFactura);
 
@@ -139,6 +156,31 @@ class FacturaController extends Controller
       'form'=>$form->createView(),
       'receptor'=>$Aentidad[0]->getNombre()
     ));
+  }
+
+  /**
+   * Inserta las facturas.
+   *
+   * @Route("/borraLinea/{di}", defaults={ "di" = "NULL" }, name="borraLinea")
+   * @Method({"GET", "POST"})
+   */
+  public function borraLineaAction(Request $request, $di='NULL'){
+    $session = $request->getSession();
+    $session->start();
+
+    $AlineaFactura = $session->get('AlineaFactura');
+    $ordenado = array();
+
+    $x=0;
+    for ($i=0; $i < count($AlineaFactura); $i++) {
+      if ($di != $i && $x < (count($AlineaFactura))) {
+        $ordenado[$x]=$AlineaFactura[$i];
+        $x++;
+      }
+    }
+
+    $session->set('AlineaFactura', $ordenado);
+    return $this->redirect($this->generateUrl('facturas'));
   }
 
   /**
@@ -161,21 +203,84 @@ class FacturaController extends Controller
 
     $opcion = 'Formulario Fecha';
     $defaultData = array('message' => $opcion);
-    $form = $this->createFormBuilder($defaultData)
+    $form1 = $this->createFormBuilder($defaultData)
     ->add('Numero', TextType::class, array('attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
     ->add('fechaFactura', DateType::class, ['widget' => 'single_text', 'format' => 'yyyy-MM-dd'
           ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')])
     ->add('Enviar', SubmitType::class)
     ->getForm();
 
+    $Aconceptos = $this->dame('Conceptos');
+    unset($Aconceptos['Todos']);
+
+    $opcion = 'Formulario Linea Factura';
+    $defaultData = array('message' => $opcion);
+    $form2 = $this->createFormBuilder($defaultData)
+    ->add('cantidad', IntegerType::class, array('attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+    ->add('concepto', ChoiceType::class, array('choices' => $Aconceptos
+            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+    ->add('precio', NumberType::class, array('attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+    ->add('iva', ChoiceType::class, array('choices' => ['10%'=>0.10, '12%'=>0.12, '21%'=>0.21]
+            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+    ->add('destino', ChoiceType::class, array('choices' => ['Campo'=>'Campo', 'Almacen'=>'Almacen', 'Otros'=>'Otros']
+            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+    ->add('Enviar', SubmitType::class)
+    ->getForm();
+
+    $cantidad = 0;
+    $concepto = 'NADA';
+    $precio = 0;
+    $iva = 0;
+    $lineaFactura = new LineaFactura();
+    $Aconcepto = $em->getRepository('AppBundle:Concepto')->findBy(['nombre'=>'Sal']);
+    $lineaFactura->setConcepto($Aconcepto[0]);
+
+    $AlineaFactura = $session->get('AlineaFactura');
+
+    $form2->handleRequest($request);
+    if ($form2->isSubmitted() && $form2->isValid()){
+      $cantidad = $form2->get('cantidad')->getData();
+      $concepto = $form2->get('concepto')->getData();
+      $precio = $form2->get('precio')->getData();
+      $iva = $form2->get('iva')->getData();
+      $lineaFactura = new LineaFactura();
+      $Aconcepto = $em->getRepository('AppBundle:Concepto')->findBy(['nombre'=>$concepto]);
+      //$lineaFactura->setFactura(NULL);
+      $lineaFactura->setCantidad($cantidad);
+      $lineaFactura->setConcepto($Aconcepto[0]);
+      $lineaFactura->setPrecio($precio);
+      $lineaFactura->setIva($iva);
+      //$concepto = $lineaFactura->getConcepto()->getNombre();
+
+
+      if (count($AlineaFactura)>0) {
+        $AlineaFactura[count($AlineaFactura)]=$lineaFactura;
+      }else {
+        $AlineaFactura[0]=$lineaFactura;
+      }
+
+      $session->set('AlineaFactura', $AlineaFactura);
+
+    }
+
     return $this->render('factura/facturas.html.twig', array(
+      'lineas' => $AlineaFactura,
+      'inicializar' => 'BORRAR ESTO',
+      'registros' => count($AlineaFactura),
+      'lineaFactura'=>$lineaFactura,
+      'cantidad'=>$cantidad,
+      'concepto'=>$concepto,
+      'precio'=>$precio,
+      'iva'=>$iva,
       'receptor'=>$receptor,
       'emisor'=>$emisor,
       'ejercicio'=>$ejercicio,
       'periodo'=>$periodo,
       'porcentaje'=>$porcentaje,
       'retencion'=>$retencion,
-      'form'=>$form->createView()
+      'form1'=>$form1->createView(),
+      'form2'=>$form2->createView()
+
     ));
   }
 
@@ -368,8 +473,14 @@ class FacturaController extends Controller
         ORDER BY e.nombre ASC'
       );
       $result = $query->getResult();
+    }elseif ($opcion == 'Conceptos') {
+      $query = $em->createQuery(
+        'SELECT e
+        FROM AppBundle:Concepto e
+        ORDER BY e.nombre ASC'
+      );
+      $result = $query->getResult();
     }
-
     if ($opcion <> 'Meses') {
 
 

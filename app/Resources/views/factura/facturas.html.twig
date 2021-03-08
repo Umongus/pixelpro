@@ -4,25 +4,49 @@
 <div class="row">
 <div class="col-4">
 <h2>NUEVA FACTURA</h2>
-<h2>EMISOR: <strong> {{emisor}} </strong> </h2>
-<h2>RECEPTOR: <strong> {{receptor}} </strong> </h2>
+<h2>EMISOR: <strong> <a href="{{ path('inicioFactura2', { 'from': 'facturas' }) }}">{{emisor}}</a>  </strong> </h2>
+<h2>RECEPTOR: <strong> <a href="{{ path('inicioFactura1', { 'from': 'facturas' }) }}">{{receptor}}</a> </strong> </h2>
 <hr>
-<h2>EJERCICIO: <strong> {{ejercicio}} </strong> </h2>
-<h2>PERIODO: <strong> {{periodo}} </strong> </h2>
+<h2>EJERCICIO: <strong> <a href="{{ path('inicioFactura1', { 'from': 'facturas' }) }}">{{ejercicio}}</a> </strong> </h2>
+<h2>PERIODO: <strong> <a href="{{ path('inicioFactura1', { 'from': 'facturas' }) }}">{{periodo}}</a> </strong> </h2>
 <hr>
-<h2>RETENCION: <strong> {{retencion}} </strong> </h2>
-<h2>PORCENTAJE: <strong> {{porcentaje}} </strong> </h2>
+<h2>RETENCION: <strong> <a href="{{ path('inicioFactura2', { 'from': 'facturas' }) }}">{{retencion}}</a> </strong> </h2>
+<h2>PORCENTAJE: <strong> <a href="{{ path('inicioFactura2', { 'from': 'facturas' }) }}">{{porcentaje}}</a> </strong> </h2>
 </div>
 <div class="col-4">
 
 <h2>NUMERO: Y FECHA</h2>
-{{ form_start(form) }}
-{{ form_widget(form) }}
-{{ form_end(form) }}
+{{ form_start(form1) }}
+{{ form_widget(form1) }}
+{{ form_end(form1) }}
+
+{% for key, linea in lineas %}
+
+      <p>
+        DI: {{key}} Cantidad: {{linea.cantidad}} Concepto: {{linea.concepto.getNombre()}} Precio: {{linea.precio}} IVA: {{linea.iva}}
+        --<a href="{{ path('borraLinea', { 'di': key }) }}">|BORRAR|</a>
+      </p>
+
+      <br>
+{% endfor %}
 
 </div>
 <div class="col-4">
-
+<h2>LINEAS DE FACTURA</h2>
+{{ form_start(form2) }}
+{{ form_widget(form2) }}
+{{ form_end(form2) }}
+<hr>
+<h3>Cantidad: {{cantidad}}</h3>
+<h3>Concepto: {{concepto}}</h3>
+<h3>Precio: {{precio}}</h3>
+<h3>IVA: {{iva}}</h3>
+<hr>
+<h3>Concepto: {{lineaFactura.concepto.getNombre()}}</h3>
+<hr>
+<h3>Registros: {{registros}}</h3>
+<hr>
+<h3>Inicializar: {{inicializar}}</h3>
 </div>
 </div>
 

@@ -9,7 +9,7 @@
     <table class="table table-sm">
   <thead>
     <tr>
-      <th scope="col">Finca: {{cabecera}}</th>
+      <th scope="col">Finca: {{cabecera}} Ha: {{hectareas}} Fan: {{fanegas}}</th>
       <th scope="col">Peonadas</th>
       <th scope="col">Horas</th>
     </tr>
@@ -37,33 +37,42 @@
 <a href=" {{ path('Inicia_Comparativa', { 'opcion': 'ambos' }) }}">Ambos</a>
 </p>
 
-{% for key, resultados in resumen %}
+<div class="row">
+  <div class="col-6">
+    {% for key, resultados in resumen %}
 
-<p>RESUMEN COSECHA: {{key}}</p>
-<table class="table table-sm">
-<thead>
-<tr>
-  <th scope="col">RESULTADO</th>
-  <th scope="col">CAMPO</th>
-  <th scope="col">RECOLECCION</th>
-  <th scope="col">ALMACEN</th>
-  <th scope="col">TOTAL</th>
-</tr>
-</thead>
-<tbody>
-{% for key, resultado in resultados %}
+    <p>RESUMEN COSECHA: {{key}}</p>
+    <table class="table table-sm">
+    <thead>
     <tr>
-      <th scope="row">{{key}}</th>
-      {% for dato in resultado %}
-          <td>{{dato}}</td>
-      {% endfor %}
+      <th scope="col">RESULTADO</th>
+      <th scope="col">CAMPO</th>
+      <th scope="col">RECOLECCION</th>
+      <th scope="col">ALMACEN</th>
+      <th scope="col">TOTAL</th>
     </tr>
-{% endfor %}
-</tbody>
-</table>
-<br>
-<hr>
-{% endfor %}
+    </thead>
+    <tbody>
+    {% for key, resultado in resultados %}
+        <tr>
+          <th scope="row">{{key}}</th>
+          {% for dato in resultado %}
+              <td>{{dato}}</td>
+          {% endfor %}
+        </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+    <br>
+    <hr>
+    {% endfor %}
+  </div>
+  <div class="col-6">
+
+  </div>
+</div>
+
+
 
 
 {% endblock %}

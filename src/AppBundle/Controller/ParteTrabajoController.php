@@ -273,7 +273,7 @@ class ParteTrabajoController extends Controller
 
     $defaultData = array('message' => 'Listar Partes');
     $form = $this->createFormBuilder($defaultData)
-        ->add('Ano', ChoiceType::class, array('choices' => ['2017'=>2017, '2018'=>2018, '2019'=>2019, '2020'=>2020]
+        ->add('Ano', ChoiceType::class, array('choices' => ['2017'=>2017, '2018'=>2018, '2019'=>2019, '2020'=>2020, '2021'=>2021]
          ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
         ->add('Ejercicio', ChoiceType::class, array('choices' => $Aejercicio
          ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
@@ -590,11 +590,16 @@ class ParteTrabajoController extends Controller
       $partes2 = $em->getRepository('AppBundle:ParteTrabajo')->findAll();
       $primero[$cosecha[$i]] = $comp->comparaProducto($partes2, $fincas, $cosecha[$i]);
       $cabecera = ' ';
+      $superficieOlivar = ' ';
+      $fanegas = ' ';
 
     }else {
 
+      $ObjFinca = $em->getRepository('AppBundle:Fincas')->findBy(['nombre'=>$finca]);
       $primero[$cosecha[$i]] = $comp->comparafinca($partes, $trabajos, $cosecha[$i]);
       $cabecera = $finca;
+      $superficieOlivar = $ObjFinca[0]->getSuperficieOlivar();
+      $fanegas = round($superficieOlivar/0.5813, 2);
     }
   }
 
@@ -605,7 +610,10 @@ class ParteTrabajoController extends Controller
 
 
 
-  return $this->render('parteTrabajo/comparativa.html.twig', array('partes'=>$primero,'cabecera'=>$cabecera,
+  return $this->render('parteTrabajo/comparativa.html.twig', array('partes'=>$primero,
+    'fanegas'=>$fanegas,
+    'hectareas'=>$superficieOlivar,
+    'cabecera'=>$cabecera,
     'resumen'=>$arrayResultados,
      ));
   }

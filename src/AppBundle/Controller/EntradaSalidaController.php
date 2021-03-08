@@ -274,8 +274,19 @@ class EntradaSalidaController extends Controller
           $sumaMolino = $this->suma('ZorzaMolino', $nombre, $accionES);
           $sumaManzMorada = $this->suma('Manzanilla Morada', $nombre, $accionES);
           $sumaManzMolino = $this->suma('Manza Molino', $nombre, $accionES);
-          $sumaMolino = $sumaMolino + $sumaManzMolino;
+          $sumaGMolino = $this->suma('Gordal Molino', $nombre, $accionES);
+          $sumaZMorada = $this->suma('ZorzaMorada', $nombre, $accionES);
+          $sumaTriticale = $this->suma('Triticale', $nombre, $accionES);
+          $sumaCartamo = $this->suma('Cartamo', $nombre, $accionES);
+          $sumaGarbanzos = $this->suma('Garbanzos', $nombre, $accionES);
+          $sumaGirasol = $this->suma('Girasol', $nombre, $accionES);
+          $sumaMolino = $sumaMolino + $sumaManzMolino + $sumaGMolino;
     return $this->render('entradasalida/ES.html.twig', array(
+      'girasol'=>$sumaGirasol,
+      'garbanzos'=>$sumaGarbanzos,
+      'zorzaMorada'=>$sumaZMorada,
+      'cartamo'=>$sumaCartamo,
+      'triticale'=>$sumaTriticale,
       'manzMorada'=>$sumaManzMorada,
       'molino'=>$sumaMolino,
       'manzanilla'=>$sumaManzanilla,
