@@ -186,6 +186,38 @@ class FacturaController extends Controller
   /**
    * Inserta las facturas.
    *
+   * @Route("/insertaFacturas", name="insertaFacturas")
+   * @Method({"GET", "POST"})
+   */
+  public function insertaFacturasAction(Request $request){
+    $session = $request->getSession();
+    $session->start();
+    $em = $this->getDoctrine()->getManager();
+    $receptor = $session->get('receptorF');
+    $emisor = $session->get('emisorF');
+    $ejercicio = $session->get('ejercicioF');
+    $periodo = $session->get('periodoF');
+    $retencion = $session->get('retencionF');
+    $porcentaje = $session->get('porcentajeF');
+    $AlineaFactura = $session->get('AlineaFactura');
+    $numeroFactura = $session->get('numeroFactura');
+    $fechaFactura = $session->get('fechaFactura');
+    return $this->render('factura/insertaFacturas.html.twig', array(
+      'receptor'=>$receptor,
+      'emisor'=>$emisor,
+      'ejercicio'=>$ejercicio,
+      'periodo'=>$periodo,
+      'retencion'=>$retencion,
+      'porcentaje'=>$porcentaje,
+      'lineas'=>$AlineaFactura,
+      'numeroFactura'=>$numeroFactura,
+      'fechaFactura'=>$fechaFactura
+    ));
+  }
+
+  /**
+   * Prepara las facturas.
+   *
    * @Route("/facturas", name="facturas")
    * @Method({"GET", "POST"})
    */
@@ -236,6 +268,15 @@ class FacturaController extends Controller
     $lineaFactura->setConcepto($Aconcepto[0]);
 
     $AlineaFactura = $session->get('AlineaFactura');
+
+    $form1->handleRequest($request);
+    if ($form1->isSubmitted() && $form1->isValid()) {
+      $numero = $form1->get('Numero')->getData();
+      $fechaFactura = $form1->get('fechaFactura')->getData();
+      $session->set('numeroFactura', $numero);
+      $session->set('fechaFactura', $fechaFactura);
+      return $this->redirect($this->generateUrl('insertaFacturas'));
+    }
 
     $form2->handleRequest($request);
     if ($form2->isSubmitted() && $form2->isValid()){

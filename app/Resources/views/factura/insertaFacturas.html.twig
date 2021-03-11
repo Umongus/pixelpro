@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+<h1>YA ESTAMOS AQUI</h1>
+<div class="row">
+  <div class="col-2">
+  </div>
+  <div class="col-8">
+    <div class="row">
+      <div class="col-2">
+        <p>Emisor:</p>
+        <p>{{emisor}}</p>
+      </div>
+      <div class="col-8">
+        <p>EJERCICIO:</p>
+        <p>{{ejercicio}}||{{periodo}}</p>
+      </div>
+      <div class="col-2">
+        <p>Receptor:</p>
+        <p>{{receptor}}</p>
+      </div>
+    </div>
+    <hr>
+    <div class="row">
+      <div class="col-2">
+        <p>Numero Factura:</p>
+        <p>{{numeroFactura}}</p>
+      </div>
+      <div class="col-8">
+      </div>
+      <div class="col-2">
+        <p>Fecha Factura:</p>
+        <p>{{fechaFactura|date('d-m-Y')}}</p>
+      </div>
+    </div>
+    <hr>
+    <div class="row">
+      <div class="col-2">
+      </div>
+      <div class="col-8">
+        {% for key, linea in lineas %}
+
+              <p>
+                ID: {{key}} Cantidad: {{linea.cantidad}} Concepto: {{linea.concepto.getNombre()}} Precio: {{linea.precio}} IVA: {{linea.iva}}
+                --<a href="{{ path('borraLinea', { 'di': key }) }}">|BORRAR|</a>
+              </p>
+
+              <br>
+        {% endfor %}
+      </div>
+      <div class="col-2">
+      </div>
+    </div>
+    <hr>
+    <div class="row">
+      <div class="col-2">
+      </div>
+      <div class="col-8">
+
+      </div>
+      <div class="col-2">
+        <p>Retencion: {{retencion}}</p>
+        <p>Porcentaje: {{numeroFactura}}</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-2">
+      </div>
+      <div class="col-8">
+
+      </div>
+      <div class="col-2">
+      </div>
+    </div>
+  </div>
+  <div class="col-2">
+  </div>
+</div>
+{% endblock %}

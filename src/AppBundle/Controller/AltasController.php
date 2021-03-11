@@ -55,6 +55,8 @@ class AltasController extends Controller
        }
      }
 
+     $anos = array('2017'=>'2017','2020'=>'2020', '2021'=>'2021');
+
      $opcion = 'Form Inicia Listado Altas';
      $defaultData = array('message' => $opcion);
      $form = $this->createFormBuilder($defaultData)
