@@ -2,7 +2,7 @@
 
 {% block body %}
 <div class="row">
-<div class="col-4">
+<div class="col-3">
 <h2>NUEVA FACTURA</h2>
 <h2>EMISOR: <strong> <a href="{{ path('inicioFactura2', { 'from': 'facturas' }) }}">{{emisor}}</a>  </strong> </h2>
 <h2>RECEPTOR: <strong> <a href="{{ path('inicioFactura1', { 'from': 'facturas' }) }}">{{receptor}}</a> </strong> </h2>
@@ -13,22 +13,60 @@
 <h2>RETENCION: <strong> <a href="{{ path('inicioFactura2', { 'from': 'facturas' }) }}">{{retencion}}</a> </strong> </h2>
 <h2>PORCENTAJE: <strong> <a href="{{ path('inicioFactura2', { 'from': 'facturas' }) }}">{{porcentaje}}</a> </strong> </h2>
 </div>
-<div class="col-4">
+<div class="col-5">
 
 <h2>NUMERO: Y FECHA</h2>
-{{ form_start(form1) }}
-{{ form_widget(form1) }}
+
+<hr>
+{{form_start(form1)}}
+<fieldset>
+  <br>
+  <div>
+  <strong>{{ form_label(form1.Numero) }}</strong><br>
+  <span>{{ form_widget(form1.Numero) }}</span>
+  </div>
+  <div>
+  <strong>{{ form_label(form1.fechaFactura) }}</strong><br>
+  <span>{{ form_widget(form1.fechaFactura) }}</span>
+  </div>
+  <br>
+  </fieldset>
 {{ form_end(form1) }}
 
 {% for key, linea in lineas %}
 
       <p>
-        DI: {{key}} Cantidad: {{linea.cantidad}} Concepto: {{linea.concepto.getNombre()}} Precio: {{linea.precio}} IVA: {{linea.iva}}
-        --<a href="{{ path('borraLinea', { 'di': key }) }}">|BORRAR|</a>
+        {% set precio = linea.precio %}
+        DI: {{key}} Cantidad: {{linea.cantidad}}
+                    Concepto: {{linea.concepto.getNombre()}}
+                    Precio: {{linea.precio}}
+                    IVA: {{linea.iva}} ||
+                    B: <strong>{{ (linea.cantidad * linea.precio)|number_format(2, ',', '.') }}</strong>
+                    IVA: <strong>{{ (linea.cantidad * linea.precio * linea.iva)|number_format(2, ',', '.') }}</strong>
+                    TOTAL: <strong>{{ ((linea.cantidad * linea.precio * linea.iva)+(linea.cantidad * linea.precio))|number_format(2, ',', '.') }}</strong>
+        <a href="{{ path('borraLinea', { 'di': key }) }}">|ERASE|</a>
       </p>
 
       <br>
 {% endfor %}
+<br>
+<hr>
+{% if retencion == 'No Aplica' %}
+  <p> BASE: <strong> {{ baseF|number_format(2, ',', '.') }} </strong> </p>
+  <p> IVA: <strong> {{ ivaF|number_format(2, ',', '.') }} </strong> </p>
+  <p> TOTAL: <strong> {{ (baseF + ivaF)|number_format(2, ',', '.') }} </strong> </p>
+{% elseif retencion == 'Si Intermedio' %}
+  <p> BASE: <strong> {{ baseF|number_format(2, ',', '.') }} </strong> </p>
+  <p> Retencion: <strong> {{ retencionF|number_format(2, ',', '.') }} </strong> </p>
+  <p> IVA: <strong> {{ ivaF|number_format(2, ',', '.') }} </strong> </p>
+  <p> TOTAL: <strong> {{ (baseF + ivaF - retencionF)|number_format(2, ',', '.') }} </strong> </p>
+{% elseif retencion == 'Si Final' %}
+  <p> BASE: <strong> {{ baseF|number_format(2, ',', '.') }} </strong> </p>
+  <p> IVA: <strong> {{ ivaF|number_format(2, ',', '.') }} </strong> </p>
+  <p> Retencion: <strong> {{ retencionF|number_format(2, ',', '.') }} </strong> </p>
+  <p> TOTAL: <strong> {{ (baseF + ivaF - retencionF)|number_format(2, ',', '.') }} </strong> </p>
+{% endif %}
+
 
 </div>
 <div class="col-4">

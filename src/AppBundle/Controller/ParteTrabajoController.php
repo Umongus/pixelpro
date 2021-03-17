@@ -1232,8 +1232,6 @@ class ParteTrabajoController extends Controller
 
             $primeraVez = $this->aviso($fech, 'PrimeraVez', $trabajadorName);
 
-
-
             if ($ultimo <> 'vacio') {
 
               if ($ultimo->getTrabajo() != $parteTrabajo->getTrabajo()) {
@@ -1290,15 +1288,12 @@ class ParteTrabajoController extends Controller
          return $this->redirectToRoute('partetrabajo_index', array('dia' => 'NULL'));
        }
 
-
        $em = $this->getDoctrine()->getManager();
        $parteTrabajos = $em->getRepository('AppBundle:ParteTrabajo')->findBy(['fecha'=>$fechaNueva, 'cuadrilla'=>$cuadrilla]);
        $partesDia = $em->getRepository('AppBundle:ParteTrabajo')->findBy(['fecha'=>$fechaNueva]);
        $arrayCuadrilla2 = $Calculo->calculaCuadrillas($partesDia);
        $arrayHoras2 = $Calculo->calculaTipos($arrayCuadrilla2, $partesDia, 'Hora');
        $arrayPeonadas2 = $Calculo->calculaTipos($arrayCuadrilla2, $partesDia, 'Peonada');
-
-
 
        $totPeonadas2 = 0;
        foreach ($arrayPeonadas2 as $peonada) {
@@ -1312,12 +1307,15 @@ class ParteTrabajoController extends Controller
 
        $fechaSiguiente = clone $fecha;
 
-       $parteTrabajo = new Partetrabajo();
+       //$parteTrabajo = new Partetrabajo();
        $parteTrabajo->setCantidad(1);
        $form = $this->createForm(ParteTrabajoType::class, $parteTrabajo, array('action'=>$this->generateUrl('partetrabajo_index'), 'method'=>'POST'));
        $form->add('trabajador', ChoiceType::class, array('choices' => $Atrabajadores, 'mapped'=>false));
        $form->add('finca', ChoiceType::class, array('choices' => $Afincas, 'mapped'=>false));
 
+       if ($parteTrabajo->getFinca() != NULL) {
+         $form->get('finca')->setData($parteTrabajo->getFinca()->getNombre());
+       }
 
 
        return $this->render('partetrabajo/index.html.twig', array(
