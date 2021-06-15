@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Estas seguro de eliminar este PERIODO</h1>
+    <h3>{{periodo.trabajador.nombre}}</h3>
+    <h3>{{periodo.fechaAlta|date('d-m-Y')}}</h3>
+    <h3>{{periodo.fechaBaja|date('d-m-Y')}}</h3>
+    <h3>{{periodo.entidad.nombre}}</h3>
+    <h3> <a href="{{ path('periodos_delete', { 'id': periodo.id}) }}">|BORRAR|</a> </h3>
+
+{% endblock %}

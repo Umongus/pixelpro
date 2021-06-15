@@ -133,6 +133,8 @@ class FacturaController extends Controller
     $form = $this->createFormBuilder($defaultData)
     ->add('emisor', ChoiceType::class, array('choices' => $Aentidades
             ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+    ->add('declarada', ChoiceType::class, array('choices' => ['SI'=>'SI', 'NO'=>'NO']
+            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
     ->add('retencion', ChoiceType::class, array('choices' => ['No Aplica'=>'No Aplica', 'Si Intermedio'=>'Si Intermedio', 'Si FINAL'=>'Si FINAL']
             ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
     ->add('porcentaje', ChoiceType::class, array('choices' => ['Cero'=>0, '2%'=>0.02, '15%'=>0.15]
@@ -145,6 +147,7 @@ class FacturaController extends Controller
       $retencion = $form->get('retencion')->getData();
       $porcentaje = $form->get('porcentaje')->getData();
       $emisor = $form->get('emisor')->getData();
+      $declarada = $form->get('declarada')->getData();
 
       $AlineaFactura = array();
 
@@ -155,6 +158,7 @@ class FacturaController extends Controller
       $session->set('emisorF', $emisor);
       $session->set('baseF', $baseF);
       $session->set('ivaF', $ivaF);
+      $session->set('declaradaF', $declarada);
       return $this->redirect($this->generateUrl('facturas'));
       //return $this->redirectToRoute('facturas', array('inicializar' => 'TRUE'));
     }
@@ -217,6 +221,8 @@ class FacturaController extends Controller
     $AlineaFactura = $session->get('AlineaFactura');
     $numeroFactura = $session->get('numeroFactura');
     $fechaFactura = $session->get('fechaFactura');
+    $declarada = $session->get('declaradaF');
+    $AlineaFactura = $session->get('AlineaFactura');
 
     $Aproductos = $this->dame('Productos');
     unset($Aproductos['Todos']);
@@ -224,13 +230,44 @@ class FacturaController extends Controller
     $opcion = 'Formulario Producto';
     $defaultData = array('message' => $opcion);
     $form = $this->createFormBuilder($defaultData)
-    ->add('Producto', ChoiceType::class, array('choices' => $Aproductos
+    ->add('producto', ChoiceType::class, array('choices' => $Aproductos
             ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
     ->add('Enviar', SubmitType::class)
     ->getForm();
 
     $form->handleRequest($request);
     if ($form->isSubmitted() && $form->isValid()) {
+
+      $factura = new Factura();
+        $Aemisor = $em->getRepository('AppBundle:Entidad')->findBy(['nombre'=>$emisor]);
+      $factura->setEmisor($Aemisor[0]);
+        $Areceptor = $em->getRepository('AppBundle:Entidad')->findBy(['nombre'=>$receptor]);
+      $factura->setReceptor($Areceptor[0]);
+      $factura->setEjercicio($ejercicio);
+      $factura->setPeriodo($periodo);
+      $factura->setNumeroFactura($numeroFactura);
+      $factura->setFecha($fechaFactura);
+      $factura->setRetencion($retencion);
+      $factura->setPorcentaje($porcentaje);
+        $producto = $form->get('producto')->getData();
+        $Aproducto = $em->getRepository('AppBundle:Producto')->findBy(['nombre'=>$producto]);
+      $factura->setProducto($Aproducto[0]);
+      $factura->setDeclarada($declarada);
+
+      $em->persist($factura);
+      $em->flush();
+
+      $insertada = $em->getRepository('AppBundle:Factura')->findBy(['numeroFactura'=>12]);
+      $AlineaFactura[0]->setFactura($insertada[0]);
+
+      $nombreConcepto = $AlineaFactura[0]->getConcepto();
+
+      $nuevoConcepto = $em->getRepository('AppBundle:Concepto')->findBy(['nombre'=>$nombreConcepto]);
+      $AlineaFactura[0]->setConcepto($nombreConcepto);
+
+      $em->persist($AlineaFactura[0]);
+      $em->flush();
+
       $AlineaFactura = array();
       $baseF = 0;
       $ivaF = 0;
@@ -241,6 +278,7 @@ class FacturaController extends Controller
     }
 
     return $this->render('factura/insertaFacturas.html.twig', array(
+      'declarada'=>$declarada,
       'form'=>$form->createView(),
       'receptor'=>$receptor,
       'emisor'=>$emisor,
@@ -253,6 +291,68 @@ class FacturaController extends Controller
       'fechaFactura'=>$fechaFactura
     ));
   }
+
+  /**
+   * Prepara las facturas.
+   *
+   * @Route("/insertaLineas", name="insertaLineas")
+   * @Method({"GET", "POST"})
+   */
+  public function insertaLineasAction(Request $request){
+
+    $em = $this->getDoctrine()->getManager();
+
+    $Aconceptos = $this->dame('Conceptos');
+    unset($Aconceptos['Todos']);
+
+    $opcion = 'Formulario Linea Factura';
+    $defaultData = array('message' => $opcion);
+    $form2 = $this->createFormBuilder($defaultData)
+    ->add('cantidad', IntegerType::class, array('attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+    ->add('concepto', ChoiceType::class, array('choices' => $Aconceptos
+            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+    ->add('variable', TextType::class, array('attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+    ->add('precio', NumberType::class, array('attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+    ->add('iva', ChoiceType::class, array('choices' => ['10%'=>0.10, '12%'=>0.12, '21%'=>0.21]
+            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+    ->add('destino', ChoiceType::class, array('choices' => ['Campo'=>'Campo', 'Almacen'=>'Almacen', 'Otros'=>'Otros']
+            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+    ->add('Enviar', SubmitType::class)
+    ->getForm();
+
+    $form2->handleRequest($request);
+    if ($form2->isSubmitted() && $form2->isValid()){
+      $cantidad = $form2->get('cantidad')->getData();
+      $concepto = $form2->get('concepto')->getData();
+      $variable = $form2->get('variable')->getData();
+      $precio = $form2->get('precio')->getData();
+      $iva = $form2->get('iva')->getData();
+      $destino = $form2->get('destino')->getData();
+      $variable = $form2->get('variable')->getData();
+
+      $factura = $em->getRepository('AppBundle:Factura')->findBy(['numeroFactura'=>12]);
+
+      $lineaFactura = new LineaFactura();
+      $Aconcepto = $em->getRepository('AppBundle:Concepto')->findBy(['nombre'=>$concepto]);
+      $lineaFactura->setFactura($factura[0]);
+      $lineaFactura->setCantidad($cantidad);
+      $lineaFactura->setConcepto($Aconcepto[0]);
+      $lineaFactura->setPrecio($precio);
+      $lineaFactura->setIva($iva);
+      $lineaFactura->setDestino($destino);
+
+      $em->persist($lineaFactura);
+      $em->flush();
+
+    }
+    return $this->render('factura/insertaLineas.html.twig', array(
+
+      'form'=>$form2->createView(),
+
+    ));
+  }
+
+
 
   /**
    * Prepara las facturas.
@@ -273,6 +373,7 @@ class FacturaController extends Controller
     $porcentaje = $session->get('porcentajeF');
     $baseF = $session->get('baseF');
     $ivaF = $session->get('ivaF');
+    $declarada = $session->get('declaradaF');
     $retencionF = 0;
 
     $opcion = 'Formulario Fecha';
@@ -330,6 +431,8 @@ class FacturaController extends Controller
       $variable = $form2->get('variable')->getData();
       $precio = $form2->get('precio')->getData();
       $iva = $form2->get('iva')->getData();
+      $destino = $form2->get('destino')->getData();
+
       $lineaFactura = new LineaFactura();
       $Aconcepto = $em->getRepository('AppBundle:Concepto')->findBy(['nombre'=>$concepto]);
       //$lineaFactura->setFactura(NULL);
@@ -337,6 +440,7 @@ class FacturaController extends Controller
       $lineaFactura->setConcepto($Aconcepto[0]);
       $lineaFactura->setPrecio($precio);
       $lineaFactura->setIva($iva);
+      $lineaFactura->setDestino($destino);
       //$concepto = $lineaFactura->getConcepto()->getNombre();
       $baseLinea=$cantidad*$precio;
       $ivaLinea=$baseLinea*$iva;
@@ -369,6 +473,7 @@ class FacturaController extends Controller
     }
 
     return $this->render('factura/facturas.html.twig', array(
+      'declarada'=>$declarada,
       'baseF'=> $baseF,
       'ivaF'=> $ivaF,
       'retencionF' => $retencionF,

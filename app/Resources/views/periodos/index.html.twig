@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Periodos list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th>Fechaalta</th>
+                <th>Fechabaja</th>
+                <th>Entidad</th>
+                <th>Comentario</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for periodo in periodos %}
+            <tr>
+                <td><a href="{{ path('periodos_show', { 'id': periodo.id }) }}">{{ periodo.id }}</a></td>
+                <td>{{ periodo.nombre }}</td>
+                <td>{% if periodo.fechaAlta %}{{ periodo.fechaAlta|date('Y-m-d') }}{% endif %}</td>
+                <td>{% if periodo.fechaBaja %}{{ periodo.fechaBaja|date('Y-m-d') }}{% endif %}</td>
+                <td>{{ periodo.entidad }}</td>
+                <td>{{ periodo.comentario }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('periodos_show', { 'id': periodo.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('periodos_edit', { 'id': periodo.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('periodos_new') }}">Create a new periodo</a>
+        </li>
+    </ul>
+{% endblock %}

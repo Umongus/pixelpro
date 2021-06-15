@@ -132,32 +132,6 @@ class Concepto
         return $this->descripcion2;
     }
 
-
-
-    /**
-     * Set variable
-     *
-     * @param string $variable
-     *
-     * @return Concepto
-     */
-    public function setVariable($variable)
-    {
-        $this->variable = $variable;
-
-        return $this;
-    }
-
-    /**
-     * Get variable
-     *
-     * @return string
-     */
-    public function getVariable()
-    {
-        return $this->variable;
-    }
-
     public function __toString()
     {
       return $this->getNombre();

@@ -149,7 +149,7 @@ class Factura
      *
      * @return Factura
      */
-    public function setReceptor(\AppBundle\Entity\Entidad $receptor)
+    public function setReceptor(\AppBundle\Entity\Entidad $emisor)
     {
         $this->receptor = $receptor;
 

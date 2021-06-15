@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Nolaborables list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Fecha</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for noLaborable in noLaborables %}
+            <tr>
+                <td><a href="{{ path('nolaborables_show', { 'id': noLaborable.id }) }}">{{ noLaborable.id }}</a></td>
+                <td>{% if noLaborable.fecha %}{{ noLaborable.fecha|date('Y-m-d') }}{% endif %}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('nolaborables_show', { 'id': noLaborable.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('nolaborables_edit', { 'id': noLaborable.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('nolaborables_new') }}">Create a new noLaborable</a>
+        </li>
+    </ul>
+{% endblock %}

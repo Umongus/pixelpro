@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Asignados list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Trabajador</th>
+                <th>Fecha</th>
+                <th>Entidad</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for asignado in asignados %}
+            <tr>
+                <td><a href="{{ path('asignados_show', { 'id': asignado.id }) }}">{{ asignado.id }}</a></td>
+                <td>{{ asignado.trabajador }}</td>
+                <td>{% if asignado.fecha %}{{ asignado.fecha|date('Y-m-d') }}{% endif %}</td>
+                <td>{{ asignado.entidad }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('asignados_show', { 'id': asignado.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('asignados_edit', { 'id': asignado.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('asignados_new') }}">Create a new asignado</a>
+        </li>
+    </ul>
+{% endblock %}

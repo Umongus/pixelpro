@@ -1172,7 +1172,8 @@ class ParteTrabajoController extends Controller
       unset($Afincas['Todos']);
 
       $form = $this->createForm(ParteTrabajoType::class, $parteTrabajo, array('action'=>$this->generateUrl('partetrabajo_index'), 'method'=>'POST'));
-      $form->add('trabajador', ChoiceType::class, array('choices' => $Atrabajadores, 'mapped'=>false));
+      $form->add('trabajador', ChoiceType::class, array('choices' => $Atrabajadores, 'preferred_choices' => array('Casado Catalan, Angel','Casado Gonzalez, AngelHijo','Casado Gonzalez, Manolito','Suarez García, Rosario')
+      , 'mapped'=>false));
       $form->add('finca', ChoiceType::class, array('choices' => $Afincas, 'mapped'=>false));
       $form->handleRequest($request);
 
@@ -1310,7 +1311,8 @@ class ParteTrabajoController extends Controller
        //$parteTrabajo = new Partetrabajo();
        $parteTrabajo->setCantidad(1);
        $form = $this->createForm(ParteTrabajoType::class, $parteTrabajo, array('action'=>$this->generateUrl('partetrabajo_index'), 'method'=>'POST'));
-       $form->add('trabajador', ChoiceType::class, array('choices' => $Atrabajadores, 'mapped'=>false));
+       $form->add('trabajador', ChoiceType::class, array('choices' => $Atrabajadores, 'preferred_choices' => array('Casado Catalan, Angel','Casado Gonzalez, AngelHijo','Casado Gonzalez, Manolito','Suarez García, Rosario'),
+        'mapped'=>false));
        $form->add('finca', ChoiceType::class, array('choices' => $Afincas, 'mapped'=>false));
 
        if ($parteTrabajo->getFinca() != NULL) {

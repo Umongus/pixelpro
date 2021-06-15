@@ -1,0 +1,114 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="row">
+<div class="col-4">
+  <hr>
+  <h2> <strong> {{trabajador}} Mes: {{mes}}</strong> </h2>
+  <hr>
+  {% if entidadActual != 'No' %}
+  <h3>{{entidadActual}}</h3>
+  <hr>
+  {% endif %}
+  {{ form_start(form) }}
+  {{ form_widget(form) }}
+  {{ form_end(form) }}
+  <hr>
+  <p>Fecha vale:{{fecha|date('d-m-Y')}}</p>
+  <hr>
+  <p>Mensaje vale:{{mensajeError}}</p>
+  <hr>
+  <p>Hos es:{{hoy|date('l')}}</p>
+  <hr>
+  <p>Marcador vale:{{marcador}}</p>
+  <hr>
+  <p><a href="{{ path('periodosTrabajador') }}">Cambiar TRABAJADOR |</a></p>
+  <hr>
+  <p>Numero de trabajadores:{{totale}}</p>
+  <hr>
+  <p>Numero de Altas {{altas}}</p>
+  <table class="table table-striped table-sm">
+  <thead>
+  <tr>
+  <th>ID</th>
+  <th>NOMBRE</th>
+  <th>FECHA ALTA</th>
+  <th>FECHA BAJA</th>
+  <th>ENTIDAD</th>
+  </tr>
+  </thead>
+  <tbody>
+  {% for alta in historial %}
+  <tr>
+  <th scope="row">{{ alta.id }}</th>
+  <td>{{ alta.trabajador.nombre }}</td>
+  <td>{{ alta.fechaAlta|date('d-m-Y') }}</td>
+  <td>{% if alta.fechaBaja == NULL %} NULL {% else %} {{ alta.fechaBaja|date('d-m-Y') }} {% endif %}</td>
+  <td>{{ alta.entidad }}</td>
+  <td><a href=" {{ path('periodos_edit', { 'id': alta.id, 'procede': 'editaPeriodos' }) }}">Editar |</a></td>
+  <td><a href=" {{ path('periodos_sure', { 'id': alta.id}) }}">Borrar |</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+  </table>
+  <hr>
+  <h2>Trabajadores en el sistema</h2>
+  {% for parcial in total %}
+      <a href="{{ path('selectTrabajador', { 'nombre': parcial }) }}">{{parcial}}</a>
+      <br>
+  {% endfor %}
+</div>
+<div class="col-4">
+  <hr>
+  <h2> <strong> ALTAS REGISTRADAS: AGRICOLA</strong> </h2>
+  <hr>
+  <table class="table table-striped table-sm">
+  <thead>
+  <tr>
+  <th>ID</th>
+  <th>NOMBRE</th>
+  <th>FECHA ALTA</th>
+  <th>ENTIDAD</th>
+  </tr>
+  </thead>
+  <tbody>
+  {% for alta in altasAraceli %}
+  <tr>
+  <th scope="row">{{ alta.id }}</th>
+  <td><a href="{{ path('selectTrabajador', { 'nombre': alta.trabajador.nombre }) }}">{{ alta.trabajador.nombre }}</a></td>
+  <td>{{ alta.fechaAlta|date('d-m-Y') }}</td>
+  <td>{{ alta.entidad }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+  </table>
+</div>
+
+<div class="col-4">
+  <hr>
+  <h2> <strong> ALTAS REGISTRADAS: HNOS</strong> </h2>
+  <hr>
+  <table class="table table-striped table-sm">
+  <thead>
+  <tr>
+  <th>ID</th>
+  <th>NOMBRE</th>
+  <th>FECHA ALTA</th>
+  <th>ENTIDAD</th>
+  </tr>
+  </thead>
+  <tbody>
+  {% for alta in altasHnos %}
+  <tr>
+  <th scope="row">{{ alta.id }}</th>
+  <td><a href="{{ path('selectTrabajador', { 'nombre': alta.trabajador.nombre }) }}">{{ alta.trabajador.nombre }}</a></td>
+  <td>{{ alta.fechaAlta|date('d-m-Y') }}</td>
+  <td>{{ alta.entidad }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+  </table>
+</div>
+</div>
+
+{% endblock %}

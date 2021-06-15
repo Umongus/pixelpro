@@ -216,28 +216,4 @@ class LineaFactura
     {
         return $this->variable;
     }
-
-    /**
-     * Set destino
-     *
-     * @param string $destino
-     *
-     * @return LineaFactura
-     */
-    public function setDestino($destino)
-    {
-        $this->destino = $destino;
-
-        return $this;
-    }
-
-    /**
-     * Get destino
-     *
-     * @return string
-     */
-    public function getDestino()
-    {
-        return $this->destino;
-    }
 }
