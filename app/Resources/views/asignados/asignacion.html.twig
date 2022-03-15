@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="row">
+  <div class="col-3">
+  {% for key, vector in vectorDias %}
+  <p>Dia: {{key}} ACT: {{vector}}</p>
+  {% endfor %}
+  </div>
+  <div class="col-3">
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    {{ form_end(form) }}
+  </div>
+  <div class="col-5">
+    <h3> MES: {{mes}} </h3>
+    <p> <strong> {{nombre}} </strong> </p>
+    <p> Fecha1: {{fecha1|date('d-m-Y')}} </p>
+    <p> Fecha2: {{fecha2|date('d-m-Y')}} </p>
+    <p> Id {{id}}</p>
+    <p> FechaInicio {{fechaInicio|date('d-m-Y')}}</p>
+    <p> Numero de partes: {{partes}}</p>
+    <p> Dias del mes en curso: {{dias}}</p>
+    <p> Encontrado: {{encontrado}}</p>
+    <p> Fecha Valida Inicio: {{fechaValida|date('d-m-Y')}}</p>
+  </div>
+  <div class="col-1">
+
+  </div>
+</div>
+
+
+
+
+{% endblock %}

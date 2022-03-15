@@ -5,6 +5,8 @@ namespace AppBundle\Controller;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
 use AppBundle\Entity\Periodos;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -45,7 +47,7 @@ class PeriodosController extends Controller
       'Noviembre'=>'Noviembre',
       'Diciembre'=>'Diciembre');
 
-      $anos = array('2017'=>'2017','2020'=>'2020', '2021'=>'2021');
+      $anos = array('2017'=>'2017','2020'=>'2020', '2021'=>'2021', "2022"=>"2022");
 
       $opcion = 'Formulario Meses';
       $defaultData = array('message' => $opcion);
@@ -85,7 +87,6 @@ class PeriodosController extends Controller
         $opcion = 'Formulario Periodos';
         $defaultData = array('message' => $opcion);
         $form = $this->createFormBuilder($defaultData)
-
         ->add('trabajador', ChoiceType::class, array('choices' => $Atrabajadores
               ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
         ->add('Enviar', SubmitType::class)
@@ -164,6 +165,9 @@ class PeriodosController extends Controller
             ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')])
       ->add('Accion', ChoiceType::class, array('choices' => ['Alta'=>'Alta']
               ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
+      ->add('inicio', DateType::class, ['widget' => 'single_text', 'format' => 'yyyy-MM-dd'
+              ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')])
+      ->add('restriccion', IntegerType::class, array('attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
       ->add('Enviar', SubmitType::class)
       ->getForm();
 
@@ -182,7 +186,8 @@ class PeriodosController extends Controller
 
         $insertar = 'NO';
         $fechaAlta = $formAltas->get('fecha')->getData();
-        if ($fechaAlta < $fecha2 && $fechaAlta >= $fecha1) {//LA FECHA DE ALTA TIENE QUE ESTAR DENTRO DEL MES EN CURSO
+        $fechaInicio = $formAltas->get('inicio')->getData();
+        if ($fechaAlta < $fecha2 && $fechaAlta >= $fecha1 && $fechaInicio <= $fechaAlta) {//LA FECHA DE ALTA TIENE QUE ESTAR DENTRO DEL MES EN CURSO
           $insertar = 'OK';
           $mensajeError = 'Dentro del rango';
           if ($registrado == 'Verdadero') {//TIENE QUE ESTAR REGISTRADO
@@ -196,10 +201,13 @@ class PeriodosController extends Controller
         }
         if ($insertar =='OK') {
           $entidad = $formAltas->get('entidad')->getData();
+          $restriccion = $formAltas->get('restriccion')->getData();
           $Aentidad = $em->getRepository('AppBundle:Entidad')->findBy(['nombre'=>$entidad]);
           $clasePeriodo->setTrabajador($Atrabajador[0]);
           $clasePeriodo->setFechaAlta($fechaAlta);
+          $clasePeriodo->setFechaInicio($fechaInicio);
           $clasePeriodo->setEntidad($Aentidad[0]);
+          $clasePeriodo->setRestriccion($restriccion);
           $em->persist($clasePeriodo);
           $em->flush();
         }
@@ -220,8 +228,8 @@ class PeriodosController extends Controller
         }
       }
 
-      $AaltasHnos = $this->selecionaPeriodos('Hnos Gallego Brenes SL','Altas');
-      $AaltasAraceli = $this->selecionaPeriodos('Agrícola Araceli SL','Altas');
+      $AaltasHnos = $this->selecionaPeriodos('Hnos Gallego Brenes SL','Altas',$mesPago,$anoPago);
+      $AaltasAraceli = $this->selecionaPeriodos('Agrícola Araceli SL','Altas',$mesPago,$anoPago);
       $Ahistorial = $this->selecionaPeriodos($trabajador,'Trabajador');
       $totalTrabajadores = $this->selecionaPeriodos('Nada','Total');
       if ($registrado == 'Verdadero') {
@@ -229,6 +237,72 @@ class PeriodosController extends Controller
       }
 
       $hoy = new \DateTime('Today');
+
+      for ($i=0; $i < count($AaltasAraceli); $i++) {
+
+        $nombreTrabajador = $AaltasAraceli[$i]->getTrabajador()->getNombre();
+        $fechaInicio = $AaltasAraceli[$i]->getFechaInicio();
+        $fechaDeAlta = $AaltasAraceli[$i]->getFechaAlta();
+        $fechaDeBaja = $AaltasAraceli[$i]->getFechaBaja();
+        $AaltasAraceli[$i]->setHaber(0);
+        $AaltasAraceli[$i]->setCapacidad(0);
+        $AaltasAraceli[$i]->setAsignados(0);
+        $query = $em->createQuery(
+          "SELECT p
+          FROM AppBundle:ParteTrabajo p
+          JOIN p.trabajador t JOIN p.tipo ti
+          WHERE p.fecha >= :fecha1 AND p.fecha <= :fecha2 AND t.nombre = :nombre1 AND ti.nombre = :nombre2
+          ORDER BY t.nombre ASC"
+        )->setParameter('fecha1', $fechaInicio)
+        ->setParameter('fecha2', $hoy)
+        ->setParameter('nombre1', $nombreTrabajador)
+        ->setParameter('nombre2', 'Peonada');
+        $partes = $query->getResult();
+
+        if (count($partes) > 0) {
+          $haber = 0;
+          for ($j=0; $j < count($partes); $j++) {
+            $haber = $haber + $partes[$j]->getCantidad();
+          }
+          $AaltasAraceli[$i]->setHaber($haber);
+        }
+
+        $query = $em->createQuery(
+          "SELECT a
+          FROM AppBundle:Asignados a
+          JOIN a.trabajador t
+          WHERE a.fecha >= :fecha1 AND a.fecha <= :fecha2 AND t.nombre = :nombre1
+          ORDER BY t.nombre ASC"
+        )->setParameter('fecha1', $fechaDeAlta)
+        ->setParameter('fecha2', $hoy)
+        ->setParameter('nombre1', $nombreTrabajador);
+        $registros = $query->getResult();
+
+        //$AaltasAraceli[$i]->setAsignados(count($registros));
+
+        $fecha1= new \DateTime($hoy->format('Y') .'-'. $hoy->format('m') .'-'. $hoy->format('d'));
+        $fecha2= new \DateTime($fechaDeAlta->format('Y') .'-'. $fechaDeAlta->format('m') .'-'. $fechaDeAlta->format('d'));
+
+        if ($fechaDeBaja == NULL) {
+          $diferencia = $fecha1->diff($fecha2);
+        }else {
+          $fecha3= new \DateTime($fechaDeBaja->format('Y') .'-'. $fechaDeBaja->format('m') .'-'. $fechaDeBaja->format('d'));
+          $diferencia = $fecha3->diff($fecha2);
+        }
+        //$AaltasAraceli[$i]->setCapacidad($diferencia->days+1);
+
+        $resta = 0;
+        $fechaMovil = clone $fechaDeAlta;
+        for ($x=0; $x < $diferencia->days; $x++) {
+          $fiestas = $em->getRepository('AppBundle:NoLaborables')->findBy(['fecha'=>$fechaMovil]);
+          if (count($fiestas)>0 || $fechaMovil->format('l') == 'Sunday') {
+            $resta = $resta+1;
+          }
+          $fechaMovil->modify('+1 day');
+        }
+        //$resta = 1;
+        $AaltasAraceli[$i]->setCapacidad($diferencia->days+1-$resta);
+      }
 
       if ($accion == 'Alta') {
         return $this->render('periodos/editaPeriodos.html.twig', array(
@@ -402,17 +476,25 @@ class PeriodosController extends Controller
     }
 
       //FUNCIONES
-    public function selecionaPeriodos($nombre,$opcion){
+    public function selecionaPeriodos($nombre,$opcion,$mes='NULO',$ano='NULO'){
       $em = $this->getDoctrine()->getManager();
     if ($opcion == 'Altas') {//TRABAJADORES QUE ESTAN DADOS DE ALTA
       //$fecha1= new \DateTime($arrayIntervalo[0] .'-'. $arrayIntervalo[1] .'-01');
+
+      $calculo = new TratArray();
+      $intervalo = $calculo->dameElIntervalo($mes,$ano);
+      $fecha1= new \DateTime($intervalo[0] .'-'. $intervalo[1] .'-01');
+      $fecha2= new \DateTime($intervalo[2] .'-'. $intervalo[3] .'-01');
+
       $query = $em->createQuery(
         'SELECT p
         FROM AppBundle:Periodos p
         JOIN p.entidad e
-        WHERE p.fechaBaja IS NULL AND e.nombre = :entidad
+        WHERE p.fechaBaja IS NULL AND e.nombre = :entidad OR (p.fechaBaja >= :fecha1 AND p.fechaBaja < :fecha2 AND e.nombre = :entidad)
         ORDER BY p.id ASC'
       )//->setParameter('nombre', 'NULL')
+      ->setParameter('fecha1', $fecha1)
+      ->setParameter('fecha2', $fecha2)
       ->setParameter('entidad', $nombre);
       $result = $query->getResult();
     }elseif ($opcion == 'Trabajador') {//HISTORIAL DE UN TRABAJADOR

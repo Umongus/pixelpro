@@ -80,7 +80,19 @@ class Factura
      */
     private $porcentaje;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="base", type="decimal", precision=10, scale=4)
+     */
+    private $base;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="iva", type="decimal", precision=10, scale=4)
+     */
+    private $iva;
 
     /**
      * Get id
@@ -359,5 +371,53 @@ class Factura
     public function getPorcentaje()
     {
         return $this->porcentaje;
+    }
+
+    /**
+     * Set base
+     *
+     * @param string $base
+     *
+     * @return Factura
+     */
+    public function setBase($base)
+    {
+        $this->base = $base;
+
+        return $this;
+    }
+
+    /**
+     * Get base
+     *
+     * @return string
+     */
+    public function getBase()
+    {
+        return $this->base;
+    }
+
+    /**
+     * Set iva
+     *
+     * @param string $iva
+     *
+     * @return Factura
+     */
+    public function setIva($iva)
+    {
+        $this->iva = $iva;
+
+        return $this;
+    }
+
+    /**
+     * Get iva
+     *
+     * @return string
+     */
+    public function getIva()
+    {
+        return $this->iva;
     }
 }

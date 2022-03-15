@@ -21,11 +21,7 @@ class Asignados
      */
     private $id;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="trabajador", type="string", length=255)
-     */
+    /** @ORM\ManyToOne(targetEntity="AppBundle\Entity\Trabajadores") */
     private $trabajador;
 
     /**
@@ -35,11 +31,7 @@ class Asignados
      */
     private $fecha;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="entidad", type="string", length=255)
-     */
+    /** @ORM\ManyToOne(targetEntity="AppBundle\Entity\Entidad") */
     private $entidad;
 
 
@@ -60,7 +52,7 @@ class Asignados
      *
      * @return Asignados
      */
-    public function setTrabajador($trabajador)
+    public function setTrabajador(\AppBundle\Entity\Trabajadores $trabajador)
     {
         $this->trabajador = $trabajador;
 
@@ -108,7 +100,7 @@ class Asignados
      *
      * @return Asignados
      */
-    public function setEntidad($entidad)
+    public function setEntidad(\AppBundle\Entity\Entidad $entidad)
     {
         $this->entidad = $entidad;
 
@@ -125,4 +117,3 @@ class Asignados
         return $this->entidad;
     }
 }
-

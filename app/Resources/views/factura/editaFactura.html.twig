@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="row">
+  <div class="col-6">
+    <h2>CABECERA</h2>
+    {{ form_start(form1) }}
+    {{ form_widget(form1) }}
+    {{ form_end(form1) }}
+    <hr>
+  </div>
+  <div class="col-6">
+    <h2>ADD LINEA FACTURA</h2>
+    {{ form_start(form2) }}
+    {{ form_widget(form2) }}
+    {{ form_end(form2) }}
+    <hr>
+  </div>
+</div>
+<h3>TOTAL BASE: <strong>{{totalBase|number_format(2, ',', '.')}}</strong>   TOTAL IVA: <strong>{{totalIva|number_format(2, ',', '.')}}</strong>
+TOTAL FACTURA: <strong>{{(totalBase + totalIva)|number_format(2, ',', '.')}}</strong>
+</h3>
+<hr>
+<p>Nmero de lineas: {{numeroLineas}}</p>
+{% for linea in lineas %}
+<p>{{linea.id}} || {{(linea.cantidad)|number_format(2, ',', '.')}} || {{linea.concepto.nombre}} || {{linea.variable}} || {{(linea.precio)|number_format(2, ',', '.')}} || {{linea.iva}} || {{linea.destino}}
+|| <a href="{{ path('editarLinea', { 'id': linea.id }) }}">EDITAR</a> | <a href="{{ path('borrarLinea', { 'id': linea.id }) }}">BORRAR</a>
+</p>
+
+{% endfor %}
+
+{% endblock %}

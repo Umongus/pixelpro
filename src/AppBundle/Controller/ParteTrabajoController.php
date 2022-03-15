@@ -126,7 +126,7 @@ class ParteTrabajoController extends Controller
         ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')])
         ->add('mes', ChoiceType::class, array('choices' => $meses
           ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
-        ->add('ano', ChoiceType::class, array('choices' => ['2017'=>2017, '2018'=>2018, '2019'=>2019, '2020'=>2020, '2021'=>2021]
+        ->add('ano', ChoiceType::class, array('choices' => ['2017'=>2017, '2018'=>2018, '2019'=>2019, '2020'=>2020, '2021'=>2021, '2022'=>2022]
            ,'attr' => array('class'=>'form-control', 'style'=>'margin-button:15px')))
         ->add('Enviar', SubmitType::class)
         ->getForm();
@@ -1172,7 +1172,7 @@ class ParteTrabajoController extends Controller
       unset($Afincas['Todos']);
 
       $form = $this->createForm(ParteTrabajoType::class, $parteTrabajo, array('action'=>$this->generateUrl('partetrabajo_index'), 'method'=>'POST'));
-      $form->add('trabajador', ChoiceType::class, array('choices' => $Atrabajadores, 'preferred_choices' => array('Casado Catalan, Angel','Casado Gonzalez, AngelHijo','Casado Gonzalez, Manolito','Suarez García, Rosario')
+      $form->add('trabajador', ChoiceType::class, array('choices' => $Atrabajadores, 'preferred_choices' => array('Casado Catalan, Angel','Casado Gonzalez, AngelHijo','Rodriguez Rivas, JuanJse','Suarez García, Rosario')
       , 'mapped'=>false));
       $form->add('finca', ChoiceType::class, array('choices' => $Afincas, 'mapped'=>false));
       $form->handleRequest($request);
@@ -1311,7 +1311,7 @@ class ParteTrabajoController extends Controller
        //$parteTrabajo = new Partetrabajo();
        $parteTrabajo->setCantidad(1);
        $form = $this->createForm(ParteTrabajoType::class, $parteTrabajo, array('action'=>$this->generateUrl('partetrabajo_index'), 'method'=>'POST'));
-       $form->add('trabajador', ChoiceType::class, array('choices' => $Atrabajadores, 'preferred_choices' => array('Casado Catalan, Angel','Casado Gonzalez, AngelHijo','Casado Gonzalez, Manolito','Suarez García, Rosario'),
+       $form->add('trabajador', ChoiceType::class, array('choices' => $Atrabajadores, 'preferred_choices' => array('Casado Catalan, Angel','Casado Gonzalez, AngelHijo','Rodriguez Rivas, JuanJse','Suarez García, Rosario'),
         'mapped'=>false));
        $form->add('finca', ChoiceType::class, array('choices' => $Afincas, 'mapped'=>false));
 

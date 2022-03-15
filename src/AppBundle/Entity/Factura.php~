@@ -80,7 +80,19 @@ class Factura
      */
     private $porcentaje;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="base", type="decimal", precision=10, scale=4)
+     */
+    private $base;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="iva", type="decimal", precision=10, scale=4)
+     */
+    private $iva;
 
     /**
      * Get id
@@ -149,7 +161,7 @@ class Factura
      *
      * @return Factura
      */
-    public function setReceptor(\AppBundle\Entity\Entidad $emisor)
+    public function setReceptor(\AppBundle\Entity\Entidad $receptor)
     {
         $this->receptor = $receptor;
 

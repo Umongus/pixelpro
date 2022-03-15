@@ -5,7 +5,8 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\NoLaborables;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;use Symfony\Component\HttpFoundation\Request;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Nolaborable controller.
@@ -39,7 +40,7 @@ class NoLaborablesController extends Controller
      */
     public function newAction(Request $request)
     {
-        $noLaborable = new Nolaborable();
+        $noLaborable = new Nolaborables();
         $form = $this->createForm('AppBundle\Form\NoLaborablesType', $noLaborable);
         $form->handleRequest($request);
 

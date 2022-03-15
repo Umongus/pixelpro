@@ -2,36 +2,135 @@
 
 {% block body %}
 <div class="row">
-<div class="col-3">
-<h2>NUEVA FACTURA</h2>
-<h2>EMISOR: <strong> <a href="{{ path('inicioFactura2', { 'from': 'facturas' }) }}">{{emisor}}</a>  </strong> </h2>
-<h2>RECEPTOR: <strong> <a href="{{ path('inicioFactura1', { 'from': 'facturas' }) }}">{{receptor}}</a> </strong> </h2>
+<div class="col-2">
+<br>
+<h2> <strong> NUEVA FACTURA</strong></h2>
+<h2>EJERCICIO:<br> <strong> <a href="{{ path('inicioFactura1', { 'from': 'facturas' }) }}">{{ejercicio}}</a> </strong> </h2>
+<h2>PERIODO:<br> <strong> <a href="{{ path('inicioFactura1', { 'from': 'facturas' }) }}">{{periodo}}</a> </strong> </h2>
 <hr>
-<h2>EJERCICIO: <strong> <a href="{{ path('inicioFactura1', { 'from': 'facturas' }) }}">{{ejercicio}}</a> </strong> </h2>
-<h2>PERIODO: <strong> <a href="{{ path('inicioFactura1', { 'from': 'facturas' }) }}">{{periodo}}</a> </strong> </h2>
+<p>Focus: {{focus}}  Mostrar: {{mostrar}}</p>
 <hr>
-<h2>RETENCION: <strong> <a href="{{ path('inicioFactura2', { 'from': 'facturas' }) }}">{{retencion}}</a> </strong> </h2>
-<h2>PORCENTAJE: <strong> <a href="{{ path('inicioFactura2', { 'from': 'facturas' }) }}">{{porcentaje}}</a> </strong> </h2>
+<div class="row">
+
+  <div class="col-6">
+    <h5><strong><a href="{{ path('cambioMostrar', { 'mostrar': 'GASTOS' }) }}">GASTOS</a></strong></h5>
+    <h6> <strong><a href="{{ path('cambioTrimestre', { 'periodo': '1 Trimestre' }) }}">1ºtimestre</a></strong> </h6>
+    <h6>IVA: {{gastos[1]['I']|number_format(2, ',', '.')}}</h6>
+    <h6>BASE: {{gastos[1]['B']|number_format(2, ',', '.')}}</h6>
+    <h6> <strong><a href="{{ path('cambioTrimestre', { 'periodo': '2 Trimestre' }) }}">2ºtimestre</a></strong> </h6>
+    <h6>IVA: {{gastos[2]['I']|number_format(2, ',', '.')}}</h6>
+    <h6>BASE: {{gastos[2]['B']|number_format(2, ',', '.')}}</h6>
+    <h6> <strong><a href="{{ path('cambioTrimestre', { 'periodo': '3 Trimestre' }) }}">3ºtimestre</a></strong> </h6>
+    <h6>IVA: {{gastos[3]['I']|number_format(2, ',', '.')}}</h6>
+    <h6>BASE: {{gastos[3]['B']|number_format(2, ',', '.')}}</h6>
+    <h6> <strong><a href="{{ path('cambioTrimestre', { 'periodo': '4 Trimestre' }) }}">4ºtimestre</a></strong> </h6>
+    <h6>IVA: {{gastos[4]['I']|number_format(2, ',', '.')}}</h6>
+    <h6>BASE: {{gastos[4]['B']|number_format(2, ',', '.')}}</h6>
+    <hr>
+
+  </div>
+  <div class="col-6">
+    <h5><strong><a href="{{ path('cambioMostrar', { 'mostrar': 'INGRESOS' }) }}">INGRESOS</a></strong></h5>
+    <h6> <strong>1ºtimestre</strong> </h6>
+    <h6>IVA: {{ingresos[1]['I']|number_format(2, ',', '.')}}</h6>
+    <h6>BASE: {{ingresos[1]['B']|number_format(2, ',', '.')}}</h6>
+    <h6> <strong>2ºtimestre</strong> </h6>
+    <h6>IVA: {{ingresos[2]['I']|number_format(2, ',', '.')}}</h6>
+    <h6>BASE: {{ingresos[2]['B']|number_format(2, ',', '.')}}</h6>
+    <h6> <strong>3ºtimestre</strong> </h6>
+    <h6>IVA: {{ingresos[3]['I']|number_format(2, ',', '.')}}</h6>
+    <h6>BASE: {{ingresos[3]['B']|number_format(2, ',', '.')}}</h6>
+    <h6> <strong>4ºtimestre</strong> </h6>
+    <h6>IVA: {{ingresos[4]['I']|number_format(2, ',', '.')}}</h6>
+    <h6>BASE: {{ingresos[4]['B']|number_format(2, ',', '.')}}</h6>
+  </div>
 </div>
-<div class="col-5">
+</div>
+<div class="col-7">
+  <div class="row">
+    <div class="col-5">
+      <br>
+      <h2>EMISOR:<br> <strong> <a href="{{ path('inicioFactura2', { 'from': 'facturas' }) }}">{{emisor}}</a>  </strong> </h2>
 
-<h2>NUMERO: Y FECHA</h2>
+    </div>
+    <div class="col-2">
 
+    </div>
+    <div class="col-5">
+      <br>
+      <h2>RECEPTOR:<br> <strong> <a href="{{ path('inicioFactura1', { 'from': 'facturas' }) }}">{{receptor}}</a> </strong> </h2>
+    </div>
+  </div>
+
+
+{% if error != 'NULL' %}
+  <hr>
+  <h3><strong>{{error}}</strong></h3>
+{% endif %}
+  <hr>
+  <h3><strong>EL ERROR; {{error}}</strong></h3>
+{% if numeroAnterior >= 0 %}
+  <hr>
+  NUMERO ANTERIOR: {{numeroAnterior}}
+{% endif %}
 <hr>
-{{form_start(form1)}}
-<fieldset>
-  <br>
-  <div>
-  <strong>{{ form_label(form1.Numero) }}</strong><br>
-  <span>{{ form_widget(form1.Numero) }}</span>
-  </div>
-  <div>
-  <strong>{{ form_label(form1.fechaFactura) }}</strong><br>
-  <span>{{ form_widget(form1.fechaFactura) }}</span>
-  </div>
-  <br>
+  <div class="row">
+    <div class="col-4">
+      {{form_start(form1)}}
+      <fieldset>
+      <div>
+      <strong>{{ form_label(form1.Numero) }}</strong><br>
+      <span>{{ form_widget(form1.Numero) }}</span>
+      </div>
+    </div>
+    <div class="col-4">
+      <div>
+      <strong>{{ form_label(form1.fechaFactura) }}</strong><br>
+      <span>{{ form_widget(form1.fechaFactura) }}</span>
+      </div>
+      <br>
+    </div>
+    <div class="col-4">
+      <h4>RETENCION: <strong> <a href="{{ path('inicioFactura2', { 'from': 'facturas' }) }}">{{retencion}}</a> </strong> </h4>
+      <h4>PORCENTAJE: <strong> <a href="{{ path('inicioFactura2', { 'from': 'facturas' }) }}">{{porcentaje}}</a> </strong> </h4>
+    </div>
   </fieldset>
-{{ form_end(form1) }}
+  {{ form_end(form1) }}
+  </div>
+  <hr>
+  <div class="row">
+    <div class="col-2">
+    {{form_start(form2)}}
+    <fieldset>
+      <strong>{{ form_label(form2.cantidad) }}</strong><br>
+      <span>{{ form_widget(form2.cantidad) }}</span>
+    </div>
+    <div class="col-2">
+      <strong>{{ form_label(form2.concepto) }}</strong><br>
+      <span>{{ form_widget(form2.concepto) }}</span>
+    </div>
+    <div class="col-2">
+      <strong>{{ form_label(form2.variable) }}</strong><br>
+      <span>{{ form_widget(form2.variable) }}</span>
+    </div>
+    <div class="col-2">
+      <strong>{{ form_label(form2.precio) }}</strong><br>
+      <span>{{ form_widget(form2.precio) }}</span>
+    </div>
+    <div class="col-2">
+      <strong>{{ form_label(form2.iva) }}</strong><br>
+      <span>{{ form_widget(form2.iva) }}</span>
+    </div>
+    <div class="col-2">
+      <strong>{{ form_label(form2.destino) }}</strong><br>
+      <span>{{ form_widget(form2.destino) }}</span>
+      <br>
+    </div>
+  </fieldset>
+  {{ form_end(form2) }}
+  </div>
+  <hr>
+
 
 {% for key, linea in lineas %}
 
@@ -47,34 +146,122 @@
         <a href="{{ path('borraLinea', { 'di': key }) }}">|ERASE|</a>
       </p>
 
-      <br>
+
 {% endfor %}
 <br>
 <hr>
 {% if retencion == 'No Aplica' %}
-  <p> BASE: <strong> {{ baseF|number_format(2, ',', '.') }} </strong> </p>
-  <p> IVA: <strong> {{ ivaF|number_format(2, ',', '.') }} </strong> </p>
-  <p> TOTAL: <strong> {{ (baseF + ivaF)|number_format(2, ',', '.') }} </strong> </p>
+  <p> BASE: <strong> {{ baseF|number_format(2, ',', '.') }} </strong>
+   IVA: <strong> {{ ivaF|number_format(2, ',', '.') }} </strong>
+   TOTAL: <strong> {{ (baseF + ivaF)|number_format(2, ',', '.') }} </strong> </p>
 {% elseif retencion == 'Si Intermedio' %}
-  <p> BASE: <strong> {{ baseF|number_format(2, ',', '.') }} </strong> </p>
-  <p> Retencion: <strong> {{ retencionF|number_format(2, ',', '.') }} </strong> </p>
-  <p> IVA: <strong> {{ ivaF|number_format(2, ',', '.') }} </strong> </p>
-  <p> TOTAL: <strong> {{ (baseF + ivaF - retencionF)|number_format(2, ',', '.') }} </strong> </p>
+  <p> BASE: <strong> {{ baseF|number_format(2, ',', '.') }} </strong>
+  Retencion: <strong> {{ retencionF|number_format(2, ',', '.') }} </strong>
+   IVA: <strong> {{ ivaF|number_format(2, ',', '.') }} </strong>
+   TOTAL: <strong> {{ (baseF + ivaF - retencionF)|number_format(2, ',', '.') }} </strong> </p>
 {% elseif retencion == 'Si Final' %}
-  <p> BASE: <strong> {{ baseF|number_format(2, ',', '.') }} </strong> </p>
-  <p> IVA: <strong> {{ ivaF|number_format(2, ',', '.') }} </strong> </p>
-  <p> Retencion: <strong> {{ retencionF|number_format(2, ',', '.') }} </strong> </p>
-  <p> TOTAL: <strong> {{ (baseF + ivaF - retencionF)|number_format(2, ',', '.') }} </strong> </p>
+  <p> BASE: <strong> {{ baseF|number_format(2, ',', '.') }} </strong>
+   IVA: <strong> {{ ivaF|number_format(2, ',', '.') }} </strong>
+   Retencion: <strong> {{ retencionF|number_format(2, ',', '.') }} </strong>
+   TOTAL: <strong> {{ (baseF + ivaF - retencionF)|number_format(2, ',', '.') }} </strong> </p>
 {% endif %}
+<hr>
+<p>Primero de ano:{{diaUno|date('d-m-Y')}} |
+Ultimo de ano:{{diaTreintaYUno|date('d-m-Y')}}</p>
+<hr>
+<h5> <strong>{{mostrar}}: </strong>
+  {% if focus == 'Receptor' %}
+    {{receptor}}
+    {% else %}
+    {{emisor}}
+  {% endif %}
+  <strong>PERIODO:</strong>  {{periodo}}
+</h5>
+<br>
+{% if numeroFacturas == 0 %}
+  <p>NO TIENE FACTURAS</p>
+{% else %}
+<table class="table caption-top">
+<caption>Lista de Facturas</caption>
+<thead>
+  <tr>
+    <th scope="col">ID</th>
+    <th scope="col">Periodo</th>
+    <th scope="col">Nombre</th>
+    <th scope="col">Fecha</th>
+    <th scope="col">Nº Fact</th>
+    <th scope="col">Base</th>
+    <th scope="col">IVA</th>
+    <th scope="col">TOTAL</th>
+    <th scope="col">Accion</th>
+  </tr>
+</thead>
+<tbody>
+  {% for factura in facturas %}
+    {% if periodo == factura.periodo %}
+    <tr>
+      <th scope="row">{{factura.id}}</th>
+      <td>{{factura.periodo}}</td>
+      <td>{{factura.emisor.nombre}}</td>
+      <td>{{factura.fecha|date('d-m-Y')}}</td>
+      <td>{{factura.numeroFactura}}</td>
+      <td>{{factura.base|number_format(2, ',', '.')}}</td>
+      <td>{{factura.iva|number_format(2, ',', '.')}}</td>
+      <td>{{(factura.base + factura.iva)|number_format(2, ',', '.')}}</td>
+      <td><a href="{{ path('editarFactura', { 'id': factura.id }) }}">EDITAR</a>| <a href="{{ path('borraFactura', { 'id': factura.id }) }}">BORRAR</a></td>
+   </tr>
+    {% endif %}
+  {% endfor %}
+{% endif %}
+</tbody>
+</table>
 
 
 </div>
-<div class="col-4">
-<h2>LINEAS DE FACTURA</h2>
-{{ form_start(form2) }}
-{{ form_widget(form2) }}
-{{ form_end(form2) }}
-<hr>
+<div class="col-3">
+  <br>
+  <h2> <strong> RESUMEN: </strong></h2>
+  <h2>EJERCICIO:<br> <strong> <a href="{{ path('inicioFactura1', { 'from': 'facturas' }) }}">{{ejercicio}}</a> </strong> </h2>
+  <h2>PERIODO:<br> <strong> <a href="{{ path('inicioFactura1', { 'from': 'facturas' }) }}">{{periodo}}</a> </strong> </h2>
+
+
+
+  <table class="table caption-top">
+
+    <thead class="table-light">
+      <tr>
+        <th scope="col">Agricola Araceli SL</th>
+        <th scope="col">Gastos</th>
+        <th scope="col">Ingresos</th>
+        <th scope="col">TOTAL</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for key, fila in ano %}
+      {% if key != 'BASE' %}
+      <tr>
+        <th scope="row">{{key}}</th>
+        {% for dato in fila %}
+            <td>{{dato|number_format(2, ',', '.')}}</td>
+        {% endfor %}
+      </tr>
+      {% endif %}
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr><td>BASE</td>
+      {% for key, fila in ano %}
+      {% if key == 'BASE' %}
+        {% for dato in fila %}
+            <td>{{dato|number_format(2, ',', '.')}}</td>
+        {% endfor %}
+      </tr>
+      {% endif %}
+      {% endfor %}
+    </tfoot>
+  </table>
+
+<h3>TotalFacturas: {{totalFacturas}}</h3>
 <h3>Cantidad: {{cantidad}}</h3>
 <h3>Concepto: {{concepto}}</h3>
 <h3>Precio: {{precio}}</h3>

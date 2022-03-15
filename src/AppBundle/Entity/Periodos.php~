@@ -309,28 +309,4 @@ class Periodos
     {
         return $this->capacidad;
     }
-
-    /**
-     * Set asignados
-     *
-     * @param integer $asignados
-     *
-     * @return Periodos
-     */
-    public function setAsignados($asignados)
-    {
-        $this->asignados = $asignados;
-
-        return $this;
-    }
-
-    /**
-     * Get asignados
-     *
-     * @return integer
-     */
-    public function getAsignados()
-    {
-        return $this->asignados;
-    }
 }

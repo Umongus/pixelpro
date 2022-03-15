@@ -67,8 +67,12 @@
   <tr>
   <th>ID</th>
   <th>NOMBRE</th>
-  <th>FECHA ALTA</th>
-  <th>ENTIDAD</th>
+  <th>ALTA</th>
+  <th>BAJA</th>
+  <th>HAB</th>
+  <th>RES</th>
+  <th>ASG</th>
+  <th>CAP</th>
   </tr>
   </thead>
   <tbody>
@@ -77,7 +81,11 @@
   <th scope="row">{{ alta.id }}</th>
   <td><a href="{{ path('selectTrabajador', { 'nombre': alta.trabajador.nombre }) }}">{{ alta.trabajador.nombre }}</a></td>
   <td>{{ alta.fechaAlta|date('d-m-Y') }}</td>
-  <td>{{ alta.entidad }}</td>
+  <td>{% if alta.fechaBaja == NULL %} NULL {% else %} {{ alta.fechaBaja|date('d-m-Y') }} {% endif %}</td>
+  <td>{{ alta.haber }}</td>
+  <td>{{ alta.restriccion}}</td>
+  <td> <a href="{{ path('asignacion', { 'nombre': alta.trabajador.nombre, 'id': alta.id }) }}">{{ alta.asignados}}</a>  </td>
+  <td>{{ alta.capacidad}}</td>
   </tr>
   {% endfor %}
   </tbody>
